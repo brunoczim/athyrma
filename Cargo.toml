@@ -1,0 +1,9 @@
+[workspace]
+members = ["./", "./diakritikos"]
+
+[package]
+name = "glossa"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

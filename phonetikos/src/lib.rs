@@ -2,6 +2,10 @@ pub mod diacritic;
 pub mod vowel;
 pub mod consonant;
 
+use consonant::Consonant;
+use std::fmt;
+use vowel::Vowel;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Phonation {
     Voiceless,

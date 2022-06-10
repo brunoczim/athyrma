@@ -32,23 +32,3 @@ impl diakritikos::Diacritic for Diacritic {
         }
     }
 }
-
-pub fn slot_hint(character: char) -> Option<pos::TotalMap<slot::Hint>> {
-    let top_and_bottom = pos::TotalMap::default();
-    let top = pos::TotalMap {
-        top: slot::Hint::Obstructed,
-        ..pos::TotalMap::default()
-    };
-    let bottom = pos::TotalMap {
-        bottom: slot::Hint::Obstructed,
-        ..pos::TotalMap::default()
-    };
-    match character {
-        'a' | 'ɑ' | 'b' | 'c' | 'd' | 'e' | 'ɛ' | 'h' | 'i' | 'k' | 'm'
-        | 'n' | 'o' | 'ɔ' | 'p' | 'q' | 'r' | 's' | 'u' | 'v' | 'w' | 'x'
-        | 'z' => Some(top_and_bottom),
-        'g' | 'j' | 'ŋ' | 'y' => Some(top),
-        'f' | 'l' | 't' => Some(bottom),
-        _ => None,
-    }
-}

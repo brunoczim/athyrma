@@ -7,9 +7,7 @@ use std::{
 };
 
 pub trait Diacritic {
-    fn render(&self, position: Position) -> Option<&str>;
-
-    fn available_pos(&self) -> OrderedPosSet;
+    fn renderings(&self) -> OrderedPosMap<&str>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -65,7 +63,7 @@ where
         fmtr: &mut fmt::Formatter,
     ) -> fmt::Result {
         for diacritic in &self.diacritics {
-            if let Some(rendered) = diacritic.render(position) {
+            if let Some(rendered) = diacritic.renderings().data(position) {
                 write!(fmtr, "{}", rendered)?;
             }
         }
@@ -168,65 +166,80 @@ impl<T> IndexMut<Position> for PosMap<T> {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct OrderedPosSet {
+pub struct OrderedPosMap<T> {
     length: u8,
-    positions: [Position; 4],
+    positions: [Option<(Position, T)>; 4],
 }
 
-impl Default for OrderedPosSet {
+impl<T> Default for OrderedPosMap<T> {
     fn default() -> Self {
         Self::empty()
     }
 }
 
-impl OrderedPosSet {
+impl<T> OrderedPosMap<T> {
     pub fn empty() -> Self {
-        Self { length: 0, positions: [Position::Top; 4] }
+        Self { length: 0, positions: [None, None, None, None] }
     }
 
     pub fn new<I>(positions: I) -> Result<Self, Option<u8>>
     where
-        I: IntoIterator<Item = Position>,
+        I: IntoIterator<Item = (Position, T)>,
     {
         let mut this = Self::empty();
-        for position in positions {
-            this.insert(position)?;
+        for (position, data) in positions {
+            this.insert(position, data)?;
         }
         Ok(this)
     }
 
-    pub fn len(self) -> u8 {
+    pub fn len(&self) -> u8 {
         self.length
     }
 
-    fn get_ref(&self, index: u8) -> Option<&Position> {
-        if index < self.length {
-            Some(&self.positions[usize::from(index)])
-        } else {
-            None
-        }
+    pub fn iter(&self) -> OrderedPosMapIter<T> {
+        self.into_iter()
     }
 
-    pub fn get(self, index: u8) -> Option<Position> {
-        self.get_ref(index).copied()
+    pub fn data(&self, position: Position) -> Option<&T> {
+        self.index_data(self.to_index(position)?)
     }
 
-    pub fn to_index(self, position: Position) -> Option<u8> {
-        self.into_iter().position(|stored| stored == position).map(|i| i as u8)
+    pub fn index_position(&self, index: u8) -> Option<Position> {
+        self.index_entry(index).map(|(position, _)| position)
     }
 
-    pub fn contains(self, position: Position) -> bool {
+    pub fn index_data(&self, index: u8) -> Option<&T> {
+        self.index_entry(index).map(|(_, data)| data)
+    }
+
+    pub fn index_entry(&self, index: u8) -> Option<(Position, &T)> {
+        self.positions.get(usize::from(index)).and_then(|option_entry| {
+            let (position, value) = option_entry.as_ref()?;
+            Some((*position, value))
+        })
+    }
+
+    pub fn to_index(&self, position: Position) -> Option<u8> {
+        self.iter().position(|(stored, _)| stored == position).map(|i| i as u8)
+    }
+
+    pub fn contains(&self, position: Position) -> bool {
         self.to_index(position).is_some()
     }
 
-    pub fn insert(&mut self, position: Position) -> Result<u8, Option<u8>> {
+    pub fn insert(
+        &mut self,
+        position: Position,
+        data: T,
+    ) -> Result<u8, Option<u8>> {
         match self.to_index(position) {
             Some(index) => Err(Some(index)),
             None => {
                 if usize::from(self.length) < self.positions.len() {
                     let index = self.length;
                     self.length += 1;
-                    self.positions[usize::from(index)] = position;
+                    self.positions[usize::from(index)] = Some((position, data));
                     Ok(index)
                 } else {
                     Err(None)
@@ -236,53 +249,66 @@ impl OrderedPosSet {
     }
 }
 
-impl Index<u8> for OrderedPosSet {
-    type Output = Position;
-
-    fn index(&self, index: u8) -> &Self::Output {
-        #[cold]
-        #[inline(never)]
-        fn invalid_index(index: u8, length: u8) -> ! {
-            panic!(
-                "invalid ordered position set index {}, given length {}",
-                index, length
-            )
-        }
-
-        self.get_ref(index).unwrap_or_else(|| invalid_index(index, self.len()))
+impl<T> FromIterator<(Position, T)> for OrderedPosMap<T> {
+    fn from_iter<I>(iterable: I) -> Self
+    where
+        I: IntoIterator<Item = (Position, T)>,
+    {
+        Self::new(iterable).expect("duplicated positions")
     }
 }
 
-impl IntoIterator for OrderedPosSet {
-    type Item = Position;
-    type IntoIter = OrderedPositions;
+impl<'map, T> IntoIterator for &'map OrderedPosMap<T> {
+    type Item = (Position, &'map T);
+    type IntoIter = OrderedPosMapIter<'map, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        OrderedPositions { front: 0, back: self.length, set: self }
+        OrderedPosMapIter { front: 0, back: self.length, map: self }
     }
 }
 
-impl PartialEq for OrderedPosSet {
+impl<T> IntoIterator for OrderedPosMap<T> {
+    type Item = (Position, T);
+    type IntoIter = OrderedPosMapIntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        OrderedPosMapIntoIter { front: 0, back: self.length, map: self }
+    }
+}
+
+impl<T> PartialEq for OrderedPosMap<T>
+where
+    T: PartialEq,
+{
     fn eq(&self, other: &Self) -> bool {
         self.into_iter().eq(other.into_iter())
     }
 }
 
-impl Eq for OrderedPosSet {}
+impl<T> Eq for OrderedPosMap<T> where T: Eq {}
 
-impl PartialOrd for OrderedPosSet {
+impl<T> PartialOrd for OrderedPosMap<T>
+where
+    T: PartialOrd,
+{
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.into_iter().partial_cmp(other.into_iter())
     }
 }
 
-impl Ord for OrderedPosSet {
+impl<T> Ord for OrderedPosMap<T>
+where
+    T: Ord,
+{
     fn cmp(&self, other: &Self) -> Ordering {
         self.into_iter().cmp(other.into_iter())
     }
 }
 
-impl Hash for OrderedPosSet {
+impl<T> Hash for OrderedPosMap<T>
+where
+    T: Hash,
+{
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
@@ -297,32 +323,69 @@ impl Hash for OrderedPosSet {
 }
 
 #[derive(Debug, Clone)]
-pub struct OrderedPositions {
+pub struct OrderedPosMapIntoIter<T> {
     front: u8,
     back: u8,
-    set: OrderedPosSet,
+    map: OrderedPosMap<T>,
 }
 
-impl Iterator for OrderedPositions {
-    type Item = Position;
+impl<T> Iterator for OrderedPosMapIntoIter<T> {
+    type Item = (Position, T);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.front < self.back {
-            let position = self.set.positions[usize::from(self.front)];
+            let entry =
+                self.map.positions[usize::from(self.front)].take().unwrap();
             self.front += 1;
-            Some(position)
+            Some(entry)
         } else {
             None
         }
     }
 }
 
-impl DoubleEndedIterator for OrderedPositions {
+impl<T> DoubleEndedIterator for OrderedPosMapIntoIter<T> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.back > self.front {
             self.back -= 1;
-            let position = self.set.positions[usize::from(self.back)];
-            Some(position)
+            let entry =
+                self.map.positions[usize::from(self.back)].take().unwrap();
+            Some(entry)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OrderedPosMapIter<'map, T> {
+    front: u8,
+    back: u8,
+    map: &'map OrderedPosMap<T>,
+}
+
+impl<'map, T> Iterator for OrderedPosMapIter<'map, T> {
+    type Item = (Position, &'map T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.front < self.back {
+            let (position, data) =
+                self.map.positions[usize::from(self.back)].as_ref().unwrap();
+            self.front += 1;
+            Some((*position, data))
+        } else {
+            None
+        }
+    }
+}
+
+impl<'map, T> DoubleEndedIterator for OrderedPosMapIter<'map, T> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.back > self.front {
+            self.back -= 1;
+            let (position, data) =
+                self.map.positions[usize::from(self.back)].as_ref().unwrap();
+            Some((*position, data))
         } else {
             None
         }
@@ -443,7 +506,7 @@ impl Solution {
             let mut maybe_previous_index = None;
             for index in slot_indices[position].iter() {
                 points += diacritics[*index]
-                    .available_pos()
+                    .renderings()
                     .to_index(position)
                     .map(u128::from)?
                     * 2;
@@ -495,7 +558,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{solve, Diacritic, OrderedPosSet, PosMap, Position, Slot};
+    use crate::{solve, Diacritic, OrderedPosMap, PosMap, Position, Slot};
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     enum PhoneticDiacritic {
@@ -505,28 +568,19 @@ mod test {
     }
 
     impl Diacritic for PhoneticDiacritic {
-        fn render(&self, position: Position) -> Option<&str> {
-            match (self, position) {
-                (Self::Nasalized, Position::Top) => Some("\u{0303}"),
-                (Self::Lowered, Position::Left) => Some("\u{02d5}"),
-                (Self::Lowered, Position::Bottom) => Some("\u{031e}"),
-                (Self::Voiceless, Position::Top) => Some("\u{030a}"),
-                (Self::Voiceless, Position::Bottom) => Some("\u{0325}"),
-                _ => None,
-            }
-        }
-
-        fn available_pos(&self) -> OrderedPosSet {
+        fn renderings(&self) -> OrderedPosMap<&str> {
             match self {
-                Self::Nasalized => OrderedPosSet::new([Position::Top]).unwrap(),
-                Self::Lowered => {
-                    OrderedPosSet::new([Position::Bottom, Position::Left])
-                        .unwrap()
+                PhoneticDiacritic::Nasalized => {
+                    OrderedPosMap::from_iter([(Position::Top, "\u{0303}")])
                 },
-                Self::Voiceless => {
-                    OrderedPosSet::new([Position::Bottom, Position::Top])
-                        .unwrap()
-                },
+                PhoneticDiacritic::Lowered => OrderedPosMap::from_iter([
+                    (Position::Bottom, "\u{031e}"),
+                    (Position::Left, "\u{02d5}"),
+                ]),
+                PhoneticDiacritic::Voiceless => OrderedPosMap::from_iter([
+                    (Position::Bottom, "\u{0325}"),
+                    (Position::Top, "\u{030a}"),
+                ]),
             }
         }
     }

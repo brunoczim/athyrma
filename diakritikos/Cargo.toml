@@ -2,6 +2,6 @@
 name = "diakritikos"
 version = "0.1.0"
 edition = "2021"
-description = "a library for optimizing Unicode diacritcs placement"
+description = "A library for optimizing Unicode diacritcs placement."
 
 [dependencies]

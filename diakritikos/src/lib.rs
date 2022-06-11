@@ -10,6 +10,45 @@ pub trait Diacritic {
     fn renderings(&self) -> pos::PartialMap<&str>;
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct GraphemeCluster<D>
+where
+    D: Diacritic,
+{
+    pub character: char,
+    pub slots: pos::TotalMap<Slot<D>>,
+}
+
+impl<D> GraphemeCluster<D>
+where
+    D: Diacritic,
+{
+    pub fn solve<I>(
+        character: char,
+        hints: pos::TotalMap<slot::Hint>,
+        diacritics: I,
+    ) -> Option<Self>
+    where
+        I: IntoIterator<Item = D>,
+    {
+        solve(hints, diacritics)
+            .map(|slots| GraphemeCluster { character, slots })
+    }
+}
+
+impl<D> fmt::Display for GraphemeCluster<D>
+where
+    D: Diacritic,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(fmtr, "{}", self.character)?;
+        for (position, slot) in &self.slots {
+            slot.fmt(position, fmtr)?;
+        }
+        Ok(())
+    }
+}
+
 pub fn solve<D, I>(
     hints: pos::TotalMap<slot::Hint>,
     diacritics: I,

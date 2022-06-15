@@ -22,6 +22,7 @@ pub struct Consonant {
     pub manner: MannerOfArticulation,
     pub phonation: Phonation,
     pub cavity: Cavity,
+    pub syllabic: bool,
 }
 
 impl Consonant {
@@ -87,6 +88,11 @@ impl Consonant {
                 }
             },
         };
+
+        if self.syllabic {
+            diacritics.push(Diacritic::Syllabic);
+        }
+
         let hints = slot::hints(character).unwrap();
         GraphemeCluster::solve(character, hints, diacritics).unwrap()
     }

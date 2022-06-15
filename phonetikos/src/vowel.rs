@@ -22,6 +22,7 @@ pub struct Vowel {
     pub frontness: Frontness,
     pub phonation: Phonation,
     pub cavity: Cavity,
+    pub syllabic: bool,
 }
 
 impl Vowel {
@@ -55,6 +56,9 @@ impl Vowel {
             Phonation::Voiced => (),
             Phonation::Voiceless => diacritics.push(Diacritic::Voiceless),
         }
+        if !self.syllabic {
+            diacritics.push(Diacritic::NonSyllabic);
+        }
         let hints = slot::hints(character).unwrap();
         GraphemeCluster::solve(character, hints, diacritics).unwrap()
     }
@@ -63,5 +67,22 @@ impl Vowel {
 impl fmt::Display for Vowel {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.grapheme_cluster(), fmtr)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Cavity, Frontness, Height, Phonation, Vowel};
+
+    #[test]
+    fn mid_e_nasal_voiceless_non_syllabic() {
+        let vowel = Vowel {
+            height: Height::Mid,
+            frontness: Frontness::Front,
+            cavity: Cavity::Nasal,
+            phonation: Phonation::Voiceless,
+            syllabic: false,
+        };
+        assert_eq!(format!(vowel), "ẽ̥̩˕");
     }
 }

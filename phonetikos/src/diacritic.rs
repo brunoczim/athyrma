@@ -7,6 +7,8 @@ pub enum Diacritic {
     Voiced,
     Voiceless,
     Centralized,
+    NonSyllabic,
+    Syllabic,
 }
 
 impl diakritikos::Diacritic for Diacritic {
@@ -29,6 +31,14 @@ impl diakritikos::Diacritic for Diacritic {
             Diacritic::Centralized => {
                 pos::PartialMap::from_iter([(Position::Top, "\u{0308}")])
             },
+            Diacritic::NonSyllabic => pos::PartialMap::from_iter([
+                (Position::Bottom, "\u{032f}"),
+                (Position::Top, "\u{0311}"),
+            ]),
+            Diacritic::Syllabic => pos::PartialMap::from_iter([
+                (Position::Bottom, "\u{0329}"),
+                (Position::Top, "\u{030d}"),
+            ]),
         }
     }
 }

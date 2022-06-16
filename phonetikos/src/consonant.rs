@@ -16,6 +16,36 @@ pub enum Manner {
     Approximant,
 }
 
+impl Manner {
+    pub fn try_lenit(self) -> Option<Self> {
+        match self {
+            Self::Plosive => Some(Self::Fricative),
+            Self::Fricative => Some(Self::Approximant),
+            Self::Approximant => None,
+        }
+    }
+
+    pub fn try_fortify(self) -> Option<Self> {
+        match self {
+            Self::Plosive => None,
+            Self::Fricative => Some(Self::Plosive),
+            Self::Approximant => Some(Self::Fricative),
+        }
+    }
+
+    pub fn lenit(&mut self) {
+        if let Some(manner) = self.try_lenit() {
+            *self = manner;
+        }
+    }
+
+    pub fn fortify(&mut self) {
+        if let Some(manner) = self.try_fortify() {
+            *self = manner;
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Consonant {
     pub place: Place,

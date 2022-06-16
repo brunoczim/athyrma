@@ -83,6 +83,6 @@ mod test {
             phonation: Phonation::Voiceless,
             syllabic: false,
         };
-        assert_eq!(format!(vowel), "ẽ̥̩˕");
+        assert_eq!(vowel.to_string(), "ẽ̥̯˕");
     }
 }

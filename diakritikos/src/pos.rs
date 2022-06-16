@@ -16,7 +16,7 @@ pub enum Position {
 
 impl Position {
     pub const ALL: [Self; 4] =
-        [Self::Top, Self::Left, Self::Bottom, Self::Right];
+        [Self::Left, Self::Top, Self::Bottom, Self::Right];
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
@@ -370,7 +370,7 @@ impl<'map, T> Iterator for PartialMapIter<'map, T> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.front < self.back {
             let (position, data) =
-                self.map.positions[usize::from(self.back)].as_ref().unwrap();
+                self.map.positions[usize::from(self.front)].as_ref().unwrap();
             self.front += 1;
             Some((*position, data))
         } else {

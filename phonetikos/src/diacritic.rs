@@ -1,4 +1,4 @@
-use diakritikos::{pos, slot, Position};
+use diakritikos::{pos, Position};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Diacritic {
@@ -19,7 +19,7 @@ impl diakritikos::Diacritic for Diacritic {
             },
             Diacritic::Lowered => pos::PartialMap::from_iter([
                 (Position::Bottom, "\u{031e}"),
-                (Position::Left, "\u{02d5}"),
+                (Position::Right, "\u{02d5}"),
             ]),
             Diacritic::Voiced => {
                 pos::PartialMap::from_iter([(Position::Bottom, "\u{032c}")])

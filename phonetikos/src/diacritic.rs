@@ -9,6 +9,7 @@ pub enum Diacritic {
     Centralized,
     NonSyllabic,
     Syllabic,
+    Labialized,
 }
 
 impl diakritikos::Diacritic for Diacritic {
@@ -39,6 +40,9 @@ impl diakritikos::Diacritic for Diacritic {
                 (Position::Bottom, "\u{0329}"),
                 (Position::Top, "\u{030d}"),
             ]),
+            Diacritic::Labialized => {
+                pos::PartialMap::from_iter([(Position::Right, "ʷ")])
+            },
         }
     }
 }

@@ -59,8 +59,8 @@ pub fn hints(character: char) -> Option<pos::TotalMap<Hint>> {
         pos::TotalMap { bottom: Hint::Obstructed, ..pos::TotalMap::default() };
     match character {
         'a' | 'ɑ' | 'b' | 'c' | 'd' | 'e' | 'ɛ' | 'h' | 'i' | 'k' | 'm'
-        | 'n' | 'o' | 'ɔ' | 'p' | 'q' | 'r' | 's' | 'u' | 'v' | 'w' | 'x'
-        | 'z' => Some(top_and_bottom),
+        | 'n' | 'o' | 'ɔ' | 'p' | 'q' | 'r' | 'ɹ' | 's' | 'u' | 'v' | 'ʋ'
+        | 'w' | 'ɰ' | 'x' | 'z' => Some(top_and_bottom),
         'g' | 'j' | 'ŋ' | 'y' => Some(top),
         'f' | 'l' | 't' => Some(bottom),
         _ => None,

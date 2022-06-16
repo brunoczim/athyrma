@@ -3,14 +3,14 @@ use diakritikos::{slot, GraphemeCluster};
 use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum PlaceOfArticulation {
+pub enum Place {
     Labial,
     Alveolar,
     Velar,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum MannerOfArticulation {
+pub enum Manner {
     Plosive,
     Fricative,
     Approximant,
@@ -18,8 +18,8 @@ pub enum MannerOfArticulation {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Consonant {
-    pub place: PlaceOfArticulation,
-    pub manner: MannerOfArticulation,
+    pub place: Place,
+    pub manner: Manner,
     pub phonation: Phonation,
     pub cavity: Cavity,
     pub syllabic: bool,
@@ -29,16 +29,14 @@ impl Consonant {
     pub fn grapheme_cluster(self) -> GraphemeCluster<Diacritic> {
         let mut diacritics = Vec::new();
         let character = match self.manner {
-            MannerOfArticulation::Plosive => match self.cavity {
+            Manner::Plosive => match self.cavity {
                 Cavity::Oral => match (self.place, self.phonation) {
-                    (PlaceOfArticulation::Labial, Phonation::Voiceless) => 'p',
-                    (PlaceOfArticulation::Labial, Phonation::Voiced) => 'b',
-                    (PlaceOfArticulation::Alveolar, Phonation::Voiceless) => {
-                        't'
-                    },
-                    (PlaceOfArticulation::Alveolar, Phonation::Voiced) => 'd',
-                    (PlaceOfArticulation::Velar, Phonation::Voiceless) => 'k',
-                    (PlaceOfArticulation::Velar, Phonation::Voiced) => 'g',
+                    (Place::Labial, Phonation::Voiceless) => 'p',
+                    (Place::Labial, Phonation::Voiced) => 'b',
+                    (Place::Alveolar, Phonation::Voiceless) => 't',
+                    (Place::Alveolar, Phonation::Voiced) => 'd',
+                    (Place::Velar, Phonation::Voiceless) => 'k',
+                    (Place::Velar, Phonation::Voiced) => 'g',
                 },
                 Cavity::Nasal => {
                     match self.phonation {
@@ -48,29 +46,27 @@ impl Consonant {
                         Phonation::Voiced => (),
                     }
                     match self.place {
-                        PlaceOfArticulation::Labial => 'm',
-                        PlaceOfArticulation::Alveolar => 'n',
-                        PlaceOfArticulation::Velar => 'ŋ',
+                        Place::Labial => 'm',
+                        Place::Alveolar => 'n',
+                        Place::Velar => 'ŋ',
                     }
                 },
             },
-            MannerOfArticulation::Fricative => {
+            Manner::Fricative => {
                 match self.cavity {
                     Cavity::Nasal => diacritics.push(Diacritic::Nasalized),
                     Cavity::Oral => (),
                 }
                 match (self.place, self.phonation) {
-                    (PlaceOfArticulation::Labial, Phonation::Voiceless) => 'ɸ',
-                    (PlaceOfArticulation::Labial, Phonation::Voiced) => 'β',
-                    (PlaceOfArticulation::Alveolar, Phonation::Voiceless) => {
-                        's'
-                    },
-                    (PlaceOfArticulation::Alveolar, Phonation::Voiced) => 'z',
-                    (PlaceOfArticulation::Velar, Phonation::Voiceless) => 'x',
-                    (PlaceOfArticulation::Velar, Phonation::Voiced) => 'ɣ',
+                    (Place::Labial, Phonation::Voiceless) => 'ɸ',
+                    (Place::Labial, Phonation::Voiced) => 'β',
+                    (Place::Alveolar, Phonation::Voiceless) => 's',
+                    (Place::Alveolar, Phonation::Voiced) => 'z',
+                    (Place::Velar, Phonation::Voiceless) => 'x',
+                    (Place::Velar, Phonation::Voiced) => 'ɣ',
                 }
             },
-            MannerOfArticulation::Approximant => {
+            Manner::Approximant => {
                 match self.phonation {
                     Phonation::Voiced => (),
                     Phonation::Voiceless => {
@@ -82,9 +78,9 @@ impl Consonant {
                     Cavity::Oral => (),
                 }
                 match self.place {
-                    PlaceOfArticulation::Labial => 'm',
-                    PlaceOfArticulation::Alveolar => 'n',
-                    PlaceOfArticulation::Velar => 'ŋ',
+                    Place::Labial => 'ʋ',
+                    Place::Alveolar => 'ɹ',
+                    Place::Velar => 'ɰ',
                 }
             },
         };
@@ -101,5 +97,22 @@ impl Consonant {
 impl fmt::Display for Consonant {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.grapheme_cluster(), fmtr)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Cavity, Consonant, Manner, Phonation, Place};
+
+    #[test]
+    fn syllabic_voiceless_nasal_labial_approximant() {
+        let consonant = Consonant {
+            place: Place::Labial,
+            manner: Manner::Approximant,
+            cavity: Cavity::Nasal,
+            phonation: Phonation::Voiceless,
+            syllabic: true,
+        };
+        assert_eq!(consonant.to_string(), "ʋ̥̩̃");
     }
 }

@@ -1,9 +1,10 @@
 //! This module provides location, paths, Urls.
 
-use crate::{
+use crate::component::{
     Component,
+    Context,
     HtmlRendering,
-    InlineContext,
+    InlineComponent,
     MdRendering,
     Render,
     TextRendering,
@@ -59,19 +60,18 @@ impl Location {
 }
 
 impl Component for Location {
-    type Context = InlineContext;
+    type Kind = InlineComponent;
 }
 
 impl Render<HtmlRendering> for Location {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &HtmlRendering,
+        ctx: &Context<HtmlRendering, Self::Kind>,
     ) -> fmt::Result {
         match self {
             Location::Url(url) => write!(fmtr, "{}", url),
-            Location::Internal(int) => int.render(fmtr, ctx, render_format),
+            Location::Internal(int) => int.render(fmtr, ctx),
         }
     }
 }
@@ -88,6 +88,10 @@ impl Render<MdRendering> for Location {
 }
 
 impl_text_as_display! { Location }
+
+impl fmt::Display for Location {
+    fn fmt(&self, fmtr: &mut fmt::Formatter<'_>) -> fmt::Result {}
+}
 
 /// An internal path, without any ID. Always absolute (with the root pointing to
 /// the root of the encyclopedia).

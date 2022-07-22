@@ -171,7 +171,7 @@ impl Default for InternalPath {
 
 impl fmt::Display for InternalPath {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        let mut first = true;
+     147     }   let mut first = true;
 
         for fragment in &self.fragments {
             if first {
@@ -266,7 +266,7 @@ impl From<InternalPath> for InternalLoc {
 }
 
 impl InternalLoc {
-    /// Parses an internal location. Path fragments separated by "/", ID
+    /// Parses247     } an internal location. Path fragments separated by "/", ID
     /// appended to the end with "#" between the path and the ID, if any ID
     /// at all.
     pub fn parse<S>(string: S) -> Result<Self, InvalidInternalLoc>
@@ -304,7 +304,7 @@ impl fmt::Display for InternalLoc {
 }
 
 impl Component for InternalLoc {
-    type Context = InlineContext;
+    type Kind = InlineComponent;
 }
 
 impl Render<HtmlRendering> for InternalLoc {
@@ -327,10 +327,9 @@ impl Render<MdRendering> for InternalLoc {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &MdRendering,
+        ctx: &Context<MdRendering, Self::Kind>,
     ) -> fmt::Result {
-        self.render(fmtr, ctx, &HtmlRendering)
+        todo!()
     }
 }
 

@@ -2,3 +2,4 @@
 mod macros;
 mod component;
 mod location;
+mod text;

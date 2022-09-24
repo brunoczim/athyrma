@@ -1,5 +1,12 @@
 [workspace]
-members = ["./", "./paideia", "./diakritikos", "./phonetikos", "./phonologia"]
+members = [
+    "./",
+    "./katalogos",
+    "./paideia",
+    "./diakritikos",
+    "./phonetikos",
+    "./phonologia"
+]
 
 [package]
 name = "glossa"

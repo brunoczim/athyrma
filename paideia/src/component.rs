@@ -1,5 +1,11 @@
+mod inline;
+mod block;
+
 use crate::location::InternalPath;
 use std::{fmt, rc::Rc, sync::Arc};
+
+pub use block::BlockComponent;
+pub use inline::InlineComponent;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Context<'loc, 'fmt, 'kind, R, K>
@@ -18,7 +24,7 @@ where
     R: RenderFormat + ?Sized,
     K: ComponentKind + ?Sized,
 {
-    pub(crate) fn new(
+    pub fn new(
         location: &'loc InternalPath,
         level: u32,
         render_format: &'fmt R,
@@ -48,7 +54,7 @@ where
         component: T,
     ) -> Renderer<'this, 'loc, 'fmt, 'kind, T, R>
     where
-        T: Component<Kind = K>,
+        T: Render<R, Kind = K>,
     {
         Renderer { context: self, component }
     }
@@ -91,7 +97,7 @@ impl<T> FullRender for T where
 #[derive(Debug, Clone, Copy)]
 pub struct Renderer<'ctx, 'loc, 'fmt, 'kind, T, R>
 where
-    R: RenderFormat,
+    R: RenderFormat + ?Sized,
     T: Render<R>,
 {
     /// The component being rendered.
@@ -109,16 +115,6 @@ where
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         self.component.render(fmt, self.context)
     }
-}
-
-#[derive(Debug)]
-pub struct InlineComponent {
-    _priv: (),
-}
-
-#[derive(Debug)]
-pub struct BlockComponent {
-    _priv: (),
 }
 
 #[derive(Debug, Clone, Copy)]

@@ -1,5 +1,4 @@
 #[macro_use]
 mod macros;
-mod component;
-mod location;
-mod text;
+pub mod component;
+pub mod location;

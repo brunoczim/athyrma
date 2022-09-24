@@ -7,7 +7,6 @@ use crate::component::{
     InlineComponent,
     MdRendering,
     Render,
-    TextRendering,
 };
 use percent_encoding::{percent_encode, CONTROLS};
 use std::{error::Error, fmt, path::PathBuf, str};
@@ -80,17 +79,26 @@ impl Render<MdRendering> for Location {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &MdRendering,
+        ctx: &Context<MdRendering, Self::Kind>,
     ) -> fmt::Result {
-        self.render(fmtr, ctx, &HtmlRendering)
+        self.render(
+            fmtr,
+            &Context::new(
+                ctx.location(),
+                ctx.level(),
+                &HtmlRendering,
+                ctx.kind(),
+            ),
+        )
     }
 }
 
 impl_text_as_display! { Location }
 
 impl fmt::Display for Location {
-    fn fmt(&self, fmtr: &mut fmt::Formatter<'_>) -> fmt::Result {}
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        todo!()
+    }
 }
 
 /// An internal path, without any ID. Always absolute (with the root pointing to
@@ -171,7 +179,7 @@ impl Default for InternalPath {
 
 impl fmt::Display for InternalPath {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-     147     }   let mut first = true;
+        let mut first = true;
 
         for fragment in &self.fragments {
             if first {
@@ -187,15 +195,14 @@ impl fmt::Display for InternalPath {
 }
 
 impl Component for InternalPath {
-    type Context = InlineContext;
+    type Kind = InlineComponent;
 }
 
 impl Render<HtmlRendering> for InternalPath {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &HtmlRendering,
+        ctx: &Context<HtmlRendering, Self::Kind>,
     ) -> fmt::Result {
         if !self.eq_index(ctx.location()) {
             for _ in 0 .. ctx.location().dir_depth() {
@@ -213,10 +220,17 @@ impl Render<MdRendering> for InternalPath {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &MdRendering,
+        ctx: &Context<MdRendering, Self::Kind>,
     ) -> fmt::Result {
-        self.render(fmtr, ctx, &HtmlRendering)
+        self.render(
+            fmtr,
+            &Context::new(
+                ctx.location(),
+                ctx.level(),
+                &HtmlRendering,
+                ctx.kind(),
+            ),
+        )
     }
 }
 
@@ -266,9 +280,9 @@ impl From<InternalPath> for InternalLoc {
 }
 
 impl InternalLoc {
-    /// Parses247     } an internal location. Path fragments separated by "/", ID
-    /// appended to the end with "#" between the path and the ID, if any ID
-    /// at all.
+    /// Parses247     } an internal location. Path fragments separated by "/",
+    /// ID appended to the end with "#" between the path and the ID, if any
+    /// ID at all.
     pub fn parse<S>(string: S) -> Result<Self, InvalidInternalLoc>
     where
         S: AsRef<str>,
@@ -311,13 +325,12 @@ impl Render<HtmlRendering> for InternalLoc {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &HtmlRendering,
+        ctx: &Context<HtmlRendering, Self::Kind>,
     ) -> fmt::Result {
-        self.path.render(fmtr, ctx, render_format)?;
+        self.path.render(fmtr, ctx)?;
         if let Some(id) = &self.id {
             fmtr.write_str("#")?;
-            id.render(fmtr, ctx, render_format)?;
+            id.render(fmtr, ctx)?;
         }
         Ok(())
     }
@@ -384,15 +397,14 @@ impl fmt::Display for Id {
 }
 
 impl Component for Id {
-    type Context = InlineContext;
+    type Kind = InlineComponent;
 }
 
 impl Render<HtmlRendering> for Id {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &HtmlRendering,
+        ctx: &Context<HtmlRendering, Self::Kind>,
     ) -> fmt::Result {
         write!(fmtr, "{}", self)
     }
@@ -402,23 +414,21 @@ impl Render<MdRendering> for Id {
     fn render(
         &self,
         fmtr: &mut fmt::Formatter,
-        ctx: &Self::Context,
-        render_format: &MdRendering,
+        ctx: &Context<MdRendering, Self::Kind>,
     ) -> fmt::Result {
-        self.render(fmtr, ctx, &HtmlRendering)
+        self.render(
+            fmtr,
+            &Context::new(
+                ctx.location(),
+                ctx.level(),
+                &HtmlRendering,
+                ctx.kind(),
+            ),
+        )
     }
 }
 
-impl Render<TextRendering> for Id {
-    fn render(
-        &self,
-        fmtr: &mut fmt::Formatter,
-        _ctx: &Self::Context,
-        _render_format: &MdRendering,
-    ) -> fmt::Result {
-        fmt::Display::fmt(self, fmtr)
-    }
-}
+impl_text_as_display! { Id }
 
 /// Error when an invalid fragment (piece of a path) string is given to be
 /// parsed.

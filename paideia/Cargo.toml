@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 url = "2.1.1"
 percent-encoding = "2.1.0"
+katalogos = { path = "../katalogos" }

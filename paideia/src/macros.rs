@@ -1,11 +1,10 @@
 macro_rules! impl_text_as_display {
     (<$($gen:ident),*> $ty:ty) => {
-        impl<$($gen),*> $crate::Render<$crate::TextRendering> for $ty {
+        impl<$($gen),*> $crate::component::Render<$crate::component::TextRendering> for $ty {
             fn render(
                 &self,
                 fmtr: &mut std::fmt::Formatter,
-                _ctx: &Self::Context,
-                _render_format: &$crate::TextRendering
+                _ctx: &$crate::component::Context< $crate::component::TextRendering, Self::Kind>,
             ) -> std::fmt::Result {
                 std::fmt::Display::fmt(self, fmtr)
             }

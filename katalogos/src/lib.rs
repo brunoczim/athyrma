@@ -3,7 +3,6 @@ pub mod colist;
 pub mod function;
 pub mod combinator;
 pub mod by_ref;
-pub mod index;
 
 #[macro_export]
 macro_rules! hlist {

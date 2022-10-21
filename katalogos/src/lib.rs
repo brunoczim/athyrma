@@ -3,6 +3,7 @@ pub mod colist;
 pub mod function;
 pub mod combinator;
 pub mod by_ref;
+pub mod index;
 
 #[macro_export]
 macro_rules! hlist {
@@ -31,7 +32,11 @@ macro_rules! HList {
 
 #[macro_export]
 macro_rules! hcolist {
-    [$elem:expr] => { $crate::colist::Cocons::Head($elem) };
+    [$($t:ident ::)* h($elem:expr)] => {{
+        let expr = $crate::colist::Cocons::Head($elem);
+        $(let expr = $crate::colist::Cocons::Tail(expr);)*
+        expr
+    }};
 }
 
 #[macro_export]

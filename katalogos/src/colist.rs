@@ -24,7 +24,7 @@ impl<M> Conil<M>
 where
     M: ?Sized,
 {
-    pub fn coerce<A>(self) -> A {
+    pub const fn coerce<A>(self) -> A {
         match self.0 {}
     }
 }

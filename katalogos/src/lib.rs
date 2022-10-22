@@ -6,7 +6,7 @@ pub mod by_ref;
 
 #[macro_export]
 macro_rules! hlist {
-    [] => { $crate::list::Nil };
+    [] => { $crate::list::Nil::new() };
     [$elem:expr $(, $elems:expr)*] => {
         $crate::list::Cons {
             head: $elem,
@@ -20,12 +20,12 @@ macro_rules! hlist {
 
 #[macro_export]
 macro_rules! HList {
-    [] => { $crate::list::Nil::new() };
-    [$elem:expr $(, $elems:expr)*] => {
-        $crate::list::Cons<$elem, $crate::HList![$($elems),*]>,
+    [(): $m:ty] => { $crate::list::Nil<M> };
+    [($elem:ty $(, $elems:ty)*): $m:ty] => {
+        $crate::list::Cons<$elem, $crate::HList![($($elems),*): $m]>,
     };
-    [$($elems:expr,)*] => {
-        $crate::HList![$($elems),*]
+    [($($elems:ty,)*): $m:ty] => {
+        $crate::HList![($($elems),*): $m]
     };
 }
 
@@ -40,11 +40,11 @@ macro_rules! hcolist {
 
 #[macro_export]
 macro_rules! HColist {
-    [] => { $crate::colist::Conil };
-    [$elem:expr $(, $elems:expr)*] => {
-        $crate::colist::Cocons<$elem, $crate::HColist![$($elems),*]>,
+    [(): $m:ty] => { $crate::colist::Conil<M> };
+    [($elem:ty $(, $elems:ty)*): $m:ty] => {
+        $crate::colist::Cocons<$elem, $crate::HColist![($($elems),*): $m]>,
     };
-    [$($elems:expr,)*] => {
-        $crate::HColist![$($elems),*]
+    [($($elems:ty,)*): $m:ty] => {
+        $crate::HColist![($($elems),*): $m]
     };
 }

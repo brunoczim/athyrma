@@ -8,7 +8,7 @@ use std::{
 };
 
 pub trait List {
-    type Meta;
+    type Meta: ?Sized;
 }
 
 pub struct Nil<M = ()>(PhantomData<M>)
@@ -24,7 +24,6 @@ where
     }
 }
 
-
 impl<M> Nil<M>
 where
     M: ?Sized,
@@ -34,7 +33,10 @@ where
     }
 }
 
-impl<M> List for Nil<M> {
+impl<M> List for Nil<M>
+where
+    M: ?Sized,
+{
     type Meta = M;
 }
 
@@ -47,35 +49,50 @@ where
     }
 }
 
-impl<M> Clone for Nil<M> {
+impl<M> Clone for Nil<M>
+where
+    M: ?Sized,
+{
     fn clone(&self) -> Self {
         Self::new()
     }
 }
 
-impl<M> Copy for Nil<M> {}
+impl<M> Copy for Nil<M> where M: ?Sized {}
 
-impl<M> PartialEq for Nil<M> {
+impl<M> PartialEq for Nil<M>
+where
+    M: ?Sized,
+{
     fn eq(&self, _other: &Self) -> bool {
         true
     }
 }
 
-impl<M> Eq for Nil<M> {}
+impl<M> Eq for Nil<M> where M: ?Sized {}
 
-impl<M> PartialOrd for Nil<M> {
+impl<M> PartialOrd for Nil<M>
+where
+    M: ?Sized,
+{
     fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
         Some(Ordering::Equal)
     }
 }
 
-impl<M> Ord for Nil<M> {
+impl<M> Ord for Nil<M>
+where
+    M: ?Sized,
+{
     fn cmp(&self, _other: &Self) -> Ordering {
         Ordering::Equal
     }
 }
 
-impl<M> Hash for Nil<M> {
+impl<M> Hash for Nil<M>
+where
+    M: ?Sized,
+{
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
@@ -97,7 +114,10 @@ where
     type Meta = T::Meta;
 }
 
-impl<M> IntoIterator for Nil<M> {
+impl<M> IntoIterator for Nil<M>
+where
+    M: ?Sized,
+{
     type Item = Conil<M>;
     type IntoIter = iter::Empty<Self::Item>;
 
@@ -106,7 +126,10 @@ impl<M> IntoIterator for Nil<M> {
     }
 }
 
-impl<'this, M> IntoIterator for &'this Nil<M> {
+impl<'this, M> IntoIterator for &'this Nil<M>
+where
+    M: ?Sized,
+{
     type Item = Conil<M>;
     type IntoIter = iter::Empty<Self::Item>;
 
@@ -115,7 +138,10 @@ impl<'this, M> IntoIterator for &'this Nil<M> {
     }
 }
 
-impl<'this, M> IntoIterator for &'this mut Nil<M> {
+impl<'this, M> IntoIterator for &'this mut Nil<M>
+where
+    M: ?Sized,
+{
     type Item = Conil<M>;
     type IntoIter = iter::Empty<Self::Item>;
 

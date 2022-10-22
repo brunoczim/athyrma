@@ -10,7 +10,7 @@ pub trait Map<F> {
     fn map(self, mapper: F) -> Self::Output;
 }
 
-impl<M, F> Map<F> for Nil<M> {
+impl<M, F> Map<F> for Nil<M> where M: ?Sized {
     type Output = Self;
 
     fn map(self, _mapper: F) -> Self::Output {
@@ -18,7 +18,7 @@ impl<M, F> Map<F> for Nil<M> {
     }
 }
 
-impl<M, F> Map<F> for Conil<M> {
+impl<M, F> Map<F> for Conil<M> where M: ?Sized {
     type Output = Self;
 
     fn map(self, _mapper: F) -> Self::Output {
@@ -57,13 +57,13 @@ pub trait FoldLeft<A, F> {
     fn fold_left(self, accumulator: A, folder: F) -> A;
 }
 
-impl<M, A, F> FoldLeft<A, F> for Nil<M> {
+impl<M, A, F> FoldLeft<A, F> for Nil<M> where M: ?Sized {
     fn fold_left(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
 }
 
-impl<M, A, F> FoldLeft<A, F> for Conil<M> {
+impl<M, A, F> FoldLeft<A, F> for Conil<M> where M: ?Sized {
     fn fold_left(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
@@ -96,13 +96,13 @@ pub trait FoldRight<A, F> {
     fn fold_right(self, accumulator: A, folder: F) -> A;
 }
 
-impl<M, A, F> FoldRight<A, F> for Nil<M> {
+impl<M, A, F> FoldRight<A, F> for Nil<M> where M: ?Sized {
     fn fold_right(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
 }
 
-impl<M, A, F> FoldRight<A, F> for Conil<M> {
+impl<M, A, F> FoldRight<A, F> for Conil<M> where M: ?Sized {
     fn fold_right(self, accumulator: A, _folder: F) -> A {
         accumulator
     }

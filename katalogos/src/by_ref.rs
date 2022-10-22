@@ -17,9 +17,9 @@ pub trait ByMut<'this>: ByRef<'this> {
 
 impl<'this, M> ByRef<'this> for Nil<M>
 where
-    M: 'this,
+    M: 'this + ?Sized,
 {
-    type Ref = Nil<&'this M>;
+    type Ref = Nil<M>;
 
     fn by_ref(&'this self) -> Self::Ref {
         Nil::new()
@@ -28,9 +28,9 @@ where
 
 impl<'this, M> ByRef<'this> for Conil<M>
 where
-    M: 'this,
+    M: 'this + ?Sized,
 {
-    type Ref = Conil<&'this M>;
+    type Ref = Conil<M>;
 
     fn by_ref(&'this self) -> Self::Ref {
         self.coerce()
@@ -66,9 +66,9 @@ where
 
 impl<'this, M> ByMut<'this> for Nil<M>
 where
-    M: 'this,
+    M: 'this + ?Sized,
 {
-    type RefMut = Nil<&'this mut M>;
+    type RefMut = Nil<M>;
 
     fn by_mut(&'this mut self) -> Self::RefMut {
         Nil::new()
@@ -77,9 +77,9 @@ where
 
 impl<'this, M> ByMut<'this> for Conil<M>
 where
-    M: 'this,
+    M: 'this + ?Sized,
 {
-    type RefMut = Conil<&'this mut M>;
+    type RefMut = Conil<M>;
 
     fn by_mut(&'this mut self) -> Self::RefMut {
         self.coerce()

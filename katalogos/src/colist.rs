@@ -10,7 +10,7 @@ use std::{
 };
 
 pub trait Colist {
-    type Meta;
+    type Meta: ?Sized;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -29,45 +29,66 @@ where
     }
 }
 
-impl<M> Colist for Conil<M> {
+impl<M> Colist for Conil<M>
+where
+    M: ?Sized,
+{
     type Meta = M;
 }
 
-impl<M> fmt::Debug for Conil<M> {
+impl<M> fmt::Debug for Conil<M>
+where
+    M: ?Sized,
+{
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
         self.coerce()
     }
 }
 
-impl<M> Clone for Conil<M> {
+impl<M> Clone for Conil<M>
+where
+    M: ?Sized,
+{
     fn clone(&self) -> Self {
         self.coerce()
     }
 }
 
-impl<M> Copy for Conil<M> {}
+impl<M> Copy for Conil<M> where M: ?Sized {}
 
-impl<M> PartialEq for Conil<M> {
+impl<M> PartialEq for Conil<M>
+where
+    M: ?Sized,
+{
     fn eq(&self, _other: &Self) -> bool {
         self.coerce()
     }
 }
 
-impl<M> Eq for Conil<M> {}
+impl<M> Eq for Conil<M> where M: ?Sized {}
 
-impl<M> PartialOrd for Conil<M> {
+impl<M> PartialOrd for Conil<M>
+where
+    M: ?Sized,
+{
     fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
         self.coerce()
     }
 }
 
-impl<M> Ord for Conil<M> {
+impl<M> Ord for Conil<M>
+where
+    M: ?Sized,
+{
     fn cmp(&self, _other: &Self) -> Ordering {
         self.coerce()
     }
 }
 
-impl<M> Hash for Conil<M> {
+impl<M> Hash for Conil<M>
+where
+    M: ?Sized,
+{
     fn hash<H>(&self, _state: &mut H)
     where
         H: Hasher,
@@ -76,17 +97,20 @@ impl<M> Hash for Conil<M> {
     }
 }
 
-impl<M> fmt::Display for Conil<M> {
+impl<M> fmt::Display for Conil<M>
+where
+    M: ?Sized,
+{
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
         self.coerce()
     }
 }
 
-impl<M> Error for Conil<M> {}
+impl<M> Error for Conil<M> where M: ?Sized {}
 
 impl<M, A> AsRef<A> for Conil<M>
 where
-    A: ?Sized,
+    M: ?Sized,
 {
     fn as_ref(&self) -> &A {
         self.coerce()
@@ -102,7 +126,10 @@ where
     }
 }
 
-impl<M> Future for Conil<M> {
+impl<M> Future for Conil<M>
+where
+    M: ?Sized,
+{
     type Output = Conil<M>;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<Self::Output> {

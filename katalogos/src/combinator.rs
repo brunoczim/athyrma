@@ -10,7 +10,7 @@ pub trait Map<F> {
     fn map(self, mapper: F) -> Self::Output;
 }
 
-impl<A, F> Map<F> for Nil<A> {
+impl<M, F> Map<F> for Nil<M> {
     type Output = Self;
 
     fn map(self, _mapper: F) -> Self::Output {
@@ -18,7 +18,7 @@ impl<A, F> Map<F> for Nil<A> {
     }
 }
 
-impl<A, F> Map<F> for Conil<A> {
+impl<M, F> Map<F> for Conil<M> {
     type Output = Self;
 
     fn map(self, _mapper: F) -> Self::Output {
@@ -53,38 +53,38 @@ where
     }
 }
 
-pub trait FoldLeft<B, F> {
-    fn fold_left(self, accumulator: B, folder: F) -> B;
+pub trait FoldLeft<A, F> {
+    fn fold_left(self, accumulator: A, folder: F) -> A;
 }
 
-impl<A, B, F> FoldLeft<B, F> for Nil<A> {
-    fn fold_left(self, accumulator: B, _folder: F) -> B {
+impl<M, A, F> FoldLeft<A, F> for Nil<M> {
+    fn fold_left(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
 }
 
-impl<A, B, F> FoldLeft<B, F> for Conil<A> {
-    fn fold_left(self, accumulator: B, _folder: F) -> B {
+impl<M, A, F> FoldLeft<A, F> for Conil<M> {
+    fn fold_left(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
 }
 
-impl<H, T, B, F> FoldLeft<B, F> for Cons<H, T>
+impl<H, T, A, F> FoldLeft<A, F> for Cons<H, T>
 where
-    F: FunctionMut<(B, H), Output = B>,
-    T: FoldLeft<B, F>,
+    F: FunctionMut<(A, H), Output = A>,
+    T: FoldLeft<A, F>,
 {
-    fn fold_left(self, accumulator: B, mut folder: F) -> B {
+    fn fold_left(self, accumulator: A, mut folder: F) -> A {
         self.tail.fold_left(folder.call_mut((accumulator, self.head)), folder)
     }
 }
 
-impl<H, T, B, F> FoldLeft<B, F> for Cocons<H, T>
+impl<H, T, A, F> FoldLeft<A, F> for Cocons<H, T>
 where
-    F: FunctionMut<(B, H), Output = B>,
-    T: FoldLeft<B, F>,
+    F: FunctionMut<(A, H), Output = A>,
+    T: FoldLeft<A, F>,
 {
-    fn fold_left(self, accumulator: B, mut folder: F) -> B {
+    fn fold_left(self, accumulator: A, mut folder: F) -> A {
         match self {
             Cocons::Head(head) => folder.call_mut((accumulator, head)),
             Cocons::Tail(tail) => tail.fold_left(accumulator, folder),
@@ -92,39 +92,39 @@ where
     }
 }
 
-pub trait FoldRight<B, F> {
-    fn fold_right(self, accumulator: B, folder: F) -> B;
+pub trait FoldRight<A, F> {
+    fn fold_right(self, accumulator: A, folder: F) -> A;
 }
 
-impl<A, B, F> FoldRight<B, F> for Nil<A> {
-    fn fold_right(self, accumulator: B, _folder: F) -> B {
+impl<M, A, F> FoldRight<A, F> for Nil<M> {
+    fn fold_right(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
 }
 
-impl<A, B, F> FoldRight<B, F> for Conil<A> {
-    fn fold_right(self, accumulator: B, _folder: F) -> B {
+impl<M, A, F> FoldRight<A, F> for Conil<M> {
+    fn fold_right(self, accumulator: A, _folder: F) -> A {
         accumulator
     }
 }
 
-impl<H, T, B, F> FoldRight<B, F> for Cons<H, T>
+impl<H, T, A, F> FoldRight<A, F> for Cons<H, T>
 where
-    F: FunctionMut<(H, B), Output = B>,
-    T: for<'a> FoldRight<B, &'a mut F>,
+    F: FunctionMut<(H, A), Output = A>,
+    T: for<'a> FoldRight<A, &'a mut F>,
 {
-    fn fold_right(self, accumulator: B, mut folder: F) -> B {
+    fn fold_right(self, accumulator: A, mut folder: F) -> A {
         let new_accumulator = self.tail.fold_right(accumulator, &mut folder);
         folder.call_mut((self.head, new_accumulator))
     }
 }
 
-impl<H, T, B, F> FoldRight<B, F> for Cocons<H, T>
+impl<H, T, A, F> FoldRight<A, F> for Cocons<H, T>
 where
-    F: FunctionMut<(H, B), Output = B>,
-    T: FoldRight<B, F>,
+    F: FunctionMut<(H, A), Output = A>,
+    T: FoldRight<A, F>,
 {
-    fn fold_right(self, accumulator: B, mut folder: F) -> B {
+    fn fold_right(self, accumulator: A, mut folder: F) -> A {
         match self {
             Cocons::Head(head) => folder.call_mut((head, accumulator)),
             Cocons::Tail(tail) => tail.fold_right(accumulator, folder),

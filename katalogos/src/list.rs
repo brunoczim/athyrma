@@ -12,10 +12,10 @@ pub trait List {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct Nil<A = ()>(pub A);
+pub struct Nil<M = ()>(pub M);
 
-impl<A> List for Nil<A> {
-    type Meta = A;
+impl<M> List for Nil<M> {
+    type Meta = M;
 
     fn meta(&self) -> &Self::Meta {
         &self.0
@@ -55,8 +55,8 @@ where
     }
 }
 
-impl<A> IntoIterator for Nil<A> {
-    type Item = Conil<A>;
+impl<M> IntoIterator for Nil<M> {
+    type Item = Conil<M>;
     type IntoIter = iter::Empty<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -64,8 +64,8 @@ impl<A> IntoIterator for Nil<A> {
     }
 }
 
-impl<'this, A> IntoIterator for &'this Nil<A> {
-    type Item = Conil<A>;
+impl<'this, M> IntoIterator for &'this Nil<M> {
+    type Item = Conil<M>;
     type IntoIter = iter::Empty<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -73,8 +73,8 @@ impl<'this, A> IntoIterator for &'this Nil<A> {
     }
 }
 
-impl<'this, A> IntoIterator for &'this mut Nil<A> {
-    type Item = Conil<A>;
+impl<'this, M> IntoIterator for &'this mut Nil<M> {
+    type Item = Conil<M>;
     type IntoIter = iter::Empty<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {

@@ -16,47 +16,47 @@ pub trait Colist {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Void {}
 
-pub struct Conil<A = ()>(pub Void, pub PhantomData<A>);
+pub struct Conil<M = ()>(pub Void, pub PhantomData<M>);
 
-impl<A> Colist for Conil<A> {
-    type Meta = A;
+impl<M> Colist for Conil<M> {
+    type Meta = M;
 }
 
-impl<A> fmt::Debug for Conil<A> {
+impl<M> fmt::Debug for Conil<M> {
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
         match self.0 {}
     }
 }
 
-impl<A> Clone for Conil<A> {
+impl<M> Clone for Conil<M> {
     fn clone(&self) -> Self {
         match self.0 {}
     }
 }
 
-impl<A> Copy for Conil<A> {}
+impl<M> Copy for Conil<M> {}
 
-impl<A> PartialEq for Conil<A> {
+impl<M> PartialEq for Conil<M> {
     fn eq(&self, _other: &Self) -> bool {
         match self.0 {}
     }
 }
 
-impl<A> Eq for Conil<A> {}
+impl<M> Eq for Conil<M> {}
 
-impl<A> PartialOrd for Conil<A> {
+impl<M> PartialOrd for Conil<M> {
     fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
         match self.0 {}
     }
 }
 
-impl<A> Ord for Conil<A> {
+impl<M> Ord for Conil<M> {
     fn cmp(&self, _other: &Self) -> Ordering {
         match self.0 {}
     }
 }
 
-impl<A> Hash for Conil<A> {
+impl<M> Hash for Conil<M> {
     fn hash<H>(&self, _state: &mut H)
     where
         H: Hasher,
@@ -65,34 +65,34 @@ impl<A> Hash for Conil<A> {
     }
 }
 
-impl<A> fmt::Display for Conil<A> {
+impl<M> fmt::Display for Conil<M> {
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
         match self.0 {}
     }
 }
 
-impl<A> Error for Conil<A> {}
+impl<M> Error for Conil<M> {}
 
-impl<A, B> AsRef<B> for Conil<A>
+impl<M, A> AsRef<A> for Conil<M>
 where
-    B: ?Sized,
+    A: ?Sized,
 {
-    fn as_ref(&self) -> &B {
+    fn as_ref(&self) -> &A {
         match self.0 {}
     }
 }
 
-impl<A, B> AsMut<B> for Conil<A>
+impl<M, A> AsMut<A> for Conil<M>
 where
-    B: ?Sized,
+    A: ?Sized,
 {
-    fn as_mut(&mut self) -> &mut B {
+    fn as_mut(&mut self) -> &mut A {
         match self.0 {}
     }
 }
 
-impl<A> Future for Conil<A> {
-    type Output = Conil<A>;
+impl<M> Future for Conil<M> {
+    type Output = Conil<M>;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<Self::Output> {
         Poll::Ready(*self)
@@ -132,13 +132,13 @@ where
 {
 }
 
-impl<H, T, A> AsRef<A> for Cocons<H, T>
+impl<H, T, M> AsRef<M> for Cocons<H, T>
 where
-    A: ?Sized,
-    H: AsRef<A>,
-    T: AsRef<A>,
+    M: ?Sized,
+    H: AsRef<M>,
+    T: AsRef<M>,
 {
-    fn as_ref(&self) -> &A {
+    fn as_ref(&self) -> &M {
         match self {
             Cocons::Head(head) => head.as_ref(),
             Cocons::Tail(tail) => tail.as_ref(),
@@ -146,13 +146,13 @@ where
     }
 }
 
-impl<H, T, A> AsMut<A> for Cocons<H, T>
+impl<H, T, M> AsMut<M> for Cocons<H, T>
 where
-    A: ?Sized,
-    H: AsMut<A>,
-    T: AsMut<A>,
+    M: ?Sized,
+    H: AsMut<M>,
+    T: AsMut<M>,
 {
-    fn as_mut(&mut self) -> &mut A {
+    fn as_mut(&mut self) -> &mut M {
         match self {
             Cocons::Head(head) => head.as_mut(),
             Cocons::Tail(tail) => tail.as_mut(),

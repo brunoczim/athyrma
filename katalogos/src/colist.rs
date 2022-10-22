@@ -14,9 +14,20 @@ pub trait Colist {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Void {}
+enum Void {}
 
-pub struct Conil<M = ()>(pub Void, pub PhantomData<M>);
+pub struct Conil<M = ()>(Void, PhantomData<M>)
+where
+    M: ?Sized;
+
+impl<M> Conil<M>
+where
+    M: ?Sized,
+{
+    pub fn coerce<A>(self) -> A {
+        match self.0 {}
+    }
+}
 
 impl<M> Colist for Conil<M> {
     type Meta = M;
@@ -24,13 +35,13 @@ impl<M> Colist for Conil<M> {
 
 impl<M> fmt::Debug for Conil<M> {
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
-        match self.0 {}
+        self.coerce()
     }
 }
 
 impl<M> Clone for Conil<M> {
     fn clone(&self) -> Self {
-        match self.0 {}
+        self.coerce()
     }
 }
 
@@ -38,7 +49,7 @@ impl<M> Copy for Conil<M> {}
 
 impl<M> PartialEq for Conil<M> {
     fn eq(&self, _other: &Self) -> bool {
-        match self.0 {}
+        self.coerce()
     }
 }
 
@@ -46,13 +57,13 @@ impl<M> Eq for Conil<M> {}
 
 impl<M> PartialOrd for Conil<M> {
     fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
-        match self.0 {}
+        self.coerce()
     }
 }
 
 impl<M> Ord for Conil<M> {
     fn cmp(&self, _other: &Self) -> Ordering {
-        match self.0 {}
+        self.coerce()
     }
 }
 
@@ -61,13 +72,13 @@ impl<M> Hash for Conil<M> {
     where
         H: Hasher,
     {
-        match self.0 {}
+        self.coerce()
     }
 }
 
 impl<M> fmt::Display for Conil<M> {
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
-        match self.0 {}
+        self.coerce()
     }
 }
 
@@ -78,7 +89,7 @@ where
     A: ?Sized,
 {
     fn as_ref(&self) -> &A {
-        match self.0 {}
+        self.coerce()
     }
 }
 
@@ -87,7 +98,7 @@ where
     A: ?Sized,
 {
     fn as_mut(&mut self) -> &mut A {
-        match self.0 {}
+        self.coerce()
     }
 }
 

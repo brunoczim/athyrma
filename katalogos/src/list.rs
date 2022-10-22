@@ -1,32 +1,86 @@
 use crate::colist::{Cocons, Conil};
-use std::iter;
+use std::{
+    cmp::Ordering,
+    fmt,
+    hash::{Hash, Hasher},
+    iter,
+    marker::PhantomData,
+};
 
 pub trait List {
     type Meta;
-
-    fn meta(&self) -> &Self::Meta;
-
-    fn meta_mut(&mut self) -> &mut Self::Meta;
-
-    fn into_meta(self) -> Self::Meta;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct Nil<M = ()>(pub M);
+pub struct Nil<M = ()>(PhantomData<M>)
+where
+    M: ?Sized;
+
+impl<M> Default for Nil<M>
+where
+    M: ?Sized,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
+impl<M> Nil<M>
+where
+    M: ?Sized,
+{
+    pub fn new() -> Self {
+        Self(PhantomData)
+    }
+}
 
 impl<M> List for Nil<M> {
     type Meta = M;
+}
 
-    fn meta(&self) -> &Self::Meta {
-        &self.0
+impl<M> fmt::Debug for Nil<M>
+where
+    M: ?Sized,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        fmtr.debug_tuple("Nil").field(&self.0).finish()
     }
+}
 
-    fn meta_mut(&mut self) -> &mut Self::Meta {
-        &mut self.0
+impl<M> Clone for Nil<M> {
+    fn clone(&self) -> Self {
+        Self::new()
     }
+}
 
-    fn into_meta(self) -> Self::Meta {
-        self.0
+impl<M> Copy for Nil<M> {}
+
+impl<M> PartialEq for Nil<M> {
+    fn eq(&self, _other: &Self) -> bool {
+        true
+    }
+}
+
+impl<M> Eq for Nil<M> {}
+
+impl<M> PartialOrd for Nil<M> {
+    fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
+        Some(Ordering::Equal)
+    }
+}
+
+impl<M> Ord for Nil<M> {
+    fn cmp(&self, _other: &Self) -> Ordering {
+        Ordering::Equal
+    }
+}
+
+impl<M> Hash for Nil<M> {
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+        self.0.hash(state)
     }
 }
 
@@ -41,18 +95,6 @@ where
     T: List,
 {
     type Meta = T::Meta;
-
-    fn meta(&self) -> &Self::Meta {
-        self.tail.meta()
-    }
-
-    fn meta_mut(&mut self) -> &mut Self::Meta {
-        self.tail.meta_mut()
-    }
-
-    fn into_meta(self) -> Self::Meta {
-        self.tail.into_meta()
-    }
 }
 
 impl<M> IntoIterator for Nil<M> {

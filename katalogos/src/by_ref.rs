@@ -22,7 +22,7 @@ where
     type Ref = Nil<&'this M>;
 
     fn by_ref(&'this self) -> Self::Ref {
-        Nil(&self.0)
+        Nil::new()
     }
 }
 
@@ -33,7 +33,7 @@ where
     type Ref = Conil<&'this M>;
 
     fn by_ref(&'this self) -> Self::Ref {
-        match self.0 {}
+        self.coerce()
     }
 }
 
@@ -71,7 +71,7 @@ where
     type RefMut = Nil<&'this mut M>;
 
     fn by_mut(&'this mut self) -> Self::RefMut {
-        Nil(&mut self.0)
+        Nil::new()
     }
 }
 
@@ -82,7 +82,7 @@ where
     type RefMut = Conil<&'this mut M>;
 
     fn by_mut(&'this mut self) -> Self::RefMut {
-        match self.0 {}
+        self.coerce()
     }
 }
 

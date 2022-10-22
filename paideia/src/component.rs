@@ -6,7 +6,10 @@ use std::{fmt, rc::Rc, sync::Arc};
 
 pub use block::BlockComponent;
 pub use inline::InlineComponent;
-use katalogos::list::{Cons, Nil};
+use katalogos::{
+    colist::{Cocons, Conil},
+    list::{Cons, Nil},
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Context<'loc, 'fmt, 'kind, R, K>
@@ -166,6 +169,36 @@ where
     T: Component + ?Sized,
 {
     type Kind = T::Kind;
+}
+
+impl<C> Component for Nil<C>
+where
+    C: ComponentKind,
+{
+    type Kind = C;
+}
+
+impl<H, T> Component for Cons<H, T>
+where
+    H: Component,
+    T: Component<Kind = H::Kind>,
+{
+    type Kind = H::Kind;
+}
+
+impl<C> Component for Conil<C>
+where
+    C: ComponentKind,
+{
+    type Kind = C;
+}
+
+impl<H, T> Component for Cocons<H, T>
+where
+    H: Component,
+    T: Component<Kind = H::Kind>,
+{
+    type Kind = H::Kind;
 }
 
 impl<'this, T, R> Render<R> for &'this T

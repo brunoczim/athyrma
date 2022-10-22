@@ -20,7 +20,7 @@ macro_rules! hlist {
 
 #[macro_export]
 macro_rules! HList {
-    [] => { $crate::list::Nil };
+    [] => { $crate::list::Nil::new() };
     [$elem:expr $(, $elems:expr)*] => {
         $crate::list::Cons<$elem, $crate::HList![$($elems),*]>,
     };

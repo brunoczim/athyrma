@@ -1,42 +1,90 @@
 use std::{
+    cmp::Ordering,
     error::Error,
     fmt,
     future::Future,
+    hash::{Hash, Hasher},
+    marker::PhantomData,
     pin::Pin,
     task::{Context, Poll},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Conil {}
+pub enum Void {}
 
-impl fmt::Display for Conil {
+pub struct Conil<A = ()>(pub Void, pub PhantomData<A>);
+
+impl<A> fmt::Debug for Conil<A> {
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
-        match *self {}
+        match self.0 {}
     }
 }
 
-impl Error for Conil {}
+impl<A> Clone for Conil<A> {
+    fn clone(&self) -> Self {
+        match self.0 {}
+    }
+}
 
-impl<A> AsRef<A> for Conil
+impl<A> Copy for Conil<A> {}
+
+impl<A> PartialEq for Conil<A> {
+    fn eq(&self, _other: &Self) -> bool {
+        match self.0 {}
+    }
+}
+
+impl<A> Eq for Conil<A> {}
+
+impl<A> PartialOrd for Conil<A> {
+    fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
+        match self.0 {}
+    }
+}
+
+impl<A> Ord for Conil<A> {
+    fn cmp(&self, _other: &Self) -> Ordering {
+        match self.0 {}
+    }
+}
+
+impl<A> Hash for Conil<A> {
+    fn hash<H>(&self, _state: &mut H)
+    where
+        H: Hasher,
+    {
+        match self.0 {}
+    }
+}
+
+impl<A> fmt::Display for Conil<A> {
+    fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self.0 {}
+    }
+}
+
+impl<A> Error for Conil<A> {}
+
+impl<A, B> AsRef<B> for Conil<A>
 where
-    A: ?Sized,
+    B: ?Sized,
 {
-    fn as_ref(&self) -> &A {
-        match *self {}
+    fn as_ref(&self) -> &B {
+        match self.0 {}
     }
 }
 
-impl<A> AsMut<A> for Conil
+impl<A, B> AsMut<B> for Conil<A>
 where
-    A: ?Sized,
+    B: ?Sized,
 {
-    fn as_mut(&mut self) -> &mut A {
-        match *self {}
+    fn as_mut(&mut self) -> &mut B {
+        match self.0 {}
     }
 }
 
-impl Future for Conil {
-    type Output = Conil;
+impl<A> Future for Conil<A> {
+    type Output = Conil<A>;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut Context) -> Poll<Self::Output> {
         Poll::Ready(*self)

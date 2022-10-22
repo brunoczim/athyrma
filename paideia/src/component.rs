@@ -6,6 +6,7 @@ use std::{fmt, rc::Rc, sync::Arc};
 
 pub use block::BlockComponent;
 pub use inline::InlineComponent;
+use katalogos::list::{Cons, Nil};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Context<'loc, 'fmt, 'kind, R, K>

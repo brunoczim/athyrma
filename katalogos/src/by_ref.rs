@@ -15,19 +15,25 @@ pub trait ByMut<'this>: ByRef<'this> {
     fn by_mut(&'this mut self) -> Self::RefMut;
 }
 
-impl<'this> ByRef<'this> for Nil {
-    type Ref = Nil;
+impl<'this, A> ByRef<'this> for Nil<A>
+where
+    A: 'this,
+{
+    type Ref = Nil<&'this A>;
 
     fn by_ref(&'this self) -> Self::Ref {
-        *self
+        Nil(&self.0)
     }
 }
 
-impl<'this> ByRef<'this> for Conil {
-    type Ref = Conil;
+impl<'this, A> ByRef<'this> for Conil<A>
+where
+    A: 'this,
+{
+    type Ref = Conil<&'this A>;
 
     fn by_ref(&'this self) -> Self::Ref {
-        *self
+        match self.0 {}
     }
 }
 
@@ -58,19 +64,25 @@ where
     }
 }
 
-impl<'this> ByMut<'this> for Nil {
-    type RefMut = Nil;
+impl<'this, A> ByMut<'this> for Nil<A>
+where
+    A: 'this,
+{
+    type RefMut = Nil<&'this mut A>;
 
     fn by_mut(&'this mut self) -> Self::RefMut {
-        *self
+        Nil(&mut self.0)
     }
 }
 
-impl<'this> ByMut<'this> for Conil {
-    type RefMut = Conil;
+impl<'this, A> ByMut<'this> for Conil<A>
+where
+    A: 'this,
+{
+    type RefMut = Conil<&'this mut A>;
 
     fn by_mut(&'this mut self) -> Self::RefMut {
-        *self
+        match self.0 {}
     }
 }
 

@@ -2,7 +2,7 @@ use crate::colist::{Cocons, Conil};
 use std::iter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct Nil;
+pub struct Nil<A = ()>(pub A);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Cons<H, T> {
@@ -10,8 +10,8 @@ pub struct Cons<H, T> {
     pub tail: T,
 }
 
-impl IntoIterator for Nil {
-    type Item = Conil;
+impl<A> IntoIterator for Nil<A> {
+    type Item = Conil<A>;
     type IntoIter = iter::Empty<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -19,8 +19,8 @@ impl IntoIterator for Nil {
     }
 }
 
-impl<'this> IntoIterator for &'this Nil {
-    type Item = Conil;
+impl<'this, A> IntoIterator for &'this Nil<A> {
+    type Item = Conil<A>;
     type IntoIter = iter::Empty<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -28,8 +28,8 @@ impl<'this> IntoIterator for &'this Nil {
     }
 }
 
-impl<'this> IntoIterator for &'this mut Nil {
-    type Item = Conil;
+impl<'this, A> IntoIterator for &'this mut Nil<A> {
+    type Item = Conil<A>;
     type IntoIter = iter::Empty<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {

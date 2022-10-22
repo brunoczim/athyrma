@@ -9,10 +9,18 @@ use std::{
     task::{Context, Poll},
 };
 
+pub trait Colist {
+    type Meta;
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Void {}
 
 pub struct Conil<A = ()>(pub Void, pub PhantomData<A>);
+
+impl<A> Colist for Conil<A> {
+    type Meta = A;
+}
 
 impl<A> fmt::Debug for Conil<A> {
     fn fmt(&self, _fmtr: &mut fmt::Formatter) -> fmt::Result {
@@ -95,6 +103,13 @@ impl<A> Future for Conil<A> {
 pub enum Cocons<H, T> {
     Head(H),
     Tail(T),
+}
+
+impl<H, T> Colist for Cocons<H, T>
+where
+    T: Colist,
+{
+    type Meta = T::Meta;
 }
 
 impl<H, T> fmt::Display for Cocons<H, T>

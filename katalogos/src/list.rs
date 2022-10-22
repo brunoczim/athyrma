@@ -1,13 +1,58 @@
 use crate::colist::{Cocons, Conil};
 use std::iter;
 
+pub trait List {
+    type Meta;
+
+    fn meta(&self) -> &Self::Meta;
+
+    fn meta_mut(&mut self) -> &mut Self::Meta;
+
+    fn into_meta(self) -> Self::Meta;
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Nil<A = ()>(pub A);
+
+impl<A> List for Nil<A> {
+    type Meta = A;
+
+    fn meta(&self) -> &Self::Meta {
+        &self.0
+    }
+
+    fn meta_mut(&mut self) -> &mut Self::Meta {
+        &mut self.0
+    }
+
+    fn into_meta(self) -> Self::Meta {
+        self.0
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Cons<H, T> {
     pub head: H,
     pub tail: T,
+}
+
+impl<H, T> List for Cons<H, T>
+where
+    T: List,
+{
+    type Meta = T::Meta;
+
+    fn meta(&self) -> &Self::Meta {
+        self.tail.meta()
+    }
+
+    fn meta_mut(&mut self) -> &mut Self::Meta {
+        self.tail.meta_mut()
+    }
+
+    fn into_meta(self) -> Self::Meta {
+        self.tail.into_meta()
+    }
 }
 
 impl<A> IntoIterator for Nil<A> {

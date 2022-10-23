@@ -5,8 +5,10 @@ use crate::component::{
     Component,
     Context,
     HtmlRendering,
+    InlineComponent,
     MdRendering,
     Render,
+    TextRendering,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -33,7 +35,7 @@ where
         write!(
             fmtr,
             "<div class=\"paideia-bold\">{}</div>",
-            ctx.renderer(&self.0)
+            ctx.render(&self.0)
         )
     }
 }
@@ -47,7 +49,7 @@ where
         fmtr: &mut fmt::Formatter,
         ctx: &Context<MdRendering, Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "<b>{}</b>", ctx.renderer(&self.0))
+        write!(fmtr, "<b>{}</b>", ctx.render(&self.0))
     }
 }
 
@@ -75,7 +77,7 @@ where
         write!(
             fmtr,
             "<div class=\"paideia-italic\">{}</div>",
-            ctx.renderer(&self.0)
+            ctx.render(&self.0)
         )
     }
 }
@@ -89,7 +91,7 @@ where
         fmtr: &mut fmt::Formatter,
         ctx: &Context<MdRendering, Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "<i>{}</i>", ctx.renderer(&self.0))
+        write!(fmtr, "<i>{}</i>", ctx.render(&self.0))
     }
 }
 
@@ -117,7 +119,7 @@ where
         write!(
             fmtr,
             "<div class=\"paideia-preformatted\">{}</div>",
-            ctx.renderer(&self.0)
+            ctx.render(&self.0)
         )
     }
 }
@@ -131,6 +133,87 @@ where
         fmtr: &mut fmt::Formatter,
         ctx: &Context<MdRendering, Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "<pre>{}</pre>", ctx.renderer(&self.0))
+        write!(fmtr, "<pre>{}</pre>", ctx.render(&self.0))
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Paragraph<C>(pub C)
+where
+    C: Component<Kind = InlineComponent>;
+
+impl<C> Component for Paragraph<C>
+where
+    C: Component<Kind = InlineComponent>,
+{
+    type Kind = BlockComponent;
+}
+
+impl<C> Render<HtmlRendering> for Paragraph<C>
+where
+    C: Render<HtmlRendering, Kind = InlineComponent>,
+{
+    fn render(
+        &self,
+        fmtr: &mut fmt::Formatter,
+        ctx: &Context<HtmlRendering, Self::Kind>,
+    ) -> fmt::Result {
+        write!(
+            fmtr,
+            "<p class=\"paideia-paragraph\">{}</p>",
+            Context::new(
+                ctx.location(),
+                ctx.level(),
+                ctx.render_format(),
+                &InlineComponent::new(),
+            )
+            .render(&self.0)
+        )
+    }
+}
+
+impl<C> Render<MdRendering> for Paragraph<C>
+where
+    C: Render<MdRendering, Kind = InlineComponent>,
+{
+    fn render(
+        &self,
+        fmtr: &mut fmt::Formatter,
+        ctx: &Context<MdRendering, Self::Kind>,
+    ) -> fmt::Result {
+        write!(
+            fmtr,
+            "{}\n\n",
+            Context::new(
+                ctx.location(),
+                ctx.level(),
+                ctx.render_format(),
+                &InlineComponent::new(),
+            )
+            .render(&self.0)
+        )
+    }
+}
+
+impl<C> Render<TextRendering> for Paragraph<C>
+where
+    C: Render<TextRendering, Kind = InlineComponent>,
+{
+    fn render(
+        &self,
+        fmtr: &mut fmt::Formatter,
+        ctx: &Context<TextRendering, Self::Kind>,
+    ) -> fmt::Result {
+        write!(
+            fmtr,
+            "{}\n\n",
+            Context::new(
+                ctx.location(),
+                ctx.level(),
+                ctx.render_format(),
+                &InlineComponent::new(),
+            )
+            .render(&self.0)
+        )
     }
 }

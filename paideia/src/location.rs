@@ -210,7 +210,7 @@ impl Render<HtmlRendering> for InternalPath {
             }
             let encoded = percent_encode(self.to_string().as_bytes(), CONTROLS)
                 .collect::<String>();
-            write!(fmtr, "{}", ctx.renderer(&encoded))?;
+            write!(fmtr, "{}", ctx.render(&encoded))?;
         }
         Ok(())
     }

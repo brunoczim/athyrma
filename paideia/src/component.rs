@@ -53,7 +53,7 @@ where
         self.kind
     }
 
-    pub fn renderer<'this, T>(
+    pub fn render<'this, T>(
         &'this self,
         component: T,
     ) -> Renderer<'this, 'loc, 'fmt, 'kind, T, R>
@@ -199,6 +199,38 @@ where
     T: Component<Kind = H::Kind>,
 {
     type Kind = H::Kind;
+}
+
+impl<C, R> Render<R> for Conil<C>
+where
+    C: ComponentKind,
+    R: RenderFormat,
+{
+    fn render(
+        &self,
+        _fmtr: &mut fmt::Formatter,
+        _ctx: &Context<R, Self::Kind>,
+    ) -> fmt::Result {
+        self.coerce()
+    }
+}
+
+impl<R, H, T> Render<R> for Cocons<H, T>
+where
+    R: RenderFormat,
+    H: Render<R>,
+    T: Render<R, Kind = H::Kind>,
+{
+    fn render(
+        &self,
+        fmtr: &mut fmt::Formatter,
+        ctx: &Context<R, Self::Kind>,
+    ) -> fmt::Result {
+        match self {
+            Cocons::Head(head) => head.render(fmtr, ctx),
+            Cocons::Tail(tail) => tail.render(fmtr, ctx),
+        }
+    }
 }
 
 impl<'this, T, R> Render<R> for &'this T

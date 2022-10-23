@@ -33,7 +33,7 @@ where
         write!(
             fmtr,
             "<span class=\"paideia-bold\">{}</span>",
-            ctx.renderer(&self.0)
+            ctx.render(&self.0)
         )
     }
 }
@@ -47,7 +47,7 @@ where
         fmtr: &mut fmt::Formatter,
         ctx: &Context<MdRendering, Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "**{}**", ctx.renderer(&self.0))
+        write!(fmtr, "**{}**", ctx.render(&self.0))
     }
 }
 
@@ -75,7 +75,7 @@ where
         write!(
             fmtr,
             "<span class=\"paideia-italic\">{}</span>",
-            ctx.renderer(&self.0)
+            ctx.render(&self.0)
         )
     }
 }
@@ -89,7 +89,7 @@ where
         fmtr: &mut fmt::Formatter,
         ctx: &Context<MdRendering, Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "_{}_", ctx.renderer(&self.0))
+        write!(fmtr, "_{}_", ctx.render(&self.0))
     }
 }
 
@@ -117,7 +117,7 @@ where
         write!(
             fmtr,
             "<span class=\"paideia-preformatted\">{}</span>",
-            ctx.renderer(&self.0)
+            ctx.render(&self.0)
         )
     }
 }
@@ -131,6 +131,6 @@ where
         fmtr: &mut fmt::Formatter,
         ctx: &Context<MdRendering, Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "<pre>{}</pre>", ctx.renderer(&self.0))
+        write!(fmtr, "<pre>{}</pre>", ctx.render(&self.0))
     }
 }

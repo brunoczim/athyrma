@@ -15,6 +15,12 @@ pub struct InlineComponent {
     _priv: (),
 }
 
+impl InlineComponent {
+    pub(crate) fn new() -> Self {
+        Self { _priv: () }
+    }
+}
+
 impl ComponentKind for InlineComponent {}
 
 fn html_escape(ch: char) -> Option<&'static str> {

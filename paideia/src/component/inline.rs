@@ -1,12 +1,7 @@
-use super::{
-    Component,
-    ComponentKind,
-    Context,
-    HtmlRendering,
-    MdRendering,
-    Render,
-};
-use std::fmt;
+use crate::render_format::{Html, Markdown, Text};
+
+use super::{Component, ComponentKind, Context, Render, Renderer};
+use std::fmt::{self, Write};
 
 pub mod text;
 
@@ -53,11 +48,11 @@ impl Component for str {
     type Kind = InlineComponent;
 }
 
-impl Render<HtmlRendering> for str {
+impl Render<Html> for str {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        _ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         let mut start = 0;
         let iter = self
@@ -65,21 +60,21 @@ impl Render<HtmlRendering> for str {
             .filter_map(|(i, ch)| html_escape(ch).map(|s| (i, s)));
 
         for (end, escape) in iter {
-            fmtr.write_str(&self[start .. end])?;
-            fmtr.write_str(escape)?;
+            renderer.write_str(&self[start .. end])?;
+            renderer.write_str(escape)?;
             start = end + 1;
         }
 
-        fmtr.write_str(&self[start ..])?;
+        renderer.write_str(&self[start ..])?;
         Ok(())
     }
 }
 
-impl Render<MdRendering> for str {
+impl<'sess> Render<Markdown<'sess>> for str {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        _ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         let mut start = 0;
         let iter = self
@@ -87,40 +82,56 @@ impl Render<MdRendering> for str {
             .filter_map(|(i, ch)| md_escape(ch).map(|s| (i, s)));
 
         for (end, escape) in iter {
-            fmtr.write_str(&self[start .. end])?;
-            fmtr.write_str(escape)?;
+            renderer.write_str(&self[start .. end])?;
+            renderer.write_str(escape)?;
             start = end + 1;
         }
 
-        fmtr.write_str(&self[start ..])?;
+        renderer.write_str(&self[start ..])?;
         Ok(())
     }
 }
 
-impl_text_as_display! { str }
+impl<'sess> Render<Text<'sess>> for str {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        _ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        renderer.write_str(self)
+    }
+}
 
 impl Component for String {
     type Kind = InlineComponent;
 }
 
-impl Render<HtmlRendering> for String {
+impl Render<Html> for String {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 
-impl Render<MdRendering> for String {
+impl<'sess> Render<Markdown<'sess>> for String {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 
-impl_text_as_display! { String }
+impl<'sess> Render<Text<'sess>> for String {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        (**self).render(renderer, ctx)
+    }
+}

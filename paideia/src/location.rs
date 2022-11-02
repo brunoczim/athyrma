@@ -1,12 +1,8 @@
 //! This module provides location, paths, Urls.
 
-use crate::component::{
-    Component,
-    Context,
-    HtmlRendering,
-    InlineComponent,
-    MdRendering,
-    Render,
+use crate::{
+    component::{Component, Context, InlineComponent, Render, Renderer},
+    render_format::{Html, Markdown, RenderFormat, Text},
 };
 use percent_encoding::{percent_encode, CONTROLS};
 use std::{error::Error, fmt, path::PathBuf, str};
@@ -62,42 +58,19 @@ impl Component for Location {
     type Kind = InlineComponent;
 }
 
-impl Render<HtmlRendering> for Location {
+impl<R> Render<R> for Location
+where
+    R: RenderFormat + ?Sized,
+{
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         match self {
-            Location::Url(url) => write!(fmtr, "{}", url),
-            Location::Internal(int) => int.render(fmtr, ctx),
+            Location::Url(url) => write!(renderer, "{}", url),
+            Location::Internal(int) => int.render(renderer, ctx),
         }
-    }
-}
-
-impl Render<MdRendering> for Location {
-    fn render(
-        &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
-    ) -> fmt::Result {
-        self.render(
-            fmtr,
-            &Context::new(
-                ctx.location(),
-                ctx.level(),
-                &HtmlRendering,
-                ctx.kind(),
-            ),
-        )
-    }
-}
-
-impl_text_as_display! { Location }
-
-impl fmt::Display for Location {
-    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-        todo!()
     }
 }
 
@@ -169,6 +142,25 @@ impl InternalPath {
             self == other
         }
     }
+
+    fn render_as_url<R>(
+        &self,
+        renderer: &mut Renderer<R>,
+        ctx: Context<<Self as Component>::Kind>,
+    ) -> fmt::Result
+    where
+        R: RenderFormat + ?Sized,
+    {
+        if !self.eq_index(ctx.location()) {
+            for _ in 0 .. ctx.location().dir_depth() {
+                renderer.write_str("../")?;
+            }
+            let encoded = percent_encode(self.to_string().as_bytes(), CONTROLS)
+                .collect::<String>();
+            write!(renderer, "{}", ctx.render(&encoded))?;
+        }
+        Ok(())
+    }
 }
 
 impl Default for InternalPath {
@@ -198,39 +190,35 @@ impl Component for InternalPath {
     type Kind = InlineComponent;
 }
 
-impl Render<HtmlRendering> for InternalPath {
+impl Render<Html> for InternalPath {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        if !self.eq_index(ctx.location()) {
-            for _ in 0 .. ctx.location().dir_depth() {
-                fmtr.write_str("../")?;
-            }
-            let encoded = percent_encode(self.to_string().as_bytes(), CONTROLS)
-                .collect::<String>();
-            write!(fmtr, "{}", ctx.render(&encoded))?;
-        }
+        self.render_as_url(renderer, ctx)?;
         Ok(())
     }
 }
 
-impl Render<MdRendering> for InternalPath {
+impl<'sess> Render<Markdown<'sess>> for InternalPath {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.render(
-            fmtr,
-            &Context::new(
-                ctx.location(),
-                ctx.level(),
-                &HtmlRendering,
-                ctx.kind(),
-            ),
-        )
+        self.render_as_url(renderer, ctx)?;
+        Ok(())
+    }
+}
+
+impl<'sess> Render<Text<'sess>> for InternalPath {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        write!(renderer, "{}", self)
     }
 }
 
@@ -321,28 +309,21 @@ impl Component for InternalLoc {
     type Kind = InlineComponent;
 }
 
-impl Render<HtmlRendering> for InternalLoc {
+impl<R> Render<R> for InternalLoc
+where
+    R: RenderFormat + ?Sized,
+{
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.path.render(fmtr, ctx)?;
+        self.path.render(renderer, ctx)?;
         if let Some(id) = &self.id {
-            fmtr.write_str("#")?;
-            id.render(fmtr, ctx)?;
+            renderer.write_str("#")?;
+            id.render(renderer, ctx)?;
         }
         Ok(())
-    }
-}
-
-impl Render<MdRendering> for InternalLoc {
-    fn render(
-        &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
-    ) -> fmt::Result {
-        todo!()
     }
 }
 
@@ -400,35 +381,18 @@ impl Component for Id {
     type Kind = InlineComponent;
 }
 
-impl Render<HtmlRendering> for Id {
+impl<R> Render<R> for Id
+where
+    R: RenderFormat + ?Sized,
+{
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(fmtr, "{}", self)
+        write!(renderer, "{}", self)
     }
 }
-
-impl Render<MdRendering> for Id {
-    fn render(
-        &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
-    ) -> fmt::Result {
-        self.render(
-            fmtr,
-            &Context::new(
-                ctx.location(),
-                ctx.level(),
-                &HtmlRendering,
-                ctx.kind(),
-            ),
-        )
-    }
-}
-
-impl_text_as_display! { Id }
 
 /// Error when an invalid fragment (piece of a path) string is given to be
 /// parsed.

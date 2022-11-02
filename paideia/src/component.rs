@@ -2,7 +2,10 @@ mod inline;
 mod block;
 mod alt;
 
-use crate::{location::InternalPath, render_format::RenderFormat};
+use crate::{
+    location::InternalPath,
+    render_format::{self, RenderFormat},
+};
 use std::{fmt, rc::Rc, sync::Arc};
 
 pub use block::BlockComponent;
@@ -106,64 +109,18 @@ where
 }
 
 pub trait FullRender:
-    Render<HtmlRendering> + Render<MdRendering> + Render<TextRendering>
+    Render<render_format::Html>
+    + for<'sess> Render<render_format::Markdown<'sess>>
+    + for<'sess> Render<render_format::Text<'sess>>
 {
 }
 
 impl<T> FullRender for T where
-    T: Render<HtmlRendering>
-        + Render<MdRendering>
-        + Render<TextRendering>
+    T: Render<render_format::Html>
+        + for<'sess> Render<render_format::Markdown<'sess>>
+        + for<'sess> Render<render_format::Text<'sess>>
         + ?Sized
 {
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct HtmlRendering;
-
-impl RenderFormat for HtmlRendering {
-    fn write_str(
-        &mut self,
-        input: &str,
-        target: &mut dyn fmt::Write,
-    ) -> fmt::Result {
-        target.write_str(input)
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct MdRendering {
-    level: u32,
-    needs_newline: bool,
-}
-
-impl MdRendering {
-    pub fn new() -> Self {
-        Self { level: 0, needs_newline: false }
-    }
-}
-
-impl RenderFormat for MdRendering {
-    fn write_str(
-        &mut self,
-        input: &str,
-        target: &mut dyn fmt::Write,
-    ) -> fmt::Result {
-        target.write_str(input)
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct TextRendering;
-
-impl RenderFormat for TextRendering {
-    fn write_str(
-        &mut self,
-        input: &str,
-        target: &mut dyn fmt::Write,
-    ) -> fmt::Result {
-        target.write_str(input)
-    }
 }
 
 impl<'this, T> Component for &'this T

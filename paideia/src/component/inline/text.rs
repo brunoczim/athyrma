@@ -1,12 +1,9 @@
 use std::fmt;
 
 use super::InlineComponent;
-use crate::component::{
-    Component,
-    Context,
-    HtmlRendering,
-    MdRendering,
-    Render,
+use crate::{
+    component::{Component, Context, Render, Renderer},
+    render_format::{Html, Markdown, Text},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -21,33 +18,46 @@ where
     type Kind = InlineComponent;
 }
 
-impl<C> Render<HtmlRendering> for Bold<C>
+impl<C> Render<Html> for Bold<C>
 where
-    C: Render<HtmlRendering, Kind = InlineComponent>,
+    C: Render<Html, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         write!(
-            fmtr,
+            renderer,
             "<span class=\"paideia-bold\">{}</span>",
             ctx.render(&self.0)
         )
     }
 }
 
-impl<C> Render<MdRendering> for Bold<C>
+impl<'sess, C> Render<Markdown<'sess>> for Bold<C>
 where
-    C: Render<MdRendering, Kind = InlineComponent>,
+    C: Render<Markdown<'sess>, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "**{}**", ctx.render(&self.0))
+        write!(renderer, "**{}**", ctx.render(&self.0))
+    }
+}
+
+impl<'sess, C> Render<Text<'sess>> for Bold<C>
+where
+    C: Render<Text<'sess>, Kind = InlineComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> std::fmt::Result {
+        write!(renderer, "{}", ctx.render(&self.0))
     }
 }
 

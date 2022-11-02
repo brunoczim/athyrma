@@ -1,7 +1,8 @@
 mod inline;
 mod block;
+mod alt;
 
-use crate::location::InternalPath;
+use crate::{location::InternalPath, render_format::RenderFormat};
 use std::{fmt, rc::Rc, sync::Arc};
 
 pub use block::BlockComponent;
@@ -11,30 +12,67 @@ use katalogos::{
     list::{Cons, Nil},
 };
 
-#[derive(Debug, Clone, Copy)]
-pub struct Context<'loc, 'fmt, 'kind, R, K>
+#[derive(Debug)]
+pub struct Renderer<'render_fmt, 'fmtr, R>
 where
     R: RenderFormat + ?Sized,
+{
+    render_format: &'render_fmt mut R,
+    formatter: &'fmtr mut fmt::Formatter<'fmtr>,
+}
+
+impl<'render_fmt, 'fmtr, R> Renderer<'render_fmt, 'fmtr, R>
+where
+    R: RenderFormat + ?Sized,
+{
+    pub fn format(&self) -> &R {
+        &self.render_format
+    }
+
+    pub fn format_mut(&mut self) -> &mut R {
+        &mut self.render_format
+    }
+
+    pub fn with<'fmt_s, 'fmtr_this, S>(
+        &'fmtr_this mut self,
+        render_format: &'fmt_s mut S,
+    ) -> Renderer<'fmt_s, 'fmtr_this, S>
+    where
+        S: RenderFormat + ?Sized,
+    {
+        Renderer { render_format, formatter: &mut *self.formatter }
+    }
+}
+
+impl<'render_fmt, 'fmtr, R> fmt::Write for Renderer<'render_fmt, 'fmtr, R>
+where
+    R: RenderFormat + ?Sized,
+{
+    fn write_str(&mut self, input: &str) -> fmt::Result {
+        self.render_format.write_str(input, self.formatter)
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Context<'loc, 'kind, K>
+where
     K: ComponentKind + ?Sized,
 {
     location: &'loc InternalPath,
     level: u32,
-    render_format: &'fmt R,
     kind: &'kind K,
 }
 
-impl<'loc, 'fmt, 'kind, R, K> Context<'loc, 'fmt, 'kind, R, K>
+impl<'loc, 'kind, K> Context<'loc, 'kind, K>
 where
-    R: RenderFormat + ?Sized,
     K: ComponentKind + ?Sized,
 {
     pub fn new(
         location: &'loc InternalPath,
         level: u32,
-        render_format: &'fmt R,
         kind: &'kind K,
     ) -> Self {
-        Self { location, level, render_format, kind }
+        Self { location, level, kind }
     }
 
     pub fn location(&self) -> &'loc InternalPath {
@@ -45,26 +83,10 @@ where
         self.level
     }
 
-    pub fn render_format(&self) -> &'fmt R {
-        self.render_format
-    }
-
     pub fn kind(&self) -> &'kind K {
         self.kind
     }
-
-    pub fn render<'this, T>(
-        &'this self,
-        component: T,
-    ) -> Renderer<'this, 'loc, 'fmt, 'kind, T, R>
-    where
-        T: Render<R, Kind = K>,
-    {
-        Renderer { context: self, component }
-    }
 }
-
-pub trait RenderFormat {}
 
 pub trait ComponentKind {}
 
@@ -78,8 +100,8 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result;
 }
 
@@ -96,45 +118,53 @@ impl<T> FullRender for T where
 {
 }
 
-/// A renderer over a component. The `Display` trait can be used on the
-/// renderer.
 #[derive(Debug, Clone, Copy)]
-pub struct Renderer<'ctx, 'loc, 'fmt, 'kind, T, R>
-where
-    R: RenderFormat + ?Sized,
-    T: Render<R>,
-{
-    /// The component being rendered.
-    pub component: T,
-    /// The context at which the component will be rendered.
-    pub context: &'ctx Context<'loc, 'fmt, 'kind, R, T::Kind>,
-}
+pub struct HtmlRendering;
 
-impl<'ctx, 'loc, 'fmt, 'kind, T, R> fmt::Display
-    for Renderer<'ctx, 'loc, 'fmt, 'kind, T, R>
-where
-    R: RenderFormat,
-    T: Render<R>,
-{
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        self.component.render(fmt, self.context)
+impl RenderFormat for HtmlRendering {
+    fn write_str(
+        &mut self,
+        input: &str,
+        target: &mut dyn fmt::Write,
+    ) -> fmt::Result {
+        target.write_str(input)
     }
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct HtmlRendering;
+pub struct MdRendering {
+    level: u32,
+    needs_newline: bool,
+}
 
-impl RenderFormat for HtmlRendering {}
+impl MdRendering {
+    pub fn new() -> Self {
+        Self { level: 0, needs_newline: false }
+    }
+}
 
-#[derive(Debug, Clone, Copy)]
-pub struct MdRendering;
-
-impl RenderFormat for MdRendering {}
+impl RenderFormat for MdRendering {
+    fn write_str(
+        &mut self,
+        input: &str,
+        target: &mut dyn fmt::Write,
+    ) -> fmt::Result {
+        target.write_str(input)
+    }
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct TextRendering;
 
-impl RenderFormat for TextRendering {}
+impl RenderFormat for TextRendering {
+    fn write_str(
+        &mut self,
+        input: &str,
+        target: &mut dyn fmt::Write,
+    ) -> fmt::Result {
+        target.write_str(input)
+    }
+}
 
 impl<'this, T> Component for &'this T
 where
@@ -208,8 +238,8 @@ where
 {
     fn render(
         &self,
-        _fmtr: &mut fmt::Formatter,
-        _ctx: &Context<R, Self::Kind>,
+        _renderer: &mut Renderer<R>,
+        _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.coerce()
     }
@@ -223,12 +253,12 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         match self {
-            Cocons::Head(head) => head.render(fmtr, ctx),
-            Cocons::Tail(tail) => tail.render(fmtr, ctx),
+            Cocons::Head(head) => head.render(renderer, ctx),
+            Cocons::Tail(tail) => tail.render(renderer, ctx),
         }
     }
 }
@@ -240,10 +270,10 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 
@@ -254,10 +284,10 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 
@@ -268,10 +298,10 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 
@@ -282,10 +312,10 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 
@@ -296,10 +326,10 @@ where
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<R, Self::Kind>,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        (**self).render(fmtr, ctx)
+        (**self).render(renderer, ctx)
     }
 }
 

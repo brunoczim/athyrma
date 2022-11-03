@@ -1,12 +1,12 @@
+use crate::render_format::{Html, Markdown, Text};
+
 use super::{
     Component,
     ComponentKind,
     Context,
-    HtmlRendering,
     InlineComponent,
-    MdRendering,
     Render,
-    TextRendering,
+    Renderer,
 };
 use std::fmt;
 
@@ -38,71 +38,56 @@ where
     type Kind = BlockComponent;
 }
 
-impl<C> Render<HtmlRendering> for InlineBlock<C>
+impl<C> Render<Html> for InlineBlock<C>
 where
-    C: Render<HtmlRendering, Kind = InlineComponent>,
+    C: Render<Html, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         write!(
-            fmtr,
+            renderer,
             "<span class=\"paideia-inline-block\">{}</p>",
-            Context::new(
-                ctx.location(),
-                ctx.level(),
-                ctx.render_format(),
-                &InlineComponent::new(),
-            )
-            .render(&self.0)
+            Context::new(ctx.location(), ctx.level(), &InlineComponent::new())
+                .render(&self.0)
         )
     }
 }
 
-impl<C> Render<MdRendering> for InlineBlock<C>
+impl<'sess, C> Render<Markdown<'sess>> for InlineBlock<C>
 where
-    C: Render<MdRendering, Kind = InlineComponent>,
+    C: Render<Markdown<'sess>, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         write!(
-            fmtr,
+            renderer,
             "{}",
-            Context::new(
-                ctx.location(),
-                ctx.level(),
-                ctx.render_format(),
-                &InlineComponent::new(),
-            )
-            .render(&self.0)
+            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
+                .render(&self.0)
         )
     }
 }
 
-impl<C> Render<TextRendering> for InlineBlock<C>
+impl<'sess, C> Render<Text<'sess>> for InlineBlock<C>
 where
-    C: Render<TextRendering, Kind = InlineComponent>,
+    C: Render<Text<'sess>, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<TextRendering, Self::Kind>,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         write!(
-            fmtr,
+            renderer,
             "{}",
-            Context::new(
-                ctx.location(),
-                ctx.level(),
-                ctx.render_format(),
-                &InlineComponent::new(),
-            )
-            .render(&self.0)
+            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
+                .render(&self.0)
         )
     }
 }

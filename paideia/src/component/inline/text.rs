@@ -1,5 +1,3 @@
-use std::fmt;
-
 use super::InlineComponent;
 use crate::{
     component::{Component, Context, Render, Renderer},
@@ -73,33 +71,46 @@ where
     type Kind = InlineComponent;
 }
 
-impl<C> Render<HtmlRendering> for Italic<C>
+impl<C> Render<Html> for Italic<C>
 where
-    C: Render<HtmlRendering, Kind = InlineComponent>,
+    C: Render<Html, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         write!(
-            fmtr,
+            renderer,
             "<span class=\"paideia-italic\">{}</span>",
             ctx.render(&self.0)
         )
     }
 }
 
-impl<C> Render<MdRendering> for Italic<C>
+impl<'sess, C> Render<Markdown<'sess>> for Italic<C>
 where
-    C: Render<MdRendering, Kind = InlineComponent>,
+    C: Render<Markdown<'sess>, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "_{}_", ctx.render(&self.0))
+        write!(renderer, "_{}_", ctx.render(&self.0))
+    }
+}
+
+impl<'sess, C> Render<Text<'sess>> for Italic<C>
+where
+    C: Render<Text<'sess>, Kind = InlineComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> std::fmt::Result {
+        write!(renderer, "{}", ctx.render(&self.0))
     }
 }
 
@@ -115,32 +126,45 @@ where
     type Kind = InlineComponent;
 }
 
-impl<C> Render<HtmlRendering> for Preformatted<C>
+impl<C> Render<Html> for Preformatted<C>
 where
-    C: Render<HtmlRendering, Kind = InlineComponent>,
+    C: Render<Html, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<HtmlRendering, Self::Kind>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         write!(
-            fmtr,
+            renderer,
             "<span class=\"paideia-preformatted\">{}</span>",
             ctx.render(&self.0)
         )
     }
 }
 
-impl<C> Render<MdRendering> for Preformatted<C>
+impl<'sess, C> Render<Markdown<'sess>> for Preformatted<C>
 where
-    C: Render<MdRendering, Kind = InlineComponent>,
+    C: Render<Markdown<'sess>, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        fmtr: &mut fmt::Formatter,
-        ctx: &Context<MdRendering, Self::Kind>,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(fmtr, "<pre>{}</pre>", ctx.render(&self.0))
+        write!(renderer, "<pre>{}</pre>", ctx.render(&self.0))
+    }
+}
+
+impl<'sess, C> Render<Text<'sess>> for Preformatted<C>
+where
+    C: Render<Text<'sess>, Kind = InlineComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> std::fmt::Result {
+        write!(renderer, "{}", ctx.render(&self.0))
     }
 }

@@ -1,6 +1,5 @@
 mod inline;
 mod block;
-mod alt;
 
 use crate::{
     location::InternalPath,
@@ -36,7 +35,7 @@ where
         &mut self.render_format
     }
 
-    pub fn with<'fmt_s, 'fmtr_this, S>(
+    pub fn with_format<'fmt_s, 'fmtr_this, S>(
         &'fmtr_this mut self,
         render_format: &'fmt_s mut S,
     ) -> Renderer<'fmt_s, 'fmtr_this, S>
@@ -76,6 +75,13 @@ where
         kind: &'kind K,
     ) -> Self {
         Self { location, level, kind }
+    }
+
+    pub fn with_kind<Q>(self, kind: &'kind Q) -> Context<'loc, 'kind, Q>
+    where
+        Q: ComponentKind + ?Sized,
+    {
+        Context::new(self.location(), self.level(), kind)
     }
 
     pub fn location(&self) -> &'loc InternalPath {
@@ -289,16 +295,6 @@ where
         (**self).render(renderer, ctx)
     }
 }
-
-impl<'this, R> RenderFormat for &'this R where R: RenderFormat + ?Sized {}
-
-impl<'this, R> RenderFormat for &'this mut R where R: RenderFormat + ?Sized {}
-
-impl<R> RenderFormat for Box<R> where R: RenderFormat + ?Sized {}
-
-impl<R> RenderFormat for Rc<R> where R: RenderFormat + ?Sized {}
-
-impl<R> RenderFormat for Arc<R> where R: RenderFormat + ?Sized {}
 
 impl<'this, K> ComponentKind for &'this K where K: ComponentKind + ?Sized {}
 

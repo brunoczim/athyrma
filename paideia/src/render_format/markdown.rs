@@ -54,7 +54,9 @@ impl<'sess> RenderFormat for Markdown<'sess> {
                     target.write_str("\n")?;
                 }
                 self.session.needs_newline = false;
-                for _ in 0 .. self.session.level * self.session.indent_size {
+                let indent_spaces = self.session.level.saturating_sub(1)
+                    * self.session.indent_size;
+                for _ in 0 .. indent_spaces {
                     target.write_str(" ")?;
                 }
                 target.write_str(line)?;

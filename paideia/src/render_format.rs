@@ -29,7 +29,10 @@ where
     }
 }
 
-impl<T> RenderFormat for Box<T> {
+impl<T> RenderFormat for Box<T>
+where
+    T: RenderFormat + ?Sized,
+{
     fn write_str(
         &mut self,
         input: &str,

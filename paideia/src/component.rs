@@ -14,13 +14,24 @@ use katalogos::{
     list::{Cons, Nil},
 };
 
-#[derive(Debug)]
 pub struct Renderer<'render_fmt, 'fmtr, R>
 where
     R: RenderFormat + ?Sized,
 {
     render_format: &'render_fmt mut R,
     formatter: &'fmtr mut fmt::Formatter<'fmtr>,
+}
+
+impl<'render_fmt, 'fmtr, R> fmt::Debug for Renderer<'render_fmt, 'fmtr, R>
+where
+    R: RenderFormat + ?Sized + fmt::Debug,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        fmtr.debug_struct("Renderer")
+            .field("render_format", &self.render_format)
+            .field("formatter", &(self.formatter as *const fmt::Formatter))
+            .finish()
+    }
 }
 
 impl<'render_fmt, 'fmtr, R> Renderer<'render_fmt, 'fmtr, R>
@@ -35,14 +46,30 @@ where
         &mut self.render_format
     }
 
-    pub fn with_format<'fmt_s, 'fmtr_this, S>(
-        &'fmtr_this mut self,
-        render_format: &'fmt_s mut S,
-    ) -> Renderer<'fmt_s, 'fmtr_this, S>
+    pub fn with_format<'new_render_fmt, 'this, S>(
+        &'this mut self,
+        render_format: &'new_render_fmt mut S,
+    ) -> Renderer<'new_render_fmt, 'this, S>
     where
         S: RenderFormat + ?Sized,
+        'this: 'fmtr,
     {
         Renderer { render_format, formatter: &mut *self.formatter }
+    }
+
+    pub fn map_format<'this, S, F>(
+        &'this mut self,
+        mapper: F,
+    ) -> Renderer<'this, 'this, S>
+    where
+        S: RenderFormat + ?Sized,
+        F: FnOnce(&'this mut R) -> &'this mut S,
+        'this: 'fmtr,
+    {
+        Renderer {
+            render_format: mapper(&mut *self.render_format),
+            formatter: &mut *self.formatter,
+        }
     }
 }
 
@@ -55,7 +82,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct Context<'loc, 'kind, K>
 where
     K: ComponentKind + ?Sized,
@@ -63,6 +90,20 @@ where
     location: &'loc InternalPath,
     level: u32,
     kind: &'kind K,
+}
+
+impl<'loc, 'kind, K> Clone for Context<'loc, 'kind, K>
+where
+    K: ComponentKind + ?Sized,
+{
+    fn clone(&self) -> Self {
+        Self { location: self.location, level: self.level, kind: self.kind }
+    }
+}
+
+impl<'loc, 'kind, K> Copy for Context<'loc, 'kind, K> where
+    K: ComponentKind + ?Sized
+{
 }
 
 impl<'loc, 'kind, K> Context<'loc, 'kind, K>

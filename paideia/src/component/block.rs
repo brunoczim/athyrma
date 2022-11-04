@@ -8,7 +8,7 @@ use super::{
     Render,
     Renderer,
 };
-use std::fmt;
+use std::fmt::{self, Write};
 
 pub mod text;
 pub mod list;
@@ -47,12 +47,10 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
-            renderer,
-            "<span class=\"paideia-inline-block\">{}</p>",
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new())
-                .render(&self.0)
-        )
+        renderer.write_str("<span class=\"paideia-inline-block\">")?;
+        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        renderer.write_str("</span>")?;
+        Ok(())
     }
 }
 
@@ -65,11 +63,9 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
+        self.0.render(
             renderer,
-            "{}",
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
-                .render(&self.0)
+            Context::new(ctx.location(), ctx.level(), &InlineComponent::new()),
         )
     }
 }
@@ -83,11 +79,9 @@ where
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
+        self.0.render(
             renderer,
-            "{}",
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
-                .render(&self.0)
+            Context::new(ctx.location(), ctx.level(), &InlineComponent::new()),
         )
     }
 }

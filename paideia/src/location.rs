@@ -5,7 +5,12 @@ use crate::{
     render_format::{Html, Markdown, RenderFormat, Text},
 };
 use percent_encoding::{percent_encode, CONTROLS};
-use std::{error::Error, fmt, path::PathBuf, str};
+use std::{
+    error::Error,
+    fmt::{self, Write},
+    path::PathBuf,
+    str,
+};
 use url::Url;
 
 /// A location of a page, either internal or external.
@@ -58,13 +63,36 @@ impl Component for Location {
     type Kind = InlineComponent;
 }
 
-impl<R> Render<R> for Location
-where
-    R: RenderFormat + ?Sized,
-{
+impl Render<Html> for Location {
     fn render(
         &self,
-        renderer: &mut Renderer<R>,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        match self {
+            Location::Url(url) => write!(renderer, "{}", url),
+            Location::Internal(int) => int.render(renderer, ctx),
+        }
+    }
+}
+
+impl<'sess> Render<Markdown<'sess>> for Location {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        match self {
+            Location::Url(url) => write!(renderer, "{}", url),
+            Location::Internal(int) => int.render(renderer, ctx),
+        }
+    }
+}
+
+impl<'sess> Render<Text<'sess>> for Location {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         match self {
@@ -150,6 +178,7 @@ impl InternalPath {
     ) -> fmt::Result
     where
         R: RenderFormat + ?Sized,
+        String: Render<R>,
     {
         if !self.eq_index(ctx.location()) {
             for _ in 0 .. ctx.location().dir_depth() {
@@ -157,7 +186,7 @@ impl InternalPath {
             }
             let encoded = percent_encode(self.to_string().as_bytes(), CONTROLS)
                 .collect::<String>();
-            write!(renderer, "{}", ctx.render(&encoded))?;
+            encoded.render(renderer, ctx)?;
         }
         Ok(())
     }
@@ -204,7 +233,7 @@ impl Render<Html> for InternalPath {
 impl<'sess> Render<Markdown<'sess>> for InternalPath {
     fn render(
         &self,
-        renderer: &mut Renderer<Html>,
+        renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.render_as_url(renderer, ctx)?;
@@ -216,7 +245,7 @@ impl<'sess> Render<Text<'sess>> for InternalPath {
     fn render(
         &self,
         renderer: &mut Renderer<Text<'sess>>,
-        ctx: Context<Self::Kind>,
+        _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         write!(renderer, "{}", self)
     }
@@ -291,6 +320,23 @@ impl InternalLoc {
             },
         })
     }
+
+    pub fn render_as_url<R>(
+        &self,
+        renderer: &mut Renderer<R>,
+        ctx: Context<<Self as Component>::Kind>,
+    ) -> fmt::Result
+    where
+        R: RenderFormat + ?Sized,
+        InternalPath: Render<R>,
+    {
+        self.path.render(renderer, ctx)?;
+        if let Some(id) = &self.id {
+            renderer.write_str("#")?;
+            id.render(renderer, ctx)?;
+        }
+        Ok(())
+    }
 }
 
 impl fmt::Display for InternalLoc {
@@ -309,21 +355,33 @@ impl Component for InternalLoc {
     type Kind = InlineComponent;
 }
 
-impl<R> Render<R> for InternalLoc
-where
-    R: RenderFormat + ?Sized,
-{
+impl Render<Html> for InternalLoc {
     fn render(
         &self,
-        renderer: &mut Renderer<R>,
+        renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.path.render(renderer, ctx)?;
-        if let Some(id) = &self.id {
-            renderer.write_str("#")?;
-            id.render(renderer, ctx)?;
-        }
-        Ok(())
+        self.render_as_url(renderer, ctx)
+    }
+}
+
+impl<'sess> Render<Markdown<'sess>> for InternalLoc {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Markdown<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        self.render_as_url(renderer, ctx)
+    }
+}
+
+impl<'sess> Render<Text<'sess>> for InternalLoc {
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text<'sess>>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        self.render_as_url(renderer, ctx)
     }
 }
 
@@ -388,7 +446,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<R>,
-        ctx: Context<Self::Kind>,
+        _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         write!(renderer, "{}", self)
     }

@@ -30,9 +30,9 @@ impl<'sess> Markdown<'sess> {
         Self { session }
     }
 
-    pub fn enter(&mut self) -> Markdown {
+    pub fn enter<'new_sess>(&'new_sess mut self) -> Markdown<'new_sess> {
         self.session.level += 1;
-        Markdown::new(&mut *self.ssession)
+        Markdown::new(&mut *self.session)
     }
 }
 

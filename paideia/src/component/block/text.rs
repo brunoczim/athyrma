@@ -1,4 +1,4 @@
-use std::fmt;
+use std::fmt::{self, Write};
 
 use super::BlockComponent;
 use crate::{
@@ -26,12 +26,11 @@ where
         &self,
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        write!(
-            renderer,
-            "<div class=\"paideia-bold\">{}</div>",
-            ctx.render(&self.0)
-        )
+    ) -> std::fmt::Result {
+        renderer.write_str("<div class=\"paideia-bold\">")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</div>")?;
+        Ok(())
     }
 }
 
@@ -43,21 +42,24 @@ where
         &self,
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        write!(renderer, "<b>{}</b>", ctx.render(&self.0))
+    ) -> std::fmt::Result {
+        renderer.write_str("<b>")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</b>")?;
+        Ok(())
     }
 }
 
 impl<'sess, C> Render<Text<'sess>> for Bold<C>
 where
-    C: Render<Markdown<'sess>, Kind = BlockComponent>,
+    C: Render<Text<'sess>, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        write!(renderer, "{}", ctx.render(&self.0))
+    ) -> std::fmt::Result {
+        self.0.render(renderer, ctx)
     }
 }
 
@@ -81,12 +83,11 @@ where
         &self,
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        write!(
-            renderer,
-            "<div class=\"paideia-italic\">{}</div>",
-            ctx.render(&self.0)
-        )
+    ) -> std::fmt::Result {
+        renderer.write_str("<div class=\"paideia-bold\">")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</div>")?;
+        Ok(())
     }
 }
 
@@ -98,21 +99,24 @@ where
         &self,
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        write!(renderer, "<i>{}</i>", ctx.render(&self.0))
+    ) -> std::fmt::Result {
+        renderer.write_str("<i>")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</i>")?;
+        Ok(())
     }
 }
 
 impl<'sess, C> Render<Text<'sess>> for Italic<C>
 where
-    C: Render<Markdown<'sess>, Kind = BlockComponent>,
+    C: Render<Text<'sess>, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        write!(renderer, "{}", ctx.render(&self.0))
+    ) -> std::fmt::Result {
+        self.0.render(renderer, ctx)
     }
 }
 
@@ -120,6 +124,13 @@ where
 pub struct Preformatted<C>(pub C)
 where
     C: Component<Kind = BlockComponent>;
+
+impl<C> Component for Preformatted<C>
+where
+    C: Component<Kind = BlockComponent>,
+{
+    type Kind = BlockComponent;
+}
 
 impl<C> Render<Html> for Preformatted<C>
 where
@@ -130,11 +141,10 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
-            renderer,
-            "<div class=\"paideia-preformatted\">{}</div>",
-            ctx.render(&self.0)
-        )
+        renderer.write_str("<div class=\"paideia-preformatted\">")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</div>")?;
+        Ok(())
     }
 }
 
@@ -147,20 +157,23 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(renderer, "<pre>{}</pre>", ctx.render(&self.0))
+        renderer.write_str("<pre>")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</pre>")?;
+        Ok(())
     }
 }
 
 impl<'sess, C> Render<Text<'sess>> for Preformatted<C>
 where
-    C: Render<Markdown<'sess>, Kind = BlockComponent>,
+    C: Render<Text<'sess>, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(renderer, "{}", ctx.render(&self.0))
+        self.0.render(renderer, ctx)
     }
 }
 
@@ -185,12 +198,10 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
-            renderer,
-            "<p class=\"paideia-paragraph\">{}</p>",
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
-                .render(&self.0)
-        )
+        renderer.write_str("<p class=\"paideia-paragraph\">")?;
+        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        renderer.write_str("</p>")?;
+        Ok(())
     }
 }
 
@@ -203,12 +214,9 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
-            renderer,
-            "{}\n\n",
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
-                .render(&self.0)
-        )
+        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        renderer.write_str("\n\n")?;
+        Ok(())
     }
 }
 
@@ -221,11 +229,8 @@ where
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(
-            renderer,
-            "{}\n\n",
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new(),)
-                .render(&self.0)
-        )
+        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        renderer.write_str("\n\n")?;
+        Ok(())
     }
 }

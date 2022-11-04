@@ -1,9 +1,9 @@
 use super::BlockComponent;
 use crate::{
     component::{Component, Context, Render, Renderer},
-    render_format::{Html, Markdown, Text},
+    render_format::{self, Html, Markdown, Text},
 };
-use std::fmt;
+use std::fmt::{self, Write};
 
 #[derive(Debug)]
 pub struct UnorderedList<L>(pub L)
@@ -48,15 +48,13 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(renderer, "<ul class=\"paideia-ulist\">")?;
+        renderer.write_str("<ul class=\"paideia-ulist\">")?;
         for element in &self.0 {
-            write!(
-                renderer,
-                "<li class=\"paideia-list-elem\">{}</li>",
-                ctx.render(element)
-            )?;
+            renderer.write_str("<li class=\"paideia-list-elem\">")?;
+            element.render(renderer, ctx)?;
+            renderer.write_str("</li>")?;
         }
-        write!(renderer, "</ul>")?;
+        renderer.write_str("</ul>")?;
         Ok(())
     }
 }
@@ -64,8 +62,8 @@ where
 impl<'sess, L> Render<Markdown<'sess>> for UnorderedList<L>
 where
     for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Markdown<'sess>, Kind = BlockComponent>,
+    for<'a, 'b_sess> <&'a L as IntoIterator>::Item:
+        Render<Markdown<'b_sess>, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -73,9 +71,11 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         let mut renderer =
-            renderer.with_format(&mut renderer.format_mut().enter());
+            renderer.map_format(|render_format| &mut render_format.enter());
         for element in &self.0 {
-            write!(renderer, "- {}\n", ctx.render(element))?;
+            renderer.write_str("-")?;
+            element.render(&mut renderer, ctx)?;
+            renderer.write_str("\n")?;
         }
         Ok(())
     }
@@ -95,7 +95,9 @@ where
         let mut renderer =
             renderer.with_format(&mut renderer.format_mut().enter());
         for element in &self.0 {
-            write!(renderer, "- {}\n", ctx.render(element))?;
+            renderer.write_str("-")?;
+            element.render(&mut renderer, ctx)?;
+            renderer.write_str("\n")?;
         }
         Ok(())
     }
@@ -144,15 +146,13 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        write!(renderer, "<ol class=\"paideia-olist\">")?;
+        renderer.write_str("<ol class=\"paideia-olist\">")?;
         for element in &self.0 {
-            write!(
-                renderer,
-                "<li class=\"paideia-list-elem\">{}</li>",
-                ctx.render(element)
-            )?;
+            renderer.write_str("<li class=\"paideia-list-elem\">")?;
+            element.render(renderer, ctx)?;
+            renderer.write_str("</li>")?;
         }
-        write!(renderer, "</ol>")?;
+        renderer.write_str("</ol>")?;
         Ok(())
     }
 }
@@ -171,7 +171,9 @@ where
         let mut renderer =
             renderer.with_format(&mut renderer.format_mut().enter());
         for (i, element) in self.0.into_iter().enumerate() {
-            write!(renderer, "{}. {}\n", i + 1, ctx.render(element))?;
+            write!(renderer, "{}. ", i)?;
+            element.render(&mut renderer, ctx)?;
+            renderer.write_str("\n")?;
         }
         Ok(())
     }
@@ -191,7 +193,9 @@ where
         let mut renderer =
             renderer.with_format(&mut renderer.format_mut().enter());
         for (i, element) in self.0.into_iter().enumerate() {
-            write!(renderer, "{}. {}\n", i + 1, ctx.render(element))?;
+            write!(renderer, "{}. ", i)?;
+            element.render(&mut renderer, ctx)?;
+            renderer.write_str("\n")?;
         }
         Ok(())
     }

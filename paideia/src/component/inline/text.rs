@@ -1,3 +1,5 @@
+use std::fmt::{self, Write};
+
 use super::InlineComponent;
 use crate::{
     component::{Component, Context, Render, Renderer},
@@ -25,11 +27,10 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(
-            renderer,
-            "<span class=\"paideia-bold\">{}</span>",
-            ctx.render(&self.0)
-        )
+        renderer.write_str("<span class=\"paideia-bold\">")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</span>")?;
+        Ok(())
     }
 }
 
@@ -42,7 +43,10 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(renderer, "**{}**", ctx.render(&self.0))
+        renderer.write_str("**")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("**")?;
+        Ok(())
     }
 }
 
@@ -55,7 +59,7 @@ where
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(renderer, "{}", ctx.render(&self.0))
+        self.0.render(renderer, ctx)
     }
 }
 
@@ -80,11 +84,10 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(
-            renderer,
-            "<span class=\"paideia-italic\">{}</span>",
-            ctx.render(&self.0)
-        )
+        renderer.write_str("<span class=\"paideia-bold\">")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</span>")?;
+        Ok(())
     }
 }
 
@@ -97,7 +100,10 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(renderer, "_{}_", ctx.render(&self.0))
+        renderer.write_str("_")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("_")?;
+        Ok(())
     }
 }
 
@@ -110,7 +116,7 @@ where
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        write!(renderer, "{}", ctx.render(&self.0))
+        self.0.render(renderer, ctx)
     }
 }
 
@@ -134,12 +140,11 @@ where
         &self,
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
-    ) -> std::fmt::Result {
-        write!(
-            renderer,
-            "<span class=\"paideia-preformatted\">{}</span>",
-            ctx.render(&self.0)
-        )
+    ) -> fmt::Result {
+        renderer.write_str("<span class=\"paideia-preformatted\">")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</span>")?;
+        Ok(())
     }
 }
 
@@ -151,8 +156,11 @@ where
         &self,
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
-    ) -> std::fmt::Result {
-        write!(renderer, "<pre>{}</pre>", ctx.render(&self.0))
+    ) -> fmt::Result {
+        renderer.write_str("<pre>")?;
+        self.0.render(renderer, ctx)?;
+        renderer.write_str("</pre>")?;
+        Ok(())
     }
 }
 
@@ -164,7 +172,7 @@ where
         &self,
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
-    ) -> std::fmt::Result {
-        write!(renderer, "{}", ctx.render(&self.0))
+    ) -> fmt::Result {
+        self.0.render(renderer, ctx)
     }
 }

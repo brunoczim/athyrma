@@ -3,7 +3,7 @@ use std::fmt::{self, Write};
 use super::BlockComponent;
 use crate::{
     component::{Component, Context, InlineComponent, Render, Renderer},
-    render_format::{Html, Markdown, Text},
+    render::{Html, Markdown, Text},
 };
 
 #[derive(Debug, Clone, Copy)]

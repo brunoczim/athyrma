@@ -1,10 +1,10 @@
-use super::RenderFormat;
+use super::Format;
 use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Html;
 
-impl RenderFormat for Html {
+impl Format for Html {
     fn write_str(
         &mut self,
         input: &str,

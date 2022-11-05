@@ -1,4 +1,4 @@
-use crate::render_format::{Html, Markdown, Text};
+use crate::render::{Html, Markdown, Text};
 
 use super::{
     Component,

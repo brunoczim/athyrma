@@ -1,51 +1,29 @@
-use super::RenderFormat;
+use super::{Format, Scope};
 use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Session {
+pub struct Text {
     needs_newline: bool,
     level: u32,
     indent_size: u32,
 }
 
-impl Default for Session {
+impl Default for Text {
     fn default() -> Self {
         Self::new(4)
     }
 }
 
-impl Session {
+impl Text {
     pub fn new(indent_size: u32) -> Self {
         Self { needs_newline: false, level: 0, indent_size }
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct Text<'sess> {
-    session: &'sess mut Session,
-}
-
-impl<'sess> Text<'sess> {
-    pub fn new(session: &'sess mut Session) -> Self {
-        Self { session }
-    }
-
-    pub fn enter(&mut self) -> Text {
-        self.session.level += 1;
-        Text::new(&mut *self.session)
-    }
-}
-
-impl<'sess> Drop for Text<'sess> {
-    fn drop(&mut self) {
-        self.session.level = self.session.level.saturating_sub(1);
-    }
-}
-
-impl<'sess> RenderFormat for Text<'sess> {
+impl Format for Text {
     fn write_str(
         &mut self,
-        input: &str,
+        mut input: &str,
         target: &mut dyn fmt::Write,
     ) -> fmt::Result {
         for line in input.split_inclusive('\n') {
@@ -54,7 +32,9 @@ impl<'sess> RenderFormat for Text<'sess> {
                     target.write_str("\n")?;
                 }
                 self.session.needs_newline = false;
-                for _ in 0 .. self.session.level * self.session.indent_size {
+                let indent_spaces = self.session.level.saturating_sub(1)
+                    * self.session.indent_size;
+                for _ in 0 .. indent_spaces {
                     target.write_str(" ")?;
                 }
                 target.write_str(line)?;
@@ -64,5 +44,20 @@ impl<'sess> RenderFormat for Text<'sess> {
         }
 
         Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Nest;
+
+impl Scope for Nest {
+    fn enter<F, T>(&self, format: &mut Self::Format, consumer: F) -> T
+    where
+        F: FnOnce(&mut Self::Format) -> T,
+    {
+        format.level += 1;
+        let output = consumer(format);
+        format.level -= 1;
+        output
     }
 }

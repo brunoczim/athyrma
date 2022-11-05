@@ -2,7 +2,7 @@
 
 use crate::{
     component::{Component, Context, InlineComponent, Render, Renderer},
-    render_format::{Html, Markdown, RenderFormat, Text},
+    render::{Format, Html, Markdown, Text},
 };
 use percent_encoding::{percent_encode, CONTROLS};
 use std::{
@@ -177,7 +177,7 @@ impl InternalPath {
         ctx: Context<<Self as Component>::Kind>,
     ) -> fmt::Result
     where
-        R: RenderFormat + ?Sized,
+        R: Format + ?Sized,
         String: Render<R>,
     {
         if !self.eq_index(ctx.location()) {
@@ -327,7 +327,7 @@ impl InternalLoc {
         ctx: Context<<Self as Component>::Kind>,
     ) -> fmt::Result
     where
-        R: RenderFormat + ?Sized,
+        R: Format + ?Sized,
         InternalPath: Render<R>,
     {
         self.path.render(renderer, ctx)?;
@@ -441,7 +441,7 @@ impl Component for Id {
 
 impl<R> Render<R> for Id
 where
-    R: RenderFormat + ?Sized,
+    R: Format + ?Sized,
 {
     fn render(
         &self,

@@ -1,4 +1,4 @@
-use crate::render_format::{Html, Markdown, Text};
+use crate::render::{Html, Markdown, Text};
 
 use super::{Component, ComponentKind, Context, Render, Renderer};
 use std::fmt::{self, Write};

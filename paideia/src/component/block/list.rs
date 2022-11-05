@@ -1,7 +1,7 @@
 use super::BlockComponent;
 use crate::{
     component::{Component, Context, Render, Renderer},
-    render_format::{self, Html, Markdown, Text},
+    render::{self, Html, Markdown, Text},
 };
 use std::fmt::{self, Write};
 
@@ -70,14 +70,17 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        let mut renderer =
-            renderer.map_format(|render_format| &mut render_format.enter());
-        for element in &self.0 {
-            renderer.write_str("-")?;
-            element.render(&mut renderer, ctx)?;
-            renderer.write_str("\n")?;
-        }
-        Ok(())
+        renderer.with_format(
+            |render_format, callback| callback(&mut render_format.enter()),
+            |renderer| {
+                for element in &self.0 {
+                    renderer.write_str("-")?;
+                    element.render(renderer, ctx)?;
+                    renderer.write_str("\n")?;
+                }
+                Ok(())
+            },
+        )
     }
 }
 
@@ -92,14 +95,17 @@ where
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        let mut renderer =
-            renderer.with_format(&mut renderer.format_mut().enter());
-        for element in &self.0 {
-            renderer.write_str("-")?;
-            element.render(&mut renderer, ctx)?;
-            renderer.write_str("\n")?;
-        }
-        Ok(())
+        renderer.with_format(
+            |render_format, callback| callback(&mut render_format.enter()),
+            |renderer| {
+                for element in &self.0 {
+                    renderer.write_str("-")?;
+                    element.render(&mut renderer, ctx)?;
+                    renderer.write_str("\n")?;
+                }
+                Ok(())
+            },
+        )
     }
 }
 
@@ -168,14 +174,17 @@ where
         renderer: &mut Renderer<Markdown<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        let mut renderer =
-            renderer.with_format(&mut renderer.format_mut().enter());
-        for (i, element) in self.0.into_iter().enumerate() {
-            write!(renderer, "{}. ", i)?;
-            element.render(&mut renderer, ctx)?;
-            renderer.write_str("\n")?;
-        }
-        Ok(())
+        renderer.with_format(
+            |render_format, callback| callback(&mut render_format.enter()),
+            |renderer| {
+                for (i, element) in self.0.into_iter().enumerate() {
+                    write!(renderer, "{}. ", i)?;
+                    element.render(&mut renderer, ctx)?;
+                    renderer.write_str("\n")?;
+                }
+                Ok(())
+            },
+        )
     }
 }
 
@@ -190,13 +199,16 @@ where
         renderer: &mut Renderer<Text<'sess>>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        let mut renderer =
-            renderer.with_format(&mut renderer.format_mut().enter());
-        for (i, element) in self.0.into_iter().enumerate() {
-            write!(renderer, "{}. ", i)?;
-            element.render(&mut renderer, ctx)?;
-            renderer.write_str("\n")?;
-        }
-        Ok(())
+        renderer.with_format(
+            |render_format, callback| callback(&mut render_format.enter()),
+            |renderer| {
+                for (i, element) in self.0.into_iter().enumerate() {
+                    write!(renderer, "{}. ", i)?;
+                    element.render(&mut renderer, ctx)?;
+                    renderer.write_str("\n")?;
+                }
+                Ok(())
+            },
+        )
     }
 }

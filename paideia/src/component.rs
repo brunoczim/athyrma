@@ -1,5 +1,6 @@
 pub mod inline;
 pub mod block;
+pub mod section;
 
 use std::{rc::Rc, sync::Arc};
 

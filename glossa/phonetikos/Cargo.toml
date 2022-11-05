@@ -5,4 +5,4 @@ edition = "2021"
 description = "A library to handle phonetic aspects of a language."
 
 [dependencies.diakritikos]
-path = "../diakritikos"
+path = "../../diakritikos"

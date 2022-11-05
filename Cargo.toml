@@ -4,12 +4,13 @@ members = [
     "./katalogos",
     "./paideia",
     "./diakritikos",
-    "./phonetikos",
-    "./phonologia"
+    "./glossa",
+    "./glossa/phonetikos",
+    "./glossa/phonologia",
 ]
 
 [package]
-name = "glossa"
+name = "paignion"
 version = "0.1.0"
 edition = "2021"
 

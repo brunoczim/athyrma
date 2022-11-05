@@ -5,11 +5,24 @@ use crate::{
 };
 use std::fmt::{self, Write};
 
-#[derive(Debug)]
 pub struct UnorderedList<L>(pub L)
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>;
+
+impl<L> fmt::Debug for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        let mut debug_fmtr = fmtr.debug_tuple("UnorderedList");
+        for element in &self.0 {
+            debug_fmtr.field(&element);
+        }
+        debug_fmtr.finish()
+    }
+}
 
 impl<L> Clone for UnorderedList<L>
 where
@@ -59,7 +72,7 @@ where
     }
 }
 
-impl<'sess, L> Render<Markdown> for UnorderedList<L>
+impl<L> Render<Markdown> for UnorderedList<L>
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
@@ -81,7 +94,7 @@ where
     }
 }
 
-impl<'sess, L> Render<Text> for UnorderedList<L>
+impl<L> Render<Text> for UnorderedList<L>
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,
@@ -102,11 +115,24 @@ where
     }
 }
 
-#[derive(Debug)]
 pub struct OrderedList<L>(pub L)
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>;
+
+impl<L> fmt::Debug for OrderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        let mut debug_fmtr = fmtr.debug_tuple("OrderedList");
+        for element in &self.0 {
+            debug_fmtr.field(&element);
+        }
+        debug_fmtr.finish()
+    }
+}
 
 impl<L> Clone for OrderedList<L>
 where
@@ -156,7 +182,7 @@ where
     }
 }
 
-impl<'sess, L> Render<Markdown> for OrderedList<L>
+impl<L> Render<Markdown> for OrderedList<L>
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
@@ -178,7 +204,7 @@ where
     }
 }
 
-impl<'sess, L> Render<Text> for OrderedList<L>
+impl<L> Render<Text> for OrderedList<L>
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,

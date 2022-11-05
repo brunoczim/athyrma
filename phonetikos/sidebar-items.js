@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Cavity",""],["Phonation",""],["Phone",""]],"mod":[["consonant",""],["diacritic",""],["vowel",""]]};

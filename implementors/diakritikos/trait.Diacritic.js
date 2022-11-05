@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"phonetikos":[["impl <a class=\"trait\" href=\"diakritikos/trait.Diacritic.html\" title=\"trait diakritikos::Diacritic\">Diacritic</a> for <a class=\"enum\" href=\"phonetikos/diacritic/enum.Diacritic.html\" title=\"enum phonetikos::diacritic::Diacritic\">Diacritic</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

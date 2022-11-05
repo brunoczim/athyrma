@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":[["HColist",""],["HList",""],["hcolist",""],["hlist",""]],"mod":[["by_ref",""],["colist",""],["combinator",""],["function",""],["list",""]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Frontness",""],["Height",""],["Roundedness",""]],"struct":[["Vowel",""]]};

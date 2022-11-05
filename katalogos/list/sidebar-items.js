@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Cons",""],["Nil",""]],"trait":[["List",""]]};

@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["paignion"];
+window.ALL_CRATES = ["diakritikos","form_urlencoded","glossa","hashbrown","idna","indexmap","katalogos","paideia","paignion","percent_encoding","phonetikos","phonologia","tinyvec","tinyvec_macros","unicode_bidi","unicode_normalization","url"];

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["solve",""]],"mod":[["pos",""],["slot",""]],"struct":[["GraphemeCluster",""],["Symbol",""]],"trait":[["Diacritic",""]]};

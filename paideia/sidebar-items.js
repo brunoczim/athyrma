@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["component",""],["location","This module provides location, paths, Urls."],["render",""]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["list",""],["text",""]],"struct":[["BlockComponent",""],["InlineBlock",""]]};

@@ -23,23 +23,23 @@ impl Markdown {
 impl Format for Markdown {
     fn write_str(
         &mut self,
-        mut input: &str,
+        input: &str,
         target: &mut dyn fmt::Write,
     ) -> fmt::Result {
         for line in input.split_inclusive('\n') {
             if line.trim().len() > 0 {
-                if self.session.needs_newline {
+                if self.needs_newline {
                     target.write_str("\n")?;
                 }
-                self.session.needs_newline = false;
-                let indent_spaces = self.session.level.saturating_sub(1)
-                    * self.session.indent_size;
-                for _ in 0 .. indent_spaces {
+                self.needs_newline = false;
+                let space_count =
+                    self.level.saturating_sub(1) * self.indent_size;
+                for _ in 0 .. space_count {
                     target.write_str(" ")?;
                 }
                 target.write_str(line)?;
             } else {
-                self.session.needs_newline = line.ends_with('\n');
+                self.needs_newline = line.ends_with('\n');
             }
         }
 
@@ -51,6 +51,8 @@ impl Format for Markdown {
 pub struct Nest;
 
 impl Scope for Nest {
+    type Format = Markdown;
+
     fn enter<F, T>(&self, format: &mut Self::Format, consumer: F) -> T
     where
         F: FnOnce(&mut Self::Format) -> T,

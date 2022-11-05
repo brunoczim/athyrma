@@ -1,7 +1,7 @@
 use super::BlockComponent;
 use crate::{
-    component::{Component, Context, Render, Renderer},
-    render::{self, Html, Markdown, Text},
+    component::Component,
+    render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
 };
 use std::fmt::{self, Write};
 
@@ -59,53 +59,46 @@ where
     }
 }
 
-impl<'sess, L> Render<Markdown<'sess>> for UnorderedList<L>
-where
-    for<'a> &'a L: IntoIterator,
-    for<'a, 'b_sess> <&'a L as IntoIterator>::Item:
-        Render<Markdown<'b_sess>, Kind = BlockComponent>,
-{
-    fn render(
-        &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
-        ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        renderer.with_format(
-            |render_format, callback| callback(&mut render_format.enter()),
-            |renderer| {
-                for element in &self.0 {
-                    renderer.write_str("-")?;
-                    element.render(renderer, ctx)?;
-                    renderer.write_str("\n")?;
-                }
-                Ok(())
-            },
-        )
-    }
-}
-
-impl<'sess, L> Render<Text<'sess>> for UnorderedList<L>
+impl<'sess, L> Render<Markdown> for UnorderedList<L>
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
-        Render<Text<'sess>, Kind = BlockComponent>,
+        Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.with_format(
-            |render_format, callback| callback(&mut render_format.enter()),
-            |renderer| {
-                for element in &self.0 {
-                    renderer.write_str("-")?;
-                    element.render(&mut renderer, ctx)?;
-                    renderer.write_str("\n")?;
-                }
-                Ok(())
-            },
-        )
+        renderer.scoped(markdown::Nest, |renderer| {
+            for element in &self.0 {
+                renderer.write_str("-")?;
+                element.render(renderer, ctx)?;
+                renderer.write_str("\n")?;
+            }
+            Ok(())
+        })
+    }
+}
+
+impl<'sess, L> Render<Text> for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        renderer.scoped(text::Nest, |renderer| {
+            for element in &self.0 {
+                renderer.write_str("-")?;
+                element.render(renderer, ctx)?;
+                renderer.write_str("\n")?;
+            }
+            Ok(())
+        })
     }
 }
 
@@ -163,52 +156,45 @@ where
     }
 }
 
-impl<'sess, L> Render<Markdown<'sess>> for OrderedList<L>
+impl<'sess, L> Render<Markdown> for OrderedList<L>
 where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
-        Render<Markdown<'sess>, Kind = BlockComponent>,
+        Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.with_format(
-            |render_format, callback| callback(&mut render_format.enter()),
-            |renderer| {
-                for (i, element) in self.0.into_iter().enumerate() {
-                    write!(renderer, "{}. ", i)?;
-                    element.render(&mut renderer, ctx)?;
-                    renderer.write_str("\n")?;
-                }
-                Ok(())
-            },
-        )
+        renderer.scoped(markdown::Nest, |renderer| {
+            for (i, element) in self.0.into_iter().enumerate() {
+                write!(renderer, "{}. ", i)?;
+                element.render(renderer, ctx)?;
+                renderer.write_str("\n")?;
+            }
+            Ok(())
+        })
     }
 }
 
-impl<'sess, L> Render<Text<'sess>> for OrderedList<L>
+impl<'sess, L> Render<Text> for OrderedList<L>
 where
     for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Text<'sess>, Kind = BlockComponent>,
+    for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.with_format(
-            |render_format, callback| callback(&mut render_format.enter()),
-            |renderer| {
-                for (i, element) in self.0.into_iter().enumerate() {
-                    write!(renderer, "{}. ", i)?;
-                    element.render(&mut renderer, ctx)?;
-                    renderer.write_str("\n")?;
-                }
-                Ok(())
-            },
-        )
+        renderer.scoped(text::Nest, |renderer| {
+            for (i, element) in self.0.into_iter().enumerate() {
+                write!(renderer, "{}. ", i)?;
+                element.render(renderer, ctx)?;
+                renderer.write_str("\n")?;
+            }
+            Ok(())
+        })
     }
 }

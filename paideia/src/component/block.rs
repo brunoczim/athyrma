@@ -1,13 +1,5 @@
-use crate::render::{Html, Markdown, Text};
-
-use super::{
-    Component,
-    ComponentKind,
-    Context,
-    InlineComponent,
-    Render,
-    Renderer,
-};
+use super::{Component, ComponentKind, InlineComponent};
+use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
 
 pub mod text;
@@ -54,13 +46,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown<'sess>> for InlineBlock<C>
+impl<'sess, C> Render<Markdown> for InlineBlock<C>
 where
-    C: Render<Markdown<'sess>, Kind = InlineComponent>,
+    C: Render<Markdown, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.0.render(
@@ -70,13 +62,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Text<'sess>> for InlineBlock<C>
+impl<'sess, C> Render<Text> for InlineBlock<C>
 where
-    C: Render<Text<'sess>, Kind = InlineComponent>,
+    C: Render<Text, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.0.render(

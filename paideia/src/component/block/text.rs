@@ -2,8 +2,8 @@ use std::fmt::{self, Write};
 
 use super::BlockComponent;
 use crate::{
-    component::{Component, Context, InlineComponent, Render, Renderer},
-    render::{Html, Markdown, Text},
+    component::{Component, InlineComponent},
+    render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -34,13 +34,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown<'sess>> for Bold<C>
+impl<'sess, C> Render<Markdown> for Bold<C>
 where
-    C: Render<Markdown<'sess>, Kind = BlockComponent>,
+    C: Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         renderer.write_str("<b>")?;
@@ -50,13 +50,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Text<'sess>> for Bold<C>
+impl<'sess, C> Render<Text> for Bold<C>
 where
-    C: Render<Text<'sess>, Kind = BlockComponent>,
+    C: Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         self.0.render(renderer, ctx)
@@ -91,13 +91,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown<'sess>> for Italic<C>
+impl<'sess, C> Render<Markdown> for Italic<C>
 where
-    C: Render<Markdown<'sess>, Kind = BlockComponent>,
+    C: Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         renderer.write_str("<i>")?;
@@ -107,13 +107,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Text<'sess>> for Italic<C>
+impl<'sess, C> Render<Text> for Italic<C>
 where
-    C: Render<Text<'sess>, Kind = BlockComponent>,
+    C: Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
         self.0.render(renderer, ctx)
@@ -148,13 +148,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown<'sess>> for Preformatted<C>
+impl<'sess, C> Render<Markdown> for Preformatted<C>
 where
-    C: Render<Markdown<'sess>, Kind = BlockComponent>,
+    C: Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<pre>")?;
@@ -164,13 +164,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Text<'sess>> for Preformatted<C>
+impl<'sess, C> Render<Text> for Preformatted<C>
 where
-    C: Render<Text<'sess>, Kind = BlockComponent>,
+    C: Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.0.render(renderer, ctx)
@@ -205,13 +205,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown<'sess>> for Paragraph<C>
+impl<'sess, C> Render<Markdown> for Paragraph<C>
 where
-    C: Render<Markdown<'sess>, Kind = InlineComponent>,
+    C: Render<Markdown, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
@@ -220,13 +220,13 @@ where
     }
 }
 
-impl<'sess, C> Render<Text<'sess>> for Paragraph<C>
+impl<'sess, C> Render<Text> for Paragraph<C>
 where
-    C: Render<Text<'sess>, Kind = InlineComponent>,
+    C: Render<Text, Kind = InlineComponent>,
 {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;

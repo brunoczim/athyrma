@@ -262,7 +262,7 @@ where
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmtr.debug_struct("Renderer")
             .field("render_format", &self.render_format)
-            .field("formatter", &(self.target as *const fmt::Formatter))
+            .field("formatter", &(self.target as *const _))
             .finish()
     }
 }

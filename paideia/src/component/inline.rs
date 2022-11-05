@@ -1,6 +1,5 @@
-use crate::render::{Html, Markdown, Text};
-
-use super::{Component, ComponentKind, Context, Render, Renderer};
+use super::{Component, ComponentKind};
+use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
 
 pub mod text;
@@ -70,10 +69,10 @@ impl Render<Html> for str {
     }
 }
 
-impl<'sess> Render<Markdown<'sess>> for str {
+impl Render<Markdown> for str {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         let mut start = 0;
@@ -92,10 +91,10 @@ impl<'sess> Render<Markdown<'sess>> for str {
     }
 }
 
-impl<'sess> Render<Text<'sess>> for str {
+impl Render<Text> for str {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         _ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str(self)
@@ -116,20 +115,20 @@ impl Render<Html> for String {
     }
 }
 
-impl<'sess> Render<Markdown<'sess>> for String {
+impl Render<Markdown> for String {
     fn render(
         &self,
-        renderer: &mut Renderer<Markdown<'sess>>,
+        renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         (**self).render(renderer, ctx)
     }
 }
 
-impl<'sess> Render<Text<'sess>> for String {
+impl Render<Text> for String {
     fn render(
         &self,
-        renderer: &mut Renderer<Text<'sess>>,
+        renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         (**self).render(renderer, ctx)

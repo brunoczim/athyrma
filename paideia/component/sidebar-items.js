@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["block",""],["inline",""],["section",""]],"trait":[["Component",""],["ComponentKind",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["asset",""],["block",""],["inline",""],["page",""],["section",""]],"trait":[["Component",""],["ComponentKind",""]]};

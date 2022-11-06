@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Bold",""],["Italic",""],["Preformatted",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["Bold",""],["Italic",""],["Link",""],["Preformatted",""]]};

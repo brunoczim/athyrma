@@ -6,7 +6,7 @@ var sourcesIndex = JSON.parse('{\
 "idna":["",[],["lib.rs","punycode.rs","uts46.rs"]],\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs"]]],["equivalent.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
 "katalogos":["",[],["by_ref.rs","colist.rs","combinator.rs","function.rs","lib.rs","list.rs"]],\
-"paideia":["",[["component",[["block",[],["list.rs","text.rs"]],["inline",[],["text.rs"]]],["block.rs","inline.rs","section.rs"]],["render",[],["html.rs","markdown.rs","text.rs"]]],["component.rs","lib.rs","location.rs","render.rs"]],\
+"paideia":["",[["component",[["block",[],["list.rs","text.rs"]],["inline",[],["text.rs"]]],["asset.rs","block.rs","inline.rs","page.rs","section.rs"]],["render",[],["html.rs","markdown.rs","text.rs"]]],["component.rs","lib.rs","location.rs","render.rs"]],\
 "paignion":["",[],["lib.rs"]],\
 "percent_encoding":["",[],["lib.rs"]],\
 "phonetikos":["",[],["consonant.rs","diacritic.rs","lib.rs","vowel.rs"]],\

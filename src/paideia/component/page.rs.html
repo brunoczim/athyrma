@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `paideia/src/component/section.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>section.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../paideia/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `paideia/src/component/page.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>page.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../paideia/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -177,90 +177,70 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
-<span class="kw">use crate</span>::{
-    location::{Id, InternalLoc, Location},
-    render::{Context, Html, Markdown, Render, Renderer, Text},
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    asset::AssetComponent,
+    section::SectionComponent,
+    BlockComponent,
+    Component,
+    ComponentKind,
+    InlineComponent,
 };
+<span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>SectionComponent {
+</span><span class="kw">pub struct </span>PageComponent {
     _priv: (),
 }
 
-<span class="kw">impl </span>SectionComponent {
+<span class="kw">impl </span>PageComponent {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ _priv: () }
     }
 }
 
-<span class="kw">impl </span>ComponentKind <span class="kw">for </span>SectionComponent {}
+<span class="kw">impl </span>ComponentKind <span class="kw">for </span>PageComponent {}
 
-<span class="kw">pub struct </span>Section&lt;T, B, L&gt;
+<span class="kw">pub struct </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt;,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
-    <span class="kw">pub </span>title: T,
-    <span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;Id&gt;,
+    <span class="kw">pub </span>title: String,
+    <span class="kw">pub </span>assets: A,
     <span class="kw">pub </span>body: B,
     <span class="kw">pub </span>children: L,
 }
 
-<span class="kw">impl</span>&lt;T, B, L&gt; fmt::Debug <span class="kw">for </span>Section&lt;T, B, L&gt;
+<span class="kw">impl</span>&lt;A, B, L&gt; fmt::Debug <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt;,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;UnorderedList&quot;</span>);
-        debug_fmtr
-            .field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title)
-            .field(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
-            .field(<span class="string">&quot;body&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.body);
+        debug_fmtr.field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title).field(<span class="string">&quot;body&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.body);
+        <span class="kw">for </span>(i, element) <span class="kw">in </span><span class="self">self</span>.assets.into_iter().enumerate() {
+            debug_fmtr.field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;asset[{}]&quot;</span>, i), <span class="kw-2">&amp;</span>element);
+        }
         <span class="kw">for </span>(i, element) <span class="kw">in </span><span class="self">self</span>.children.into_iter().enumerate() {
-            debug_fmtr.field(<span class="kw-2">&amp;</span>i.to_string(), <span class="kw-2">&amp;</span>element);
+            debug_fmtr.field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;children[{}]&quot;</span>, i), <span class="kw-2">&amp;</span>element);
         }
         debug_fmtr.finish()
     }
 }
 
-<span class="kw">impl</span>&lt;T, B, L&gt; Clone <span class="kw">for </span>Section&lt;T, B, L&gt;
+<span class="kw">impl</span>&lt;A, B, L&gt; Clone <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Clone,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
+    A: Clone,
     B: Component&lt;Kind = BlockComponent&gt; + Clone,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
@@ -269,27 +249,29 @@
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             title: <span class="self">self</span>.title.clone(),
-            id: <span class="self">self</span>.id.clone(),
+            assets: <span class="self">self</span>.assets.clone(),
             body: <span class="self">self</span>.body.clone(),
             children: <span class="self">self</span>.children.clone(),
         }
     }
 }
 
-<span class="kw">impl</span>&lt;T, B, L&gt; Component <span class="kw">for </span>Section&lt;T, B, L&gt;
+<span class="kw">impl</span>&lt;A, B, L&gt; Component <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt;,
-    B: Component&lt;Kind = BlockComponent&gt;,
+    </span>B: Component&lt;Kind = BlockComponent&gt;,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator + Clone,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
-    <span class="kw">type </span>Kind = SectionComponent;
+    <span class="kw">type </span>Kind = PageComponent;
 }
 
-<span class="kw">impl</span>&lt;T, B, L&gt; Render&lt;Html&gt; <span class="kw">for </span>Section&lt;T, B, L&gt;
+<span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Html&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Render&lt;Html, Kind = InlineComponent&gt;,
-    B: Render&lt;Html, Kind = BlockComponent&gt;,
+    </span>B: Render&lt;Html, Kind = BlockComponent&gt;,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator + Clone,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Render&lt;Html, Kind = AssetComponent&gt;,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
         Render&lt;Html, Kind = SectionComponent&gt;,
@@ -299,52 +281,37 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Html&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="kw">let </span>tag = <span class="kw">match </span>ctx.level() {
-            <span class="number">0 </span>=&gt; <span class="string">&quot;h2&quot;</span>,
-            <span class="number">1 </span>=&gt; <span class="string">&quot;h3&quot;</span>,
-            <span class="number">2 </span>=&gt; <span class="string">&quot;h4&quot;</span>,
-            <span class="number">3 </span>=&gt; <span class="string">&quot;h5&quot;</span>,
-            <span class="kw">_ </span>=&gt; <span class="string">&quot;h6&quot;</span>,
-        };
-        <span class="macro">write!</span>(
-            renderer,
-            <span class="string">&quot;&lt;div class=\&quot;paideia-section paideia-section-{}\&quot;&quot;</span>,
-            ctx.level()
+        renderer.write_str(
+            <span class="string">&quot;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&lt;meta \
+             name=\&quot;viewport\&quot; content=\&quot;width=device-width, \
+             initial-scale=1.0\&quot;&gt;&quot;</span>,
         )<span class="question-mark">?</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
-            renderer.write_str(<span class="string">&quot;id=\&quot;&quot;</span>)<span class="question-mark">?</span>;
-            id.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
-            renderer.write_str(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>asset <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.assets {
+            asset.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>AssetComponent::new()))<span class="question-mark">?</span>;
         }
-        <span class="macro">write!</span>(renderer, <span class="string">&quot;&gt;&lt;{} class=\&quot;paideia-title\&quot;&gt;&quot;</span>, tag)<span class="question-mark">?</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
-            <span class="kw">let </span>location = Location::Internal(InternalLoc {
-                path: ctx.location().clone(),
-                id: <span class="prelude-val">Some</span>(id.clone()),
-            });
-            renderer.write_str(<span class="string">&quot;&lt;a href=\&quot;&quot;</span>)<span class="question-mark">?</span>;
-            location
-                .render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
-            renderer.write_str(<span class="string">&quot;\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
-        }
+        renderer.write_str(<span class="string">&quot;&lt;title&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
-        <span class="kw">if </span><span class="self">self</span>.id.is_some() {
-            renderer.write_str(<span class="string">&quot;&lt;/a&gt;&quot;</span>)<span class="question-mark">?</span>;
-        }
-        <span class="macro">write!</span>(renderer, <span class="string">&quot;&lt;/{}&gt;&lt;div class=\&quot;paideia-body\&quot;&gt;&quot;</span>, tag)<span class="question-mark">?</span>;
+        renderer.write_str(
+            <span class="string">&quot;&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=\&quot;paideia-page-wrapper\&quot; \
+             id=\&quot;paideia-page-root\&quot;&gt;&lt;h1 class=\&quot;paideia-title\&quot;&gt;&lt;a \
+             href=\&quot;#paideia-page-root\&quot;&gt;&quot;</span>,
+        )<span class="question-mark">?</span>;
+        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(renderer, <span class="string">&quot;&lt;/a&gt;&lt;/h1&gt;&lt;div class=\&quot;paideia-body\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent::new()))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div class=\&quot;paideia-children\&quot;&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
             child.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>SectionComponent::new()))<span class="question-mark">?</span>;
         }
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span>&lt;T, B, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>Section&lt;T, B, L&gt;
+<span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Render&lt;Markdown, Kind = InlineComponent&gt;,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator + Clone,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     B: Render&lt;Markdown, Kind = BlockComponent&gt;,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
@@ -355,32 +322,8 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Markdown&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="kw">let </span>tag = <span class="kw">match </span>ctx.level() {
-            <span class="number">0 </span>=&gt; <span class="string">&quot;##&quot;</span>,
-            <span class="number">1 </span>=&gt; <span class="string">&quot;###&quot;</span>,
-            <span class="number">2 </span>=&gt; <span class="string">&quot;####&quot;</span>,
-            <span class="number">3 </span>=&gt; <span class="string">&quot;#####&quot;</span>,
-            <span class="kw">_ </span>=&gt; <span class="string">&quot;######&quot;</span>,
-        };
-        <span class="macro">write!</span>(renderer, <span class="string">&quot;{} &quot;</span>, tag)<span class="question-mark">?</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
-            renderer.write_str(<span class="string">&quot;&lt;span id=\&quot;&quot;</span>)<span class="question-mark">?</span>;
-            id.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
-            renderer.write_str(<span class="string">&quot;\&quot;&gt;[&quot;</span>)<span class="question-mark">?</span>;
-        }
-
+        renderer.write_str(<span class="string">&quot;# &quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
-            <span class="kw">let </span>location = Location::Internal(InternalLoc {
-                path: ctx.location().clone(),
-                id: <span class="prelude-val">Some</span>(id.clone()),
-            });
-            renderer.write_str(<span class="string">&quot;](&quot;</span>)<span class="question-mark">?</span>;
-            location
-                .render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
-            renderer.write_str(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
-        }
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent::new()))<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
@@ -390,9 +333,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;T, B, L&gt; Render&lt;Text&gt; <span class="kw">for </span>Section&lt;T, B, L&gt;
+<span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Text&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
-    </span>T: Render&lt;Text, Kind = InlineComponent&gt;,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A: IntoIterator + Clone,
+    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     B: Render&lt;Text, Kind = BlockComponent&gt;,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:

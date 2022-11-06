@@ -350,6 +350,40 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{fmt, rc::Rc, sync::Arc};
 
 <span class="kw">pub mod </span>html;
@@ -357,7 +391,10 @@
 <span class="kw">pub mod </span>text;
 
 <span class="kw">pub use </span>html::Html;
-<span class="kw">use </span>katalogos::colist::{Cocons, Conil};
+<span class="kw">use </span>katalogos::{
+    colist::{Cocons, Conil},
+    list::{Cons, Nil},
+};
 <span class="kw">pub use </span>markdown::Markdown;
 <span class="kw">pub use </span>text::Text;
 
@@ -487,6 +524,37 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;W&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result;
+}
+
+<span class="kw">impl</span>&lt;C, W&gt; Render&lt;W&gt; <span class="kw">for </span>Nil&lt;C&gt;
+<span class="kw">where
+    </span>C: ComponentKind,
+    W: Format,
+{
+    <span class="kw">fn </span>render(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;W&gt;,
+        _ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
+    ) -&gt; fmt::Result {
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">impl</span>&lt;W, H, T&gt; Render&lt;W&gt; <span class="kw">for </span>Cons&lt;H, T&gt;
+<span class="kw">where
+    </span>W: Format,
+    H: Render&lt;W&gt;,
+    T: Render&lt;W, Kind = H::Kind&gt;,
+{
+    <span class="kw">fn </span>render(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;W&gt;,
+        ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
+    ) -&gt; fmt::Result {
+        <span class="self">self</span>.head.render(renderer, ctx)<span class="question-mark">?</span>;
+        <span class="self">self</span>.tail.render(renderer, ctx)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
 }
 
 <span class="kw">impl</span>&lt;C, W&gt; Render&lt;W&gt; <span class="kw">for </span>Conil&lt;C&gt;

@@ -91,22 +91,26 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>inline;
 <span class="kw">pub mod </span>block;
 <span class="kw">pub mod </span>section;
+<span class="kw">pub mod </span>asset;
+<span class="kw">pub mod </span>page;
 
-<span class="kw">use </span>std::{rc::Rc, sync::Arc};
-
-<span class="kw">pub use </span>block::BlockComponent;
-<span class="kw">pub use </span>inline::InlineComponent;
 <span class="kw">use </span>katalogos::{
     colist::{Cocons, Conil},
     list::{Cons, Nil},
 };
+<span class="kw">use </span>std::{fmt, rc::Rc, sync::Arc};
+
+<span class="kw">pub use </span>block::BlockComponent;
+<span class="kw">pub use </span>inline::InlineComponent;
 
 <span class="kw">pub trait </span>ComponentKind {}
 
-<span class="kw">pub trait </span>Component {
+<span class="kw">pub trait </span>Component: fmt::Debug {
     <span class="kw">type </span>Kind: ComponentKind + <span class="question-mark">?</span>Sized;
 }
 

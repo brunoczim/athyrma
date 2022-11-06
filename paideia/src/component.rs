@@ -1,6 +1,7 @@
 pub mod inline;
 pub mod block;
 pub mod section;
+pub mod asset;
 pub mod page;
 
 use katalogos::{

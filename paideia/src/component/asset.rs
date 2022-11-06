@@ -5,7 +5,7 @@ use crate::{
     render::{Context, Html, Render, Renderer},
 };
 
-use super::Component;
+use super::{Component, ComponentKind, InlineComponent};
 
 #[derive(Debug)]
 pub struct AssetComponent {
@@ -36,7 +36,8 @@ impl Render<Html> for Stylesheet {
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<link rel=\"stylesheet\" href=\"")?;
-        self.location.render(renderer, ctx)?;
+        self.location
+            .render(renderer, ctx.with_kind(&InlineComponent::new()))?;
         renderer.write_str("\">")?;
         Ok(())
     }
@@ -58,7 +59,8 @@ impl Render<Html> for Script {
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<script type=\"application/javascript\" src=\"")?;
-        self.location.render(renderer, ctx)?;
+        self.location
+            .render(renderer, ctx.with_kind(&InlineComponent::new()))?;
         renderer.write_str("\"></script>")?;
         Ok(())
     }

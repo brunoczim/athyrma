@@ -51,6 +51,24 @@ where
     }
 }
 
+impl<T, B, L> Clone for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + Clone,
+    B: Component<Kind = BlockComponent> + Clone,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            title: self.title.clone(),
+            id: self.id.clone(),
+            body: self.body.clone(),
+            children: self.children.clone(),
+        }
+    }
+}
+
 impl<T, B, L> Component for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,

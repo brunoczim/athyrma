@@ -1,14 +1,12 @@
 use super::{
+    asset::AssetComponent,
     section::SectionComponent,
     BlockComponent,
     Component,
     ComponentKind,
     InlineComponent,
 };
-use crate::{
-    location::{Id, InternalLoc, Location},
-    render::{Context, Html, Markdown, Render, Renderer, Text},
-};
+use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
 
 #[derive(Debug)]
@@ -24,21 +22,24 @@ impl PageComponent {
 
 impl ComponentKind for PageComponent {}
 
-pub struct Page<T, B, L>
+pub struct Page<A, B, L>
 where
-    T: Component<Kind = InlineComponent>,
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
-    pub title: T,
+    pub title: String,
+    pub assets: A,
     pub body: B,
     pub children: L,
 }
 
-impl<T, B, L> fmt::Debug for Page<T, B, L>
+impl<A, B, L> fmt::Debug for Page<A, B, L>
 where
-    T: Component<Kind = InlineComponent>,
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
@@ -46,27 +47,52 @@ where
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_struct("UnorderedList");
         debug_fmtr.field("title", &self.title).field("body", &self.body);
+        for (i, element) in self.assets.into_iter().enumerate() {
+            debug_fmtr.field(&format!("asset[{}]", i), &element);
+        }
         for (i, element) in self.children.into_iter().enumerate() {
-            debug_fmtr.field(&i.to_string(), &element);
+            debug_fmtr.field(&format!("children[{}]", i), &element);
         }
         debug_fmtr.finish()
     }
 }
 
-impl<T, B, L> Component for Page<T, B, L>
+impl<A, B, L> Clone for Page<A, B, L>
 where
-    T: Component<Kind = InlineComponent>,
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: Clone,
+    B: Component<Kind = BlockComponent> + Clone,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            title: self.title.clone(),
+            assets: self.assets.clone(),
+            body: self.body.clone(),
+            children: self.children.clone(),
+        }
+    }
+}
+
+impl<A, B, L> Component for Page<A, B, L>
+where
     B: Component<Kind = BlockComponent>,
+    for<'a> &'a A: IntoIterator + Clone,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
     type Kind = PageComponent;
 }
 
-impl<T, B, L> Render<Html> for Page<T, B, L>
+impl<A, B, L> Render<Html> for Page<A, B, L>
 where
-    T: Render<Html, Kind = InlineComponent>,
     B: Render<Html, Kind = BlockComponent>,
+    for<'a> &'a A: IntoIterator + Clone,
+    for<'a> <&'a A as IntoIterator>::Item: Render<Html, Kind = AssetComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Html, Kind = SectionComponent>,
@@ -77,8 +103,19 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str(
-            "<div class=\"paideia-page-wrapper\" id=\"paideia-page-root\"><h1 \
-             class=\"paideia-title\"><a href=\"#paideia-page-root\">",
+            "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta \
+             name=\"viewport\" content=\"width=device-width, \
+             initial-scale=1.0\">",
+        )?;
+        for asset in &self.assets {
+            asset.render(renderer, ctx.with_kind(&AssetComponent::new()))?;
+        }
+        renderer.write_str("<title>")?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        renderer.write_str(
+            "</title></head><body><div class=\"paideia-page-wrapper\" \
+             id=\"paideia-page-root\"><h1 class=\"paideia-title\"><a \
+             href=\"#paideia-page-root\">",
         )?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
         write!(renderer, "</a></h1><div class=\"paideia-body\">")?;
@@ -87,14 +124,15 @@ where
         for child in &self.children {
             child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
         }
-        renderer.write_str("</div></div>")?;
+        renderer.write_str("</div></div></body></html>")?;
         Ok(())
     }
 }
 
-impl<T, B, L> Render<Markdown> for Page<T, B, L>
+impl<A, B, L> Render<Markdown> for Page<A, B, L>
 where
-    T: Render<Markdown, Kind = InlineComponent>,
+    for<'a> &'a A: IntoIterator + Clone,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
@@ -116,9 +154,10 @@ where
     }
 }
 
-impl<T, B, L> Render<Text> for Page<T, B, L>
+impl<A, B, L> Render<Text> for Page<A, B, L>
 where
-    T: Render<Text, Kind = InlineComponent>,
+    for<'a> &'a A: IntoIterator + Clone,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:

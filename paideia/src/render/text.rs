@@ -1,9 +1,15 @@
 use super::{Format, Scope};
 use std::fmt;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+enum NewlineState {
+    Unfinished,
+    Starting { needs_flush: bool },
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Text {
-    needs_newline: bool,
+    newline_state: NewlineState,
     level: u32,
     indent_size: u32,
 }
@@ -16,7 +22,11 @@ impl Default for Text {
 
 impl Text {
     pub fn new(indent_size: u32) -> Self {
-        Self { needs_newline: false, level: 0, indent_size }
+        Self {
+            newline_state: NewlineState::Starting { needs_flush: false },
+            level: 0,
+            indent_size,
+        }
     }
 }
 
@@ -27,22 +37,36 @@ impl Format for Text {
         target: &mut dyn fmt::Write,
     ) -> fmt::Result {
         for line in input.split_inclusive('\n') {
-            if line.trim().len() > 0 {
-                if self.needs_newline {
-                    target.write_str("\n")?;
-                }
-                self.needs_newline = false;
-                let space_count =
-                    self.level.saturating_sub(1) * self.indent_size;
-                for _ in 0 .. space_count {
-                    target.write_str(" ")?;
-                }
-                target.write_str(line)?;
-            } else {
-                self.needs_newline = line.ends_with('\n');
-                if !self.needs_newline {
+            match self.newline_state {
+                NewlineState::Unfinished => {
                     target.write_str(line)?;
-                }
+                    if line.ends_with('\n') {
+                        self.newline_state =
+                            NewlineState::Starting { needs_flush: false };
+                    }
+                },
+
+                NewlineState::Starting { needs_flush } => {
+                    if needs_flush {
+                        target.write_str("\n")?;
+                    }
+                    if line == "\n" {
+                        self.newline_state =
+                            NewlineState::Starting { needs_flush: true };
+                    } else {
+                        for _ in
+                            0 .. self.indent_size * self.level.saturating_sub(1)
+                        {
+                            target.write_str(" ")?;
+                        }
+                        target.write_str(line)?;
+                        self.newline_state = if line.ends_with('\n') {
+                            NewlineState::Starting { needs_flush: false }
+                        } else {
+                            NewlineState::Unfinished
+                        };
+                    }
+                },
             }
         }
 
@@ -64,5 +88,58 @@ impl Scope for Nest {
         let output = consumer(format);
         format.level -= 1;
         output
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Nest, Text};
+    use crate::render::Renderer;
+    use std::fmt::Write;
+
+    #[test]
+    fn newlines() {
+        let mut output = String::new();
+        let mut format = Text::default();
+        let mut renderer = Renderer::new(&mut format, &mut output);
+        write!(renderer, "abcd").unwrap();
+        write!(renderer, "  ").unwrap();
+        write!(renderer, "efg\n\n").unwrap();
+        write!(renderer, " ").unwrap();
+        write!(renderer, "123\n\n").unwrap();
+
+        assert_eq!(output, "abcd  efg\n\n 123\n");
+    }
+
+    #[test]
+    fn nest() {
+        let mut output = String::new();
+        let mut format = Text::default();
+        let mut renderer = Renderer::new(&mut format, &mut output);
+        write!(renderer, "abcdefg\n").unwrap();
+
+        renderer
+            .scoped(Nest, |renderer| write!(renderer, "123\n4567\nh\n"))
+            .unwrap();
+
+        write!(renderer, "ijk\n").unwrap();
+
+        renderer
+            .scoped(Nest, |renderer| {
+                write!(renderer, "a1\nb\n")?;
+                renderer.scoped(Nest, |renderer| {
+                    write!(renderer, "c\nd2\n")?;
+                    renderer.scoped(Nest, |renderer| {
+                        write!(renderer, "idk\nyeah\n")
+                    })
+                })?;
+                write!(renderer, "eee\n")
+            })
+            .unwrap();
+
+        assert_eq!(
+            output,
+            "abcdefg\n123\n4567\nh\nijk\na1\nb\n    c\n    d2\n        idk\n        yeah\neee\n",
+        );
     }
 }

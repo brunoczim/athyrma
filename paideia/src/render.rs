@@ -8,13 +8,16 @@ pub mod html;
 pub mod markdown;
 pub mod text;
 
+mod common_text;
+
 pub use html::Html;
+pub use markdown::Markdown;
+pub use text::Text;
+
 use katalogos::{
     colist::{Cocons, Conil},
     list::{Cons, Nil},
 };
-pub use markdown::Markdown;
-pub use text::Text;
 
 use crate::{
     component::{Component, ComponentKind},

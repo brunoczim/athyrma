@@ -1,22 +1,18 @@
-use super::{Format, Scope};
+use super::{
+    common_text::{self, CommonText},
+    Format,
+    Scope,
+};
 use std::fmt;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Text {
-    needs_newline: bool,
-    level: u32,
-    indent_size: u32,
-}
-
-impl Default for Text {
-    fn default() -> Self {
-        Self::new(4)
-    }
+    inner: CommonText,
 }
 
 impl Text {
     pub fn new(indent_size: u32) -> Self {
-        Self { needs_newline: false, level: 0, indent_size }
+        Self { inner: CommonText::new(indent_size) }
     }
 }
 
@@ -26,24 +22,7 @@ impl Format for Text {
         input: &str,
         target: &mut dyn fmt::Write,
     ) -> fmt::Result {
-        for line in input.split_inclusive('\n') {
-            if line.trim().len() > 0 {
-                if self.needs_newline {
-                    target.write_str("\n")?;
-                }
-                self.needs_newline = false;
-                let space_count =
-                    self.level.saturating_sub(1) * self.indent_size;
-                for _ in 0 .. space_count {
-                    target.write_str(" ")?;
-                }
-                target.write_str(line)?;
-            } else {
-                self.needs_newline = line.ends_with('\n');
-            }
-        }
-
-        Ok(())
+        self.inner.write_str(input, target)
     }
 }
 
@@ -57,9 +36,11 @@ impl Scope for Nest {
     where
         F: FnOnce(&mut Self::Format) -> T,
     {
-        format.level += 1;
-        let output = consumer(format);
-        format.level -= 1;
-        output
+        common_text::Nest.enter(&mut format.inner, |inner| {
+            let mut copy = Text { inner: *inner };
+            let output = consumer(&mut copy);
+            *inner = copy.inner;
+            output
+        })
     }
 }

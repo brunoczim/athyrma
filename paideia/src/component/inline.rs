@@ -17,6 +17,7 @@ fn html_escape(ch: char) -> Option<&'static str> {
         '"' => Some("&quot;"),
         '\'' => Some("&#39;"),
         '\\' => Some("&#92;"),
+        '/' => Some("&#47;"),
         _ => None,
     }
 }
@@ -124,5 +125,74 @@ impl Render<Text> for String {
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         (**self).render(renderer, ctx)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::InlineComponent;
+    use crate::{
+        location::InternalPath,
+        render::{Context, Html, Markdown, RenderAsDisplay, Text},
+    };
+
+    #[test]
+    fn render_str_as_html_simple() {
+        let rendered = RenderAsDisplay::new(
+            "abc def g",
+            &mut Html,
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        assert_eq!(rendered, "abc def g");
+    }
+
+    #[test]
+    fn render_str_as_html_escape() {
+        let rendered = RenderAsDisplay::new(
+            "abc def \" g </> &",
+            &mut Html,
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        assert_eq!(rendered, "abc def &quot; g &lt;&#47;&gt; &amp;");
+    }
+
+    #[test]
+    fn render_str_as_md_simple() {
+        let rendered = RenderAsDisplay::new(
+            "abc def g",
+            &mut Markdown::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        assert_eq!(rendered, "abc def g");
+    }
+
+    #[test]
+    fn render_str_as_md_escape() {
+        let rendered = RenderAsDisplay::new(
+            "abc def \" g </> &",
+            &mut Markdown::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        assert_eq!(rendered, "abc def &quot; g &lt;&#47;&gt; &amp;");
+    }
+
+    #[test]
+    fn render_str_as_text() {
+        let rendered = RenderAsDisplay::new(
+            "abc def g",
+            &mut Text::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        assert_eq!(rendered, "abc def g");
     }
 }

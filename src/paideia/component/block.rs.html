@@ -63,20 +63,6 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
 <span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
@@ -84,16 +70,8 @@
 <span class="kw">pub mod </span>text;
 <span class="kw">pub mod </span>list;
 
-<span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>BlockComponent {
-    _priv: (),
-}
-
-<span class="kw">impl </span>BlockComponent {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ _priv: () }
-    }
-}
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+</span><span class="kw">pub struct </span>BlockComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>BlockComponent {}
 
@@ -119,13 +97,13 @@
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
         renderer.write_str(<span class="string">&quot;&lt;span class=\&quot;paideia-inline-block\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="number">0</span>.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="number">0</span>.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;&lt;/span&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;sess</span>, C&gt; Render&lt;Markdown&gt; <span class="kw">for </span>InlineBlock&lt;C&gt;
+<span class="kw">impl</span>&lt;C&gt; Render&lt;Markdown&gt; <span class="kw">for </span>InlineBlock&lt;C&gt;
 <span class="kw">where
     </span>C: Render&lt;Markdown, Kind = InlineComponent&gt;,
 {
@@ -134,14 +112,11 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Markdown&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="self">self</span>.<span class="number">0</span>.render(
-            renderer,
-            Context::new(ctx.location(), ctx.level(), <span class="kw-2">&amp;</span>InlineComponent::new()),
-        )
+        <span class="self">self</span>.<span class="number">0</span>.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;sess</span>, C&gt; Render&lt;Text&gt; <span class="kw">for </span>InlineBlock&lt;C&gt;
+<span class="kw">impl</span>&lt;C&gt; Render&lt;Text&gt; <span class="kw">for </span>InlineBlock&lt;C&gt;
 <span class="kw">where
     </span>C: Render&lt;Text, Kind = InlineComponent&gt;,
 {
@@ -150,10 +125,7 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Text&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="self">self</span>.<span class="number">0</span>.render(
-            renderer,
-            Context::new(ctx.location(), ctx.level(), <span class="kw-2">&amp;</span>InlineComponent::new()),
-        )
+        <span class="self">self</span>.<span class="number">0</span>.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))
     }
 }
 </code></pre></div>

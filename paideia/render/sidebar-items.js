@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["html",""],["markdown",""],["text",""]],"struct":[["Context",""],["Renderer",""]],"trait":[["Format",""],["FullRender",""],["Render",""],["Scope",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["html",""],["markdown",""],["text",""]],"struct":[["Context",""],["RenderAsDisplay",""],["Renderer",""]],"trait":[["Format",""],["FullRender",""],["Render",""],["Scope",""]]};

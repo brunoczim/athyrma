@@ -126,30 +126,14 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{Component, ComponentKind};
 <span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">pub mod </span>text;
 
-<span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>InlineComponent {
-    _priv: (),
-}
-
-<span class="kw">impl </span>InlineComponent {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ _priv: () }
-    }
-}
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+</span><span class="kw">pub struct </span>InlineComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>InlineComponent {}
 

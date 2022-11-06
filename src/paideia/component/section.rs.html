@@ -195,16 +195,6 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
 <span class="kw">use crate</span>::{
     location::{Id, InternalLoc, Location},
@@ -212,16 +202,8 @@
 };
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
-<span class="attribute">#[derive(Debug)]
-</span><span class="kw">pub struct </span>SectionComponent {
-    _priv: (),
-}
-
-<span class="kw">impl </span>SectionComponent {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ _priv: () }
-    }
-}
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+</span><span class="kw">pub struct </span>SectionComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>SectionComponent {}
 
@@ -313,7 +295,7 @@
         )<span class="question-mark">?</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
             renderer.write_str(<span class="string">&quot;id=\&quot;&quot;</span>)<span class="question-mark">?</span>;
-            id.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+            id.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
             renderer.write_str(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
         }
         <span class="macro">write!</span>(renderer, <span class="string">&quot;&gt;&lt;{} class=\&quot;paideia-title\&quot;&gt;&quot;</span>, tag)<span class="question-mark">?</span>;
@@ -323,19 +305,18 @@
                 id: <span class="prelude-val">Some</span>(id.clone()),
             });
             renderer.write_str(<span class="string">&quot;&lt;a href=\&quot;&quot;</span>)<span class="question-mark">?</span>;
-            location
-                .render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+            location.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
             renderer.write_str(<span class="string">&quot;\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         <span class="kw">if </span><span class="self">self</span>.id.is_some() {
             renderer.write_str(<span class="string">&quot;&lt;/a&gt;&quot;</span>)<span class="question-mark">?</span>;
         }
         <span class="macro">write!</span>(renderer, <span class="string">&quot;&lt;/{}&gt;&lt;div class=\&quot;paideia-body\&quot;&gt;&quot;</span>, tag)<span class="question-mark">?</span>;
-        <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div class=\&quot;paideia-children\&quot;&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
-            child.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>SectionComponent::new()))<span class="question-mark">?</span>;
+            child.render(renderer, ctx.enter().with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
         renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -365,11 +346,11 @@
         <span class="macro">write!</span>(renderer, <span class="string">&quot;{} &quot;</span>, tag)<span class="question-mark">?</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
             renderer.write_str(<span class="string">&quot;&lt;span id=\&quot;&quot;</span>)<span class="question-mark">?</span>;
-            id.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+            id.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
             renderer.write_str(<span class="string">&quot;\&quot;&gt;[&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="kw-2">&amp;</span><span class="self">self</span>.id {
             <span class="kw">let </span>location = Location::Internal(InternalLoc {
@@ -377,14 +358,13 @@
                 id: <span class="prelude-val">Some</span>(id.clone()),
             });
             renderer.write_str(<span class="string">&quot;](&quot;</span>)<span class="question-mark">?</span>;
-            location
-                .render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+            location.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
             renderer.write_str(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
         }
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
-            child.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>SectionComponent::new()))<span class="question-mark">?</span>;
+            child.render(renderer, ctx.enter().with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -403,11 +383,11 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Text&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent::new()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
-            child.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>SectionComponent::new()))<span class="question-mark">?</span>;
+            child.render(renderer, ctx.enter().with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }

@@ -40,6 +40,9 @@ impl Format for Text {
                 target.write_str(line)?;
             } else {
                 self.needs_newline = line.ends_with('\n');
+                if !self.needs_newline {
+                    target.write_str(line)?;
+                }
             }
         }
 

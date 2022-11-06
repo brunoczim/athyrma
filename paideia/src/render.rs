@@ -1,4 +1,8 @@
-use std::{fmt, rc::Rc, sync::Arc};
+use std::{
+    fmt,
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
 pub mod html;
 pub mod markdown;
@@ -143,7 +147,7 @@ where
 impl<C, W> Render<W> for Nil<C>
 where
     C: ComponentKind,
-    W: Format,
+    W: Format + ?Sized,
 {
     fn render(
         &self,
@@ -156,7 +160,7 @@ where
 
 impl<W, H, T> Render<W> for Cons<H, T>
 where
-    W: Format,
+    W: Format + ?Sized,
     H: Render<W>,
     T: Render<W, Kind = H::Kind>,
 {
@@ -174,7 +178,7 @@ where
 impl<C, W> Render<W> for Conil<C>
 where
     C: ComponentKind,
-    W: Format,
+    W: Format + ?Sized,
 {
     fn render(
         &self,
@@ -187,7 +191,7 @@ where
 
 impl<W, H, T> Render<W> for Cocons<H, T>
 where
-    W: Format,
+    W: Format + ?Sized,
     H: Render<W>,
     T: Render<W, Kind = H::Kind>,
 {
@@ -205,7 +209,7 @@ where
 
 impl<'this, T, W> Render<W> for &'this T
 where
-    W: Format,
+    W: Format + ?Sized,
     T: Render<W> + ?Sized,
 {
     fn render(
@@ -219,7 +223,7 @@ where
 
 impl<'this, T, W> Render<W> for &'this mut T
 where
-    W: Format,
+    W: Format + ?Sized,
     T: Render<W> + ?Sized,
 {
     fn render(
@@ -233,7 +237,7 @@ where
 
 impl<T, W> Render<W> for Box<T>
 where
-    W: Format,
+    W: Format + ?Sized,
     T: Render<W> + ?Sized,
 {
     fn render(
@@ -247,7 +251,7 @@ where
 
 impl<T, W> Render<W> for Rc<T>
 where
-    W: Format,
+    W: Format + ?Sized,
     T: Render<W> + ?Sized,
 {
     fn render(
@@ -261,7 +265,7 @@ where
 
 impl<T, W> Render<W> for Arc<T>
 where
-    W: Format,
+    W: Format + ?Sized,
     T: Render<W> + ?Sized,
 {
     fn render(
@@ -284,8 +288,8 @@ pub struct Renderer<'format, 'target, 'obj, W>
 where
     W: Format + ?Sized,
 {
-    render_format: &'format mut W,
-    target: &'target mut (dyn fmt::Write + Send + Sync + 'obj),
+    format: &'format mut W,
+    target: &'target mut (dyn fmt::Write + 'obj),
 }
 
 impl<'format, 'target, 'obj, W> fmt::Debug
@@ -295,7 +299,7 @@ where
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmtr.debug_struct("Renderer")
-            .field("render_format", &self.render_format)
+            .field("render_format", &self.format)
             .field("formatter", &(self.target as *const _))
             .finish()
     }
@@ -303,18 +307,25 @@ where
 
 impl<'format, 'target, 'obj, W> Renderer<'format, 'target, 'obj, W>
 where
-    W: Format,
+    W: Format + ?Sized,
 {
+    pub fn new(
+        format: &'format mut W,
+        target: &'target mut (dyn fmt::Write + 'obj),
+    ) -> Self {
+        Self { format, target }
+    }
+
     pub fn scoped<S, F, T>(&mut self, scope: S, consumer: F) -> T
     where
         F: FnOnce(&mut Renderer<W>) -> T,
         S: Scope<Format = W>,
     {
-        let render_format = &mut *self.render_format;
+        let render_format = &mut *self.format;
         let formatter = &mut *self.target;
 
         scope.enter(render_format, |render_format| {
-            consumer(&mut Renderer { render_format, target: formatter })
+            consumer(&mut Renderer { format: render_format, target: formatter })
         })
     }
 }
@@ -325,7 +336,7 @@ where
     W: Format + ?Sized,
 {
     fn write_str(&mut self, input: &str) -> fmt::Result {
-        self.render_format.write_str(input, self.target)
+        self.format.write_str(input, self.target)
     }
 }
 
@@ -357,30 +368,69 @@ impl<'loc, 'kind, K> Context<'loc, 'kind, K>
 where
     K: ComponentKind + ?Sized,
 {
-    pub fn new(
-        location: &'loc InternalPath,
-        level: u32,
-        kind: &'kind K,
-    ) -> Self {
-        Self { location, level, kind }
+    pub fn new(location: &'loc InternalPath, kind: &'kind K) -> Self {
+        Self { location, level: 0, kind }
     }
 
     pub fn with_kind<Q>(self, kind: &'kind Q) -> Context<'loc, 'kind, Q>
     where
         Q: ComponentKind + ?Sized,
     {
-        Context::new(self.location(), self.level(), kind)
+        Context { location: self.location, level: self.level, kind }
     }
 
-    pub fn location(&self) -> &'loc InternalPath {
+    pub fn location(self) -> &'loc InternalPath {
         self.location
     }
 
-    pub fn level(&self) -> u32 {
+    pub fn level(self) -> u32 {
         self.level
     }
 
-    pub fn kind(&self) -> &'kind K {
+    pub fn enter(self) -> Self {
+        Self { level: self.level + 1, ..self }
+    }
+
+    pub fn kind(self) -> &'kind K {
         self.kind
+    }
+}
+
+#[derive(Debug)]
+pub struct RenderAsDisplay<'loc, 'kind, 'format, C, W>
+where
+    C: Render<W>,
+    W: Format + ?Sized,
+{
+    component: C,
+    format: Mutex<&'format mut W>,
+    context: Context<'loc, 'kind, C::Kind>,
+}
+
+impl<'loc, 'kind, 'format, C, W> RenderAsDisplay<'loc, 'kind, 'format, C, W>
+where
+    C: Render<W>,
+    W: Format + ?Sized,
+{
+    pub fn new(
+        component: C,
+        format: &'format mut W,
+        context: Context<'loc, 'kind, C::Kind>,
+    ) -> Self {
+        Self { component, format: Mutex::new(format), context }
+    }
+}
+
+impl<'loc, 'kind, 'format, C, W> fmt::Display
+    for RenderAsDisplay<'loc, 'kind, 'format, C, W>
+where
+    C: Render<W>,
+    W: Format + ?Sized,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        let mut format = self.format.lock().unwrap();
+        self.component
+            .render(&mut Renderer::new(&mut **format, fmtr), self.context)?;
+        Ok(())
     }
 }

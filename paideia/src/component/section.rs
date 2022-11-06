@@ -5,16 +5,8 @@ use crate::{
 };
 use std::fmt::{self, Write};
 
-#[derive(Debug)]
-pub struct SectionComponent {
-    _priv: (),
-}
-
-impl SectionComponent {
-    pub(crate) fn new() -> Self {
-        Self { _priv: () }
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct SectionComponent;
 
 impl ComponentKind for SectionComponent {}
 
@@ -106,7 +98,7 @@ where
         )?;
         if let Some(id) = &self.id {
             renderer.write_str("id=\"")?;
-            id.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+            id.render(renderer, ctx.with_kind(&InlineComponent))?;
             renderer.write_str("\"")?;
         }
         write!(renderer, "><{} class=\"paideia-title\">", tag)?;
@@ -116,19 +108,18 @@ where
                 id: Some(id.clone()),
             });
             renderer.write_str("<a href=\"")?;
-            location
-                .render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+            location.render(renderer, ctx.with_kind(&InlineComponent))?;
             renderer.write_str("\">")?;
         }
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         if self.id.is_some() {
             renderer.write_str("</a>")?;
         }
         write!(renderer, "</{}><div class=\"paideia-body\">", tag)?;
-        self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
+        self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         renderer.write_str("</div><div class=\"paideia-children\"")?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
         }
         renderer.write_str("</div></div>")?;
         Ok(())
@@ -158,11 +149,11 @@ where
         write!(renderer, "{} ", tag)?;
         if let Some(id) = &self.id {
             renderer.write_str("<span id=\"")?;
-            id.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+            id.render(renderer, ctx.with_kind(&InlineComponent))?;
             renderer.write_str("\">[")?;
         }
 
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
 
         if let Some(id) = &self.id {
             let location = Location::Internal(InternalLoc {
@@ -170,14 +161,13 @@ where
                 id: Some(id.clone()),
             });
             renderer.write_str("](")?;
-            location
-                .render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+            location.render(renderer, ctx.with_kind(&InlineComponent))?;
             renderer.write_str(")")?;
         }
         renderer.write_str("\n\n")?;
-        self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
+        self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
         }
         Ok(())
     }
@@ -196,11 +186,11 @@ where
         renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
-        self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
+        self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
         }
         Ok(())
     }

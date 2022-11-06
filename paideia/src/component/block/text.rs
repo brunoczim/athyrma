@@ -199,7 +199,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<p class=\"paideia-paragraph\">")?;
-        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.0.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("</p>")?;
         Ok(())
     }
@@ -214,7 +214,7 @@ where
         renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.0.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
         Ok(())
     }
@@ -229,7 +229,7 @@ where
         renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.0.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
         Ok(())
     }

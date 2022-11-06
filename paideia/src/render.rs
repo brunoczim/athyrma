@@ -8,7 +8,7 @@ pub mod html;
 pub mod markdown;
 pub mod text;
 
-mod text_commons;
+mod common_text;
 
 pub use html::Html;
 pub use markdown::Markdown;

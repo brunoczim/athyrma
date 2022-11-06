@@ -1,5 +1,5 @@
 use super::{
-    text_commons::{self, TextCommons},
+    common_text::{self, CommonText},
     Format,
     Scope,
 };
@@ -7,12 +7,12 @@ use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Markdown {
-    inner: TextCommons,
+    inner: CommonText,
 }
 
 impl Markdown {
     pub fn new(indent_size: u32) -> Self {
-        Self { inner: TextCommons::new(indent_size) }
+        Self { inner: CommonText::new(indent_size) }
     }
 }
 
@@ -36,7 +36,7 @@ impl Scope for Nest {
     where
         F: FnOnce(&mut Self::Format) -> T,
     {
-        text_commons::Nest.enter(&mut format.inner, |inner| {
+        common_text::Nest.enter(&mut format.inner, |inner| {
             let mut copy = Markdown { inner: *inner };
             let output = consumer(&mut copy);
             *inner = copy.inner;

@@ -8,19 +8,19 @@ enum NewlineState {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TextCommons {
+pub struct CommonText {
     newline_state: NewlineState,
     level: u32,
     indent_size: u32,
 }
 
-impl Default for TextCommons {
+impl Default for CommonText {
     fn default() -> Self {
         Self::new(4)
     }
 }
 
-impl TextCommons {
+impl CommonText {
     pub fn new(indent_size: u32) -> Self {
         Self {
             newline_state: NewlineState::Starting { needs_flush: false },
@@ -30,7 +30,7 @@ impl TextCommons {
     }
 }
 
-impl Format for TextCommons {
+impl Format for CommonText {
     fn write_str(
         &mut self,
         input: &str,
@@ -78,7 +78,7 @@ impl Format for TextCommons {
 pub struct Nest;
 
 impl Scope for Nest {
-    type Format = TextCommons;
+    type Format = CommonText;
 
     fn enter<F, T>(&self, format: &mut Self::Format, consumer: F) -> T
     where
@@ -93,14 +93,14 @@ impl Scope for Nest {
 
 #[cfg(test)]
 mod test {
-    use super::{Nest, TextCommons};
+    use super::{CommonText, Nest};
     use crate::render::Renderer;
     use std::fmt::Write;
 
     #[test]
     fn newlines() {
         let mut output = String::new();
-        let mut format = TextCommons::default();
+        let mut format = CommonText::default();
         let mut renderer = Renderer::new(&mut format, &mut output);
         write!(renderer, "abcd").unwrap();
         write!(renderer, "  ").unwrap();
@@ -114,7 +114,7 @@ mod test {
     #[test]
     fn nest() {
         let mut output = String::new();
-        let mut format = TextCommons::default();
+        let mut format = CommonText::default();
         let mut renderer = Renderer::new(&mut format, &mut output);
         write!(renderer, "abcdefg\n").unwrap();
 

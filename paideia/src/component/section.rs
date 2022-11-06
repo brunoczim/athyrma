@@ -128,7 +128,10 @@ where
         self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
         renderer.write_str("</div><div class=\"paideia-children\"")?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(
+                renderer,
+                ctx.enter().with_kind(&SectionComponent::new()),
+            )?;
         }
         renderer.write_str("</div></div>")?;
         Ok(())
@@ -177,7 +180,10 @@ where
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(
+                renderer,
+                ctx.enter().with_kind(&SectionComponent::new()),
+            )?;
         }
         Ok(())
     }
@@ -200,7 +206,10 @@ where
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(
+                renderer,
+                ctx.enter().with_kind(&SectionComponent::new()),
+            )?;
         }
         Ok(())
     }

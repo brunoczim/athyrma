@@ -46,7 +46,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown> for InlineBlock<C>
+impl<C> Render<Markdown> for InlineBlock<C>
 where
     C: Render<Markdown, Kind = InlineComponent>,
 {
@@ -55,14 +55,11 @@ where
         renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.0.render(
-            renderer,
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new()),
-        )
+        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))
     }
 }
 
-impl<'sess, C> Render<Text> for InlineBlock<C>
+impl<C> Render<Text> for InlineBlock<C>
 where
     C: Render<Text, Kind = InlineComponent>,
 {
@@ -71,9 +68,6 @@ where
         renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.0.render(
-            renderer,
-            Context::new(ctx.location(), ctx.level(), &InlineComponent::new()),
-        )
+        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))
     }
 }

@@ -34,7 +34,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown> for Bold<C>
+impl<C> Render<Markdown> for Bold<C>
 where
     C: Render<Markdown, Kind = BlockComponent>,
 {
@@ -50,7 +50,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Text> for Bold<C>
+impl<C> Render<Text> for Bold<C>
 where
     C: Render<Text, Kind = BlockComponent>,
 {
@@ -91,7 +91,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown> for Italic<C>
+impl<C> Render<Markdown> for Italic<C>
 where
     C: Render<Markdown, Kind = BlockComponent>,
 {
@@ -107,7 +107,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Text> for Italic<C>
+impl<C> Render<Text> for Italic<C>
 where
     C: Render<Text, Kind = BlockComponent>,
 {
@@ -148,7 +148,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown> for Preformatted<C>
+impl<C> Render<Markdown> for Preformatted<C>
 where
     C: Render<Markdown, Kind = BlockComponent>,
 {
@@ -164,7 +164,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Text> for Preformatted<C>
+impl<C> Render<Text> for Preformatted<C>
 where
     C: Render<Text, Kind = BlockComponent>,
 {
@@ -205,7 +205,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Markdown> for Paragraph<C>
+impl<C> Render<Markdown> for Paragraph<C>
 where
     C: Render<Markdown, Kind = InlineComponent>,
 {
@@ -220,7 +220,7 @@ where
     }
 }
 
-impl<'sess, C> Render<Text> for Paragraph<C>
+impl<C> Render<Text> for Paragraph<C>
 where
     C: Render<Text, Kind = InlineComponent>,
 {

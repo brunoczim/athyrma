@@ -1,19 +1,21 @@
 pub mod inline;
 pub mod block;
 pub mod section;
+pub mod asset;
+pub mod page;
 
-use std::{rc::Rc, sync::Arc};
-
-pub use block::BlockComponent;
-pub use inline::InlineComponent;
 use katalogos::{
     colist::{Cocons, Conil},
     list::{Cons, Nil},
 };
+use std::{fmt, rc::Rc, sync::Arc};
+
+pub use block::BlockComponent;
+pub use inline::InlineComponent;
 
 pub trait ComponentKind {}
 
-pub trait Component {
+pub trait Component: fmt::Debug {
     type Kind: ComponentKind + ?Sized;
 }
 

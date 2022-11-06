@@ -5,7 +5,10 @@ pub mod markdown;
 pub mod text;
 
 pub use html::Html;
-use katalogos::colist::{Cocons, Conil};
+use katalogos::{
+    colist::{Cocons, Conil},
+    list::{Cons, Nil},
+};
 pub use markdown::Markdown;
 pub use text::Text;
 
@@ -135,6 +138,37 @@ where
         renderer: &mut Renderer<W>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result;
+}
+
+impl<C, W> Render<W> for Nil<C>
+where
+    C: ComponentKind,
+    W: Format,
+{
+    fn render(
+        &self,
+        _renderer: &mut Renderer<W>,
+        _ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        Ok(())
+    }
+}
+
+impl<W, H, T> Render<W> for Cons<H, T>
+where
+    W: Format,
+    H: Render<W>,
+    T: Render<W, Kind = H::Kind>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<W>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        self.head.render(renderer, ctx)?;
+        self.tail.render(renderer, ctx)?;
+        Ok(())
+    }
 }
 
 impl<C, W> Render<W> for Conil<C>

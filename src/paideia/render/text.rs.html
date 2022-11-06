@@ -44,44 +44,21 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{Format, Scope};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    common_text::{<span class="self">self</span>, CommonText},
+    Format,
+    Scope,
+};
 <span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 </span><span class="kw">pub struct </span>Text {
-    needs_newline: bool,
-    level: u32,
-    indent_size: u32,
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>Text {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="number">4</span>)
-    }
+    inner: CommonText,
 }
 
 <span class="kw">impl </span>Text {
     <span class="kw">pub fn </span>new(indent_size: u32) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ needs_newline: <span class="bool-val">false</span>, level: <span class="number">0</span>, indent_size }
+        <span class="self">Self </span>{ inner: CommonText::new(indent_size) }
     }
 }
 
@@ -91,24 +68,7 @@
         input: <span class="kw-2">&amp;</span>str,
         target: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write,
     ) -&gt; fmt::Result {
-        <span class="kw">for </span>line <span class="kw">in </span>input.split_inclusive(<span class="string">&#39;\n&#39;</span>) {
-            <span class="kw">if </span>line.trim().len() &gt; <span class="number">0 </span>{
-                <span class="kw">if </span><span class="self">self</span>.needs_newline {
-                    target.write_str(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
-                }
-                <span class="self">self</span>.needs_newline = <span class="bool-val">false</span>;
-                <span class="kw">let </span>space_count =
-                    <span class="self">self</span>.level.saturating_sub(<span class="number">1</span>) * <span class="self">self</span>.indent_size;
-                <span class="kw">for _ in </span><span class="number">0 </span>.. space_count {
-                    target.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-                }
-                target.write_str(line)<span class="question-mark">?</span>;
-            } <span class="kw">else </span>{
-                <span class="self">self</span>.needs_newline = line.ends_with(<span class="string">&#39;\n&#39;</span>);
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(())
+        <span class="self">self</span>.inner.write_str(input, target)
     }
 }
 
@@ -122,10 +82,12 @@
     <span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Format) -&gt; T,
     {
-        format.level += <span class="number">1</span>;
-        <span class="kw">let </span>output = consumer(format);
-        format.level -= <span class="number">1</span>;
-        output
+        common_text::Nest.enter(<span class="kw-2">&amp;mut </span>format.inner, |inner| {
+            <span class="kw">let </span><span class="kw-2">mut </span>copy = Text { inner: <span class="kw-2">*</span>inner };
+            <span class="kw">let </span>output = consumer(<span class="kw-2">&amp;mut </span>copy);
+            <span class="kw-2">*</span>inner = copy.inner;
+            output
+        })
     }
 }
 </code></pre></div>

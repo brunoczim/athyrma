@@ -434,6 +434,9 @@
 <span id="434">434</span>
 <span id="435">435</span>
 <span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     fmt,
     rc::Rc,
@@ -444,13 +447,16 @@
 <span class="kw">pub mod </span>markdown;
 <span class="kw">pub mod </span>text;
 
+<span class="kw">mod </span>common_text;
+
 <span class="kw">pub use </span>html::Html;
+<span class="kw">pub use </span>markdown::Markdown;
+<span class="kw">pub use </span>text::Text;
+
 <span class="kw">use </span>katalogos::{
     colist::{Cocons, Conil},
     list::{Cons, Nil},
 };
-<span class="kw">pub use </span>markdown::Markdown;
-<span class="kw">pub use </span>text::Text;
 
 <span class="kw">use crate</span>::{
     component::{Component, ComponentKind},

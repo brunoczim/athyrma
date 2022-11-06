@@ -9,16 +9,8 @@ use super::{
 use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
 
-#[derive(Debug)]
-pub struct PageComponent {
-    _priv: (),
-}
-
-impl PageComponent {
-    pub(crate) fn new() -> Self {
-        Self { _priv: () }
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct PageComponent;
 
 impl ComponentKind for PageComponent {}
 
@@ -108,21 +100,21 @@ where
              initial-scale=1.0\">",
         )?;
         for asset in &self.assets {
-            asset.render(renderer, ctx.with_kind(&AssetComponent::new()))?;
+            asset.render(renderer, ctx.with_kind(&AssetComponent))?;
         }
         renderer.write_str("<title>")?;
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str(
             "</title></head><body><div class=\"paideia-page-wrapper\" \
              id=\"paideia-page-root\"><h1 class=\"paideia-title\"><a \
              href=\"#paideia-page-root\">",
         )?;
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         write!(renderer, "</a></h1><div class=\"paideia-body\">")?;
-        self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
+        self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         renderer.write_str("</div><div class=\"paideia-children\"")?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         renderer.write_str("</div></div></body></html>")?;
         Ok(())
@@ -144,11 +136,11 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("# ")?;
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
-        self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
+        self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         Ok(())
     }
@@ -168,11 +160,11 @@ where
         renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.title.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
-        self.body.render(renderer, ctx.with_kind(&BlockComponent::new()))?;
+        self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         for child in &self.children {
-            child.render(renderer, ctx.with_kind(&SectionComponent::new()))?;
+            child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         Ok(())
     }

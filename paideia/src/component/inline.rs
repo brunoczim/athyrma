@@ -4,16 +4,8 @@ use std::fmt::{self, Write};
 
 pub mod text;
 
-#[derive(Debug)]
-pub struct InlineComponent {
-    _priv: (),
-}
-
-impl InlineComponent {
-    pub(crate) fn new() -> Self {
-        Self { _priv: () }
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct InlineComponent;
 
 impl ComponentKind for InlineComponent {}
 

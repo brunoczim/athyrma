@@ -5,16 +5,8 @@ use std::fmt::{self, Write};
 pub mod text;
 pub mod list;
 
-#[derive(Debug)]
-pub struct BlockComponent {
-    _priv: (),
-}
-
-impl BlockComponent {
-    pub(crate) fn new() -> Self {
-        Self { _priv: () }
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct BlockComponent;
 
 impl ComponentKind for BlockComponent {}
 
@@ -40,7 +32,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<span class=\"paideia-inline-block\">")?;
-        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))?;
+        self.0.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("</span>")?;
         Ok(())
     }
@@ -55,7 +47,7 @@ where
         renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))
+        self.0.render(renderer, ctx.with_kind(&InlineComponent))
     }
 }
 
@@ -68,6 +60,6 @@ where
         renderer: &mut Renderer<Text>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        self.0.render(renderer, ctx.with_kind(&InlineComponent::new()))
+        self.0.render(renderer, ctx.with_kind(&InlineComponent))
     }
 }

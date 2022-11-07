@@ -13,3 +13,26 @@ impl Format for Html {
         target.write_str(input)
     }
 }
+
+#[cfg(test)]
+pub mod test {
+    use scraper::Html;
+
+    pub fn validate_html_fragment(fragment: &str) -> Result<(), Vec<String>> {
+        let output = Html::parse_fragment(fragment);
+        if output.errors.len() == 0 {
+            Ok(())
+        } else {
+            Err(output.errors.into_iter().map(String::from).collect())
+        }
+    }
+
+    pub fn validate_html_documentl(fragment: &str) -> Result<(), Vec<String>> {
+        let output = Html::parse_document(fragment);
+        if output.errors.len() == 0 {
+            Ok(())
+        } else {
+            Err(output.errors.into_iter().map(String::from).collect())
+        }
+    }
+}

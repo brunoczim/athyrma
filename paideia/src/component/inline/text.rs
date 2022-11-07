@@ -241,3 +241,66 @@ where
         self.target.render(renderer, ctx)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{Bold, Italic, Link, Preformatted};
+    use crate::{
+        component::InlineComponent,
+        location::{InternalPath, Location},
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    #[test]
+    fn bold_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Bold("abc"),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn italic_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Italic("abc"),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn preformatted_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Preformatted("abc"),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn link_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Link { location: Location::internal(""), target: "abc" },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+}

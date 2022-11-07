@@ -200,7 +200,7 @@ where
     ) -> fmt::Result {
         renderer.write_str("<p class=\"paideia-paragraph\">")?;
         self.0.render(renderer, ctx.with_kind(&InlineComponent))?;
-        renderer.write_str("</p>")?;
+        renderer.write_str("<p>")?;
         Ok(())
     }
 }
@@ -232,5 +232,68 @@ where
         self.0.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Bold, Italic, Paragraph, Preformatted};
+    use crate::{
+        component::{block::InlineBlock, BlockComponent},
+        location::InternalPath,
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    #[test]
+    fn bold_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Bold(InlineBlock("abc")),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn italic_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Italic(InlineBlock("abc")),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn preformatted_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Preformatted(InlineBlock("abc")),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn paragraph_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Paragraph("abc"),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
     }
 }

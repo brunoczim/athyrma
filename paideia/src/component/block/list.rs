@@ -224,3 +224,51 @@ where
         })
     }
 }
+
+#[cfg(test)]
+mod test {
+    use katalogos::{hlist, HList};
+
+    use super::{OrderedList, UnorderedList};
+    use crate::{
+        component::{
+            block::{text::Paragraph, InlineBlock},
+            BlockComponent,
+        },
+        location::InternalPath,
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    #[test]
+    fn unordered_list_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            UnorderedList::<
+                HList![(InlineBlock<&str>, Paragraph<&str>): BlockComponent],
+            >(hlist![InlineBlock("abc"), Paragraph("def")]),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn ordered_list_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            OrderedList::<
+                HList![(InlineBlock<&str>, Paragraph<&str>): BlockComponent],
+            >(hlist![InlineBlock("abc"), Paragraph("def")]),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+}

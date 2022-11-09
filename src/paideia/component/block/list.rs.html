@@ -272,17 +272,7 @@
 <span id="272">272</span>
 <span id="273">273</span>
 <span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-</pre><pre class="rust"><code><span class="kw">use </span>katalogos::list::List;
-
-<span class="kw">use </span><span class="kw">super</span>::BlockComponent;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::BlockComponent;
 <span class="kw">use crate</span>::{
     component::Component,
     render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
@@ -291,14 +281,12 @@
 
 <span class="kw">pub struct </span>UnorderedList&lt;L&gt;(<span class="kw">pub </span>L)
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = BlockComponent&gt;;
 
 <span class="kw">impl</span>&lt;L&gt; fmt::Debug <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = BlockComponent&gt;,
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
@@ -312,7 +300,7 @@
 
 <span class="kw">impl</span>&lt;L&gt; Clone <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt; + Clone,
+    </span>L: Clone,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = BlockComponent&gt;,
 {
@@ -323,7 +311,7 @@
 
 <span class="kw">impl</span>&lt;L&gt; Copy <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt; + Copy,
+    </span>L: Copy,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = BlockComponent&gt;,
 {
@@ -331,8 +319,7 @@
 
 <span class="kw">impl</span>&lt;L&gt; Component <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = BlockComponent&gt;,
 {
     <span class="kw">type </span>Kind = BlockComponent;
@@ -340,8 +327,7 @@
 
 <span class="kw">impl</span>&lt;L&gt; Render&lt;Html&gt; <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Render&lt;Html, Kind = BlockComponent&gt;,
 {
     <span class="kw">fn </span>render(
@@ -362,8 +348,7 @@
 
 <span class="kw">impl</span>&lt;L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
         Render&lt;Markdown, Kind = BlockComponent&gt;,
 {
@@ -385,8 +370,7 @@
 
 <span class="kw">impl</span>&lt;L&gt; Render&lt;Text&gt; <span class="kw">for </span>UnorderedList&lt;L&gt;
 <span class="kw">where
-    </span>L: List&lt;Meta = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
+    for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
     <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Render&lt;Text, Kind = BlockComponent&gt;,
 {
     <span class="kw">fn </span>render(

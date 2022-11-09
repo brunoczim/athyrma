@@ -1,5 +1,3 @@
-use katalogos::list::List;
-
 use super::{
     asset::AssetComponent,
     section::SectionComponent,
@@ -18,11 +16,9 @@ impl ComponentKind for PageComponent {}
 
 pub struct Page<A, B, L>
 where
-    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
-    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -34,11 +30,9 @@ where
 
 impl<A, B, L> fmt::Debug for Page<A, B, L>
 where
-    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
-    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -57,11 +51,11 @@ where
 
 impl<A, B, L> Clone for Page<A, B, L>
 where
-    A: List<Meta = AssetComponent> + Clone,
+    A: Clone,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent> + Clone,
-    L: List<Meta = SectionComponent> + Clone,
+    L: Clone,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -77,11 +71,9 @@ where
 
 impl<A, B, L> Component for Page<A, B, L>
 where
-    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator + Clone,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
-    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -90,11 +82,9 @@ where
 
 impl<A, B, L> Render<Html> for Page<A, B, L>
 where
-    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Render<Html, Kind = AssetComponent>,
     B: Render<Html, Kind = BlockComponent>,
-    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Html, Kind = SectionComponent>,
@@ -133,11 +123,9 @@ where
 
 impl<A, B, L> Render<Markdown> for Page<A, B, L>
 where
-    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator + Clone,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
-    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Markdown, Kind = SectionComponent>,
@@ -160,11 +148,9 @@ where
 
 impl<A, B, L> Render<Text> for Page<A, B, L>
 where
-    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator + Clone,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
-    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Text, Kind = SectionComponent>,

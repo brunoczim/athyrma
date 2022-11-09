@@ -65,7 +65,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>validate_html_documentl(fragment: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Vec&lt;String&gt;&gt; {
+    <span class="kw">pub fn </span>validate_html_document(fragment: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Vec&lt;String&gt;&gt; {
         <span class="kw">let </span>output = Html::parse_document(fragment);
         <span class="kw">if </span>output.errors.len() == <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(())

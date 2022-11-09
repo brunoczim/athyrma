@@ -1,3 +1,5 @@
+use katalogos::list::List;
+
 use super::{
     asset::AssetComponent,
     section::SectionComponent,
@@ -16,9 +18,11 @@ impl ComponentKind for PageComponent {}
 
 pub struct Page<A, B, L>
 where
+    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -30,9 +34,11 @@ where
 
 impl<A, B, L> fmt::Debug for Page<A, B, L>
 where
+    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -51,13 +57,13 @@ where
 
 impl<A, B, L> Clone for Page<A, B, L>
 where
+    A: List<Meta = AssetComponent> + Clone,
     for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
-    A: Clone,
     B: Component<Kind = BlockComponent> + Clone,
+    L: List<Meta = SectionComponent> + Clone,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
-    L: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -71,9 +77,11 @@ where
 
 impl<A, B, L> Component for Page<A, B, L>
 where
-    B: Component<Kind = BlockComponent>,
+    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator + Clone,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    B: Component<Kind = BlockComponent>,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -82,9 +90,11 @@ where
 
 impl<A, B, L> Render<Html> for Page<A, B, L>
 where
-    B: Render<Html, Kind = BlockComponent>,
-    for<'a> &'a A: IntoIterator + Clone,
+    A: List<Meta = AssetComponent>,
+    for<'a> &'a A: IntoIterator,
     for<'a> <&'a A as IntoIterator>::Item: Render<Html, Kind = AssetComponent>,
+    B: Render<Html, Kind = BlockComponent>,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Html, Kind = SectionComponent>,
@@ -112,7 +122,7 @@ where
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         write!(renderer, "</a></h1><div class=\"paideia-body\">")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        renderer.write_str("</div><div class=\"paideia-children\"")?;
+        renderer.write_str("</div><div class=\"paideia-children\">")?;
         for child in &self.children {
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
@@ -123,9 +133,11 @@ where
 
 impl<A, B, L> Render<Markdown> for Page<A, B, L>
 where
+    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator + Clone,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Markdown, Kind = SectionComponent>,
@@ -148,9 +160,11 @@ where
 
 impl<A, B, L> Render<Text> for Page<A, B, L>
 where
+    A: List<Meta = AssetComponent>,
     for<'a> &'a A: IntoIterator + Clone,
     for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Text, Kind = SectionComponent>,
@@ -167,5 +181,125 @@ where
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use katalogos::{hlist, HList};
+
+    use super::{Page, PageComponent};
+    use crate::{
+        component::{
+            asset::{AssetComponent, Script, Stylesheet},
+            block::text::Paragraph,
+            section::{Section, SectionComponent},
+        },
+        location::{Id, InternalPath, Location},
+        render::{
+            html::test::validate_html_document,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    #[test]
+    fn page_without_assets_is_valid_html() {
+        let rendered =
+            RenderAsDisplay::new(
+                Page::<
+                    HList![(): AssetComponent],
+                    _,
+                    HList![(): SectionComponent],
+                > {
+                    title: String::from("Hello"),
+                    assets: hlist![],
+                    body: Paragraph("World!"),
+                    children: hlist![],
+                },
+                &mut Html::default(),
+                Context::new(&InternalPath::default(), &PageComponent),
+            )
+            .to_string();
+
+        validate_html_document(&rendered).unwrap();
+    }
+
+    #[test]
+    fn page_with_assets_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Page::<
+                HList![(_, _): AssetComponent],
+                _,
+                HList![(): SectionComponent],
+            > {
+                title: String::from("Hello"),
+                assets: hlist![
+                    Stylesheet {
+                        location: Location::internal("styles/main.css"),
+                    },
+                    Script { location: Location::internal("js/main.js") }
+                ],
+                body: Paragraph("World!"),
+                children: hlist![],
+            },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &PageComponent),
+        )
+        .to_string();
+
+        validate_html_document(&rendered).unwrap();
+    }
+
+    #[test]
+    fn page_with_children_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Page::<
+                HList![(_): AssetComponent],
+                _,
+                HList![(_, _, _): SectionComponent],
+            > {
+                title: String::from("Hello"),
+                assets: hlist![Stylesheet {
+                    location: Location::internal("styles/main.css"),
+                },],
+                body: Paragraph("World, aaaa!"),
+                children: hlist![
+                    Section::<_, _, HList![(): SectionComponent]> {
+                        title: "Hey",
+                        id: None,
+                        body: Paragraph("Hey!"),
+                        children: hlist![],
+                    },
+                    Section::<_, _, HList![(_): SectionComponent]> {
+                        title: "Good",
+                        id: Some(Id::new("good").unwrap()),
+                        body: Paragraph("Afternoon!"),
+                        children: hlist![Section::<
+                            _,
+                            _,
+                            HList![(): SectionComponent],
+                        > {
+                            title: "By",
+                            id: None,
+                            body: Paragraph("Bye!"),
+                            children: hlist![],
+                        }],
+                    },
+                    Section::<_, _, HList![(): SectionComponent]> {
+                        title: "Hay",
+                        id: None,
+                        body: Paragraph("Bay!"),
+                        children: hlist![],
+                    },
+                ],
+            },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &PageComponent),
+        )
+        .to_string();
+
+        validate_html_document(&rendered).unwrap();
     }
 }

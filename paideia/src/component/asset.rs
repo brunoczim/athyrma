@@ -55,3 +55,41 @@ impl Render<Html> for Script {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{AssetComponent, Script, Stylesheet};
+    use crate::{
+        location::{InternalPath, Location},
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    #[test]
+    fn stylesheet_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Stylesheet { location: Location::internal("styles/main.css") },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &AssetComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn script_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Script { location: Location::internal("js/main.js") },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &AssetComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+}

@@ -1,3 +1,5 @@
+use katalogos::list::List;
+
 use super::BlockComponent;
 use crate::{
     component::Component,
@@ -7,11 +9,13 @@ use std::fmt::{self, Write};
 
 pub struct UnorderedList<L>(pub L)
 where
+    L: List<Meta = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>;
 
 impl<L> fmt::Debug for UnorderedList<L>
 where
+    L: List<Meta = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
 {
@@ -26,7 +30,7 @@ where
 
 impl<L> Clone for UnorderedList<L>
 where
-    L: Clone,
+    L: List<Meta = BlockComponent> + Clone,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
 {
@@ -37,7 +41,7 @@ where
 
 impl<L> Copy for UnorderedList<L>
 where
-    L: Copy,
+    L: List<Meta = BlockComponent> + Copy,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
 {
@@ -45,6 +49,7 @@ where
 
 impl<L> Component for UnorderedList<L>
 where
+    L: List<Meta = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
 {
@@ -53,6 +58,7 @@ where
 
 impl<L> Render<Html> for UnorderedList<L>
 where
+    L: List<Meta = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Render<Html, Kind = BlockComponent>,
 {
@@ -74,6 +80,7 @@ where
 
 impl<L> Render<Markdown> for UnorderedList<L>
 where
+    L: List<Meta = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Markdown, Kind = BlockComponent>,
@@ -96,6 +103,7 @@ where
 
 impl<L> Render<Text> for UnorderedList<L>
 where
+    L: List<Meta = BlockComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,
 {

@@ -27,7 +27,7 @@ pub mod test {
         }
     }
 
-    pub fn validate_html_documentl(fragment: &str) -> Result<(), Vec<String>> {
+    pub fn validate_html_document(fragment: &str) -> Result<(), Vec<String>> {
         let output = Html::parse_document(fragment);
         if output.errors.len() == 0 {
             Ok(())

@@ -16,7 +16,7 @@ pub struct Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -30,7 +30,7 @@ impl<T, B, L> fmt::Debug for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -51,7 +51,7 @@ impl<T, B, L> Clone for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + Clone,
     B: Component<Kind = BlockComponent> + Clone,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
     L: Clone,
@@ -70,7 +70,7 @@ impl<T, B, L> Component for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
 {
@@ -81,7 +81,7 @@ impl<T, B, L> Render<Html> for Section<T, B, L>
 where
     T: Render<Html, Kind = InlineComponent>,
     B: Render<Html, Kind = BlockComponent>,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Html, Kind = SectionComponent>,
@@ -137,7 +137,7 @@ impl<T, B, L> Render<Markdown> for Section<T, B, L>
 where
     T: Render<Markdown, Kind = InlineComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Markdown, Kind = SectionComponent>,
@@ -185,7 +185,7 @@ impl<T, B, L> Render<Text> for Section<T, B, L>
 where
     T: Render<Text, Kind = InlineComponent>,
     B: Render<Text, Kind = BlockComponent>,
-    L: List,
+    L: List<Meta = SectionComponent>,
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item:
         Render<Text, Kind = SectionComponent>,

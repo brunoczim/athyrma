@@ -6,7 +6,7 @@ use crate::{
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Bold<C>(pub C)
 where
     C: Component<Kind = BlockComponent>;
@@ -63,7 +63,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Italic<C>(pub C)
 where
     C: Component<Kind = BlockComponent>;
@@ -120,7 +120,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Preformatted<C>(pub C)
 where
     C: Component<Kind = BlockComponent>;
@@ -177,7 +177,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Paragraph<C>(pub C)
 where
     C: Component<Kind = InlineComponent>;

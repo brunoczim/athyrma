@@ -7,12 +7,12 @@ use crate::{
 
 use super::{Component, ComponentKind, InlineComponent};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct AssetComponent;
 
 impl ComponentKind for AssetComponent {}
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Stylesheet {
     pub location: Location,
 }
@@ -34,7 +34,7 @@ impl Render<Html> for Stylesheet {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Script {
     pub location: Location,
 }

@@ -3,9 +3,13 @@ use crate::{
     location::{Id, InternalLoc, Location},
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
-use std::fmt::{self, Write};
+use std::{
+    cmp::Ordering,
+    fmt::{self, Write},
+    hash::{Hash, Hasher},
+};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct SectionComponent;
 
 impl ComponentKind for SectionComponent {}
@@ -57,6 +61,110 @@ where
             id: self.id.clone(),
             body: self.body.clone(),
             children: self.children.clone(),
+        }
+    }
+}
+
+impl<T, B, L> PartialEq for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + PartialEq,
+    B: Component<Kind = BlockComponent> + PartialEq,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.title == other.title
+            && self.body == other.body
+            && self.children.into_iter().eq(other.children.into_iter())
+    }
+}
+
+impl<T, B, L> Eq for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + Eq,
+    B: Component<Kind = BlockComponent> + Eq,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + Eq,
+{
+}
+
+impl<T, B, L> PartialOrd for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + PartialOrd,
+    B: Component<Kind = BlockComponent> + PartialOrd,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let ordering = self
+            .title
+            .partial_cmp(&other.title)?
+            .then(self.body.partial_cmp(&other.body)?)
+            .then(
+                self.children
+                    .into_iter()
+                    .partial_cmp(other.children.into_iter())?,
+            );
+        Some(ordering)
+    }
+}
+
+impl<T, B, L> Ord for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + Ord,
+    B: Component<Kind = BlockComponent> + Ord,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.title
+            .cmp(&other.title)
+            .then_with(|| self.body.cmp(&other.body))
+            .then_with(|| {
+                self.children.into_iter().cmp(other.children.into_iter())
+            })
+    }
+}
+
+impl<T, B, L> Hash for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + Hash,
+    B: Component<Kind = BlockComponent> + Hash,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + Hash,
+{
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+        self.title.hash(state);
+        self.body.hash(state);
+        for (i, child) in self.children.into_iter().enumerate() {
+            i.hash(state);
+            child.hash(state);
+        }
+    }
+}
+
+impl<T, B, L> Default for Section<T, B, L>
+where
+    T: Component<Kind = InlineComponent> + Default,
+    B: Component<Kind = BlockComponent> + Default,
+    L: Default,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+{
+    fn default() -> Self {
+        Self {
+            title: T::default(),
+            id: Option::default(),
+            body: B::default(),
+            children: L::default(),
         }
     }
 }

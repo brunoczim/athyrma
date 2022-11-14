@@ -4,7 +4,7 @@ use std::fmt::{self, Write};
 
 pub mod text;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct InlineComponent;
 
 impl ComponentKind for InlineComponent {}

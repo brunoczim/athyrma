@@ -5,12 +5,12 @@ use std::fmt::{self, Write};
 pub mod text;
 pub mod list;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct BlockComponent;
 
 impl ComponentKind for BlockComponent {}
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct InlineBlock<C>(pub C)
 where
     C: Component<Kind = InlineComponent>;

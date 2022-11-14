@@ -5,7 +5,7 @@ use crate::{
     location::{Fragment, InternalPath},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Site<P>
 where
     P: Component<Kind = PageComponent>,
@@ -13,7 +13,7 @@ where
     pub root: Directory<P>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Directory<P>
 where
     P: Component<Kind = PageComponent>,
@@ -40,7 +40,7 @@ where
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Entry<P, D = Directory<P>, R = PathBuf>
 where
     P: Component<Kind = PageComponent>,
@@ -148,5 +148,79 @@ where
             }
         }
         Some(entry)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::{fmt, path::PathBuf};
+
+    use katalogos::{hlist, HList};
+
+    use crate::{
+        component::{
+            asset::AssetComponent,
+            block::text::Paragraph,
+            page::{Page, PageComponent},
+            section::SectionComponent,
+        },
+        location::{Fragment, InternalPath},
+        render::FullRender,
+    };
+
+    use super::{Directory, Entry};
+
+    fn make_directory() -> Directory<
+        impl FullRender<Kind = PageComponent>
+            + fmt::Debug
+            + Eq
+            + Send
+            + Sync
+            + 'static,
+    > {
+        Directory {
+            entries: [
+                (
+                    Fragment::new("avocado").unwrap(),
+                    Entry::Directory(Directory {
+                        entries: [
+                            (
+                                Fragment::new("apple").unwrap(),
+                                Entry::Page(Page::<
+                                    HList![(): AssetComponent],
+                                    _,
+                                    HList![(): SectionComponent],
+                                > {
+                                    title: String::from("My Page"),
+                                    assets: hlist![],
+                                    body: Paragraph("hello"),
+                                    children: hlist![],
+                                }),
+                            ),
+                            (
+                                Fragment::new("banana").unwrap(),
+                                Entry::Resource(PathBuf::from("image.png")),
+                            ),
+                        ]
+                        .into_iter()
+                        .collect(),
+                    }),
+                ),
+                (
+                    Fragment::new("pineapple").unwrap(),
+                    Entry::Resource(PathBuf::from("audio.ogg")),
+                ),
+            ]
+            .into_iter()
+            .collect(),
+        }
+    }
+
+    #[test]
+    fn access_internal_path_valid() {
+        let dir = make_directory();
+        assert!(dir
+            .get(InternalPath::parse("avocado/apple").unwrap())
+            .is_some());
     }
 }

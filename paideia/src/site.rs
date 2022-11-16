@@ -54,6 +54,18 @@ impl<P, D, R> Entry<P, D, R>
 where
     P: Component<Kind = PageComponent>,
 {
+    pub fn is_page(&self) -> bool {
+        matches!(self, Self::Page(_))
+    }
+
+    pub fn is_directory(&self) -> bool {
+        matches!(self, Self::Directory(_))
+    }
+
+    pub fn is_resource(&self) -> bool {
+        matches!(self, Self::Resource(_))
+    }
+
     pub fn by_ref(&self) -> Entry<&P, &D, &R> {
         match self {
             Self::Page(page) => Entry::Page(page),
@@ -153,7 +165,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use std::{fmt, path::PathBuf};
+    use std::path::PathBuf;
 
     use katalogos::{hlist, HList};
 
@@ -171,12 +183,7 @@ mod test {
     use super::{Directory, Entry};
 
     fn make_directory() -> Directory<
-        impl FullRender<Kind = PageComponent>
-            + fmt::Debug
-            + Eq
-            + Send
-            + Sync
-            + 'static,
+        impl FullRender<Kind = PageComponent> + Eq + Send + Sync + 'static,
     > {
         Directory {
             entries: [
@@ -217,10 +224,34 @@ mod test {
     }
 
     #[test]
+    fn access_fragment_valid() {
+        let dir = make_directory();
+        assert!(dir
+            .get(Fragment::new("avocado").unwrap())
+            .unwrap()
+            .is_directory());
+    }
+
+    #[test]
+    fn access_fragment_invalid() {
+        let dir = make_directory();
+        assert!(dir.get(Fragment::new("grapes").unwrap()).is_none());
+    }
+
+    #[test]
     fn access_internal_path_valid() {
         let dir = make_directory();
         assert!(dir
             .get(InternalPath::parse("avocado/apple").unwrap())
-            .is_some());
+            .unwrap()
+            .is_page());
+    }
+
+    #[test]
+    fn access_internal_path_invalid() {
+        let dir = make_directory();
+        assert!(dir
+            .get(InternalPath::parse("avocado/grapes").unwrap())
+            .is_none());
     }
 }

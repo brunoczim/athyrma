@@ -1,9 +1,21 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, io, path::PathBuf};
 
 use crate::{
     component::{page::PageComponent, Component},
     location::{Fragment, InternalPath},
 };
+
+#[derive(Debug)]
+pub struct BuildError {
+    pub path: PathBuf,
+    pub cause: io::Error,
+}
+
+impl From<BuildError> for io::Error {
+    fn from(error: BuildError) -> Self {
+        error.cause
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Site<P>
@@ -11,6 +23,28 @@ where
     P: Component<Kind = PageComponent>,
 {
     pub root: Directory<P>,
+}
+
+impl<P> Site<P>
+where
+    P: Component<Kind = PageComponent>,
+{
+    pub fn build(
+        &self,
+        parent: &mut PathBuf,
+        resources: &mut PathBuf,
+    ) -> Result<(), BuildError> {
+        enum Operation {
+            Pop,
+        }
+
+        parent.clear();
+        resources.clear();
+        let mut path = InternalPath::default();
+        let mut entries = vec![Entry::Directory(&self.root)];
+
+        while let Some(entry) = entries.pop() {}
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

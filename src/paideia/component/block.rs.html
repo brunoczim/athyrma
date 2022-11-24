@@ -70,12 +70,12 @@
 <span class="kw">pub mod </span>text;
 <span class="kw">pub mod </span>list;
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>BlockComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>BlockComponent {}
 
-<span class="attribute">#[derive(Debug, Clone, Copy)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>InlineBlock&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;

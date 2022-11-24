@@ -517,6 +517,12 @@
 <span id="517">517</span>
 <span id="518">518</span>
 <span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module provides location, paths, Urls.
 
 </span><span class="kw">use crate</span>::{
@@ -539,6 +545,12 @@
     </span>Url(Url),
     <span class="doccomment">/// An internal location.
     </span>Internal(InternalLoc),
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Location {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Internal(InternalLoc::default())
+    }
 }
 
 <span class="kw">impl </span>From&lt;InternalPath&gt; <span class="kw">for </span>Location {

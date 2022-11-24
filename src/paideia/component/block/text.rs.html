@@ -305,7 +305,7 @@
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
-<span class="attribute">#[derive(Debug, Clone, Copy)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Bold&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = BlockComponent&gt;;
@@ -362,7 +362,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Italic&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = BlockComponent&gt;;
@@ -419,7 +419,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Preformatted&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = BlockComponent&gt;;
@@ -476,7 +476,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Paragraph&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;

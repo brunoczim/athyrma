@@ -102,12 +102,12 @@
 
 <span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>AssetComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>AssetComponent {}
 
-<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Stylesheet {
     <span class="kw">pub </span>location: Location,
 }
@@ -129,7 +129,7 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Script {
     <span class="kw">pub </span>location: Location,
 }

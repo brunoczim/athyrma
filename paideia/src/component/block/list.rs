@@ -3,7 +3,11 @@ use crate::{
     component::Component,
     render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
 };
-use std::fmt::{self, Write};
+use std::{
+    cmp::Ordering,
+    fmt::{self, Write},
+    hash::{Hash, Hasher},
+};
 
 pub struct UnorderedList<L>(pub L)
 where
@@ -41,6 +45,75 @@ where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
 {
+}
+
+impl<L> PartialEq for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.0.into_iter().eq(other.0.into_iter())
+    }
+}
+
+impl<L> Eq for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + Eq,
+{
+}
+
+impl<L> PartialOrd for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.into_iter().partial_cmp(other.0.into_iter())
+    }
+}
+
+impl<L> Ord for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.into_iter().cmp(other.0.into_iter())
+    }
+}
+
+impl<L> Hash for UnorderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + Hash,
+{
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+        for (i, element) in self.0.into_iter().enumerate() {
+            i.hash(state);
+            element.hash(state);
+        }
+    }
+}
+
+impl<L> Default for UnorderedList<L>
+where
+    L: Default,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+{
+    fn default() -> Self {
+        Self(L::default())
+    }
 }
 
 impl<L> Component for UnorderedList<L>
@@ -151,6 +224,75 @@ where
     for<'a> &'a L: IntoIterator,
     for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
 {
+}
+
+impl<L> PartialEq for OrderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.0.into_iter().eq(other.0.into_iter())
+    }
+}
+
+impl<L> Eq for OrderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + Eq,
+{
+}
+
+impl<L> PartialOrd for OrderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.into_iter().partial_cmp(other.0.into_iter())
+    }
+}
+
+impl<L> Ord for OrderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.into_iter().cmp(other.0.into_iter())
+    }
+}
+
+impl<L> Hash for OrderedList<L>
+where
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = BlockComponent> + Hash,
+{
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+        for (i, element) in self.0.into_iter().enumerate() {
+            i.hash(state);
+            element.hash(state);
+        }
+    }
+}
+
+impl<L> Default for OrderedList<L>
+where
+    L: Default,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+{
+    fn default() -> Self {
+        Self(L::default())
+    }
 }
 
 impl<L> Component for OrderedList<L>

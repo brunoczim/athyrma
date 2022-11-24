@@ -22,6 +22,12 @@ pub enum Location {
     Internal(InternalLoc),
 }
 
+impl Default for Location {
+    fn default() -> Self {
+        Self::Internal(InternalLoc::default())
+    }
+}
+
 impl From<InternalPath> for Location {
     fn from(path: InternalPath) -> Self {
         Location::Internal(InternalLoc::from(path))

@@ -7,9 +7,13 @@ use super::{
     InlineComponent,
 };
 use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
-use std::fmt::{self, Write};
+use std::{
+    cmp::Ordering,
+    fmt::{self, Write},
+    hash::{Hash, Hasher},
+};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct PageComponent;
 
 impl ComponentKind for PageComponent {}
@@ -65,6 +69,132 @@ where
             assets: self.assets.clone(),
             body: self.body.clone(),
             children: self.children.clone(),
+        }
+    }
+}
+
+impl<A, B, L> PartialEq for Page<A, B, L>
+where
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item:
+        Component<Kind = AssetComponent> + PartialEq,
+    B: Component<Kind = BlockComponent> + PartialEq,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.title == other.title
+            && self.assets.into_iter().eq(other.assets.into_iter())
+            && self.body == other.body
+            && self.children.into_iter().eq(other.children.into_iter())
+    }
+}
+
+impl<A, B, L> Eq for Page<A, B, L>
+where
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item:
+        Component<Kind = AssetComponent> + Eq,
+    B: Component<Kind = BlockComponent> + Eq,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + Eq,
+{
+}
+
+impl<A, B, L> PartialOrd for Page<A, B, L>
+where
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item:
+        Component<Kind = AssetComponent> + PartialOrd,
+    B: Component<Kind = BlockComponent> + PartialOrd,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let ordering = self
+            .title
+            .partial_cmp(&other.title)?
+            .then(
+                self.assets
+                    .into_iter()
+                    .partial_cmp(other.assets.into_iter())?,
+            )
+            .then(self.body.partial_cmp(&other.body)?)
+            .then(
+                self.children
+                    .into_iter()
+                    .partial_cmp(other.children.into_iter())?,
+            );
+        Some(ordering)
+    }
+}
+
+impl<A, B, L> Ord for Page<A, B, L>
+where
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item:
+        Component<Kind = AssetComponent> + Ord,
+    B: Component<Kind = BlockComponent> + Ord,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.title
+            .cmp(&other.title)
+            .then_with(|| self.assets.into_iter().cmp(other.assets.into_iter()))
+            .then_with(|| self.body.cmp(&other.body))
+            .then_with(|| {
+                self.children.into_iter().cmp(other.children.into_iter())
+            })
+    }
+}
+
+impl<A, B, L> Hash for Page<A, B, L>
+where
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item:
+        Component<Kind = AssetComponent> + Hash,
+    B: Component<Kind = BlockComponent> + Hash,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item:
+        Component<Kind = SectionComponent> + Hash,
+{
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+        self.title.hash(state);
+        for (i, asset) in self.assets.into_iter().enumerate() {
+            i.hash(state);
+            asset.hash(state);
+        }
+        self.body.hash(state);
+        for (i, child) in self.children.into_iter().enumerate() {
+            i.hash(state);
+            child.hash(state);
+        }
+    }
+}
+impl<A, B, L> Default for Page<A, B, L>
+where
+    A: Default,
+    for<'a> &'a A: IntoIterator,
+    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    B: Component<Kind = BlockComponent> + Default,
+    L: Default,
+    for<'a> &'a L: IntoIterator,
+    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+{
+    fn default() -> Self {
+        Self {
+            title: String::default(),
+            assets: A::default(),
+            body: B::default(),
+            children: L::default(),
         }
     }
 }

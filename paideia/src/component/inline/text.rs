@@ -6,7 +6,7 @@ use crate::{
 };
 use std::fmt::{self, Write};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Bold<C>(pub C)
 where
     C: Component<Kind = InlineComponent>;
@@ -63,7 +63,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Italic<C>(pub C)
 where
     C: Component<Kind = InlineComponent>;
@@ -120,7 +120,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Preformatted<C>(pub C)
 where
     C: Component<Kind = InlineComponent>;
@@ -177,7 +177,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Link<C>
 where
     C: Component<Kind = InlineComponent>,

@@ -1,13 +1,19 @@
-use std::{collections::HashMap, io, path::PathBuf};
+use std::{
+    collections::HashMap,
+    fs,
+    io::{self, Write},
+    path::PathBuf,
+};
 
 use crate::{
     component::{page::PageComponent, Component},
     location::{Fragment, InternalPath},
+    render::{self, Context, Render, RenderAsDisplay},
 };
 
 #[derive(Debug)]
 pub struct BuildError {
-    pub path: PathBuf,
+    pub path: InternalPath,
     pub cause: io::Error,
 }
 
@@ -29,21 +35,86 @@ impl<P> Site<P>
 where
     P: Component<Kind = PageComponent>,
 {
-    pub fn build(
+    pub fn build<W>(
         &self,
+        format: &mut W,
         parent: &mut PathBuf,
         resources: &mut PathBuf,
-    ) -> Result<(), BuildError> {
-        enum Operation {
+    ) -> Result<(), BuildError>
+    where
+        W: render::Format + ?Sized,
+        P: Render<W>,
+    {
+        enum Operation<'site, P>
+        where
+            P: Component<Kind = PageComponent>,
+        {
+            Build(Entry<&'site P, &'site Directory<P>>),
+            Push(&'site Fragment),
             Pop,
         }
 
-        parent.clear();
-        resources.clear();
-        let mut path = InternalPath::default();
-        let mut entries = vec![Entry::Directory(&self.root)];
+        let dest = parent;
+        let source = resources;
+        let mut internal_path = InternalPath::default();
 
-        while let Some(entry) = entries.pop() {}
+        fs::remove_dir_all(&dest).map_err(|cause| BuildError {
+            path: internal_path.clone(),
+            cause,
+        })?;
+
+        let mut operations =
+            vec![Operation::Build(Entry::Directory(&self.root))];
+
+        while let Some(operation) = operations.pop() {
+            match operation {
+                Operation::Build(Entry::Directory(directory)) => {
+                    fs::create_dir_all(&dest).map_err(|cause| BuildError {
+                        path: internal_path.clone(),
+                        cause,
+                    })?;
+                    for (fragment, entry) in &directory.entries {
+                        operations.push(Operation::Pop);
+                        operations.push(Operation::Build(entry.by_ref()));
+                        operations.push(Operation::Push(fragment));
+                    }
+                },
+
+                Operation::Build(Entry::Page(page)) => {
+                    let mut file = fs::File::open(&dest).map_err(|cause| {
+                        BuildError { path: internal_path.clone(), cause }
+                    })?;
+
+                    let context = Context::new(&internal_path, &PageComponent);
+                    let renderer = RenderAsDisplay::new(page, format, context);
+
+                    write!(file, "{}", renderer).map_err(|cause| {
+                        BuildError { path: internal_path.clone(), cause }
+                    })?;
+                },
+
+                Operation::Build(Entry::Resource) => {
+                    fs::copy(&source, &dest).map_err(|cause| BuildError {
+                        path: internal_path.clone(),
+                        cause,
+                    })?;
+                },
+
+                Operation::Push(fragment) => {
+                    dest.push(fragment.as_str());
+                    source.push(fragment.as_str());
+                    internal_path.fragments.push(fragment.clone());
+                },
+
+                Operation::Pop => {
+                    dest.pop();
+                    source.pop();
+                    internal_path.fragments.pop();
+                },
+            }
+        }
+
+        Ok(())
     }
 }
 
@@ -75,16 +146,16 @@ where
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Entry<P, D = Directory<P>, R = PathBuf>
+pub enum Entry<P, D = Directory<P>>
 where
     P: Component<Kind = PageComponent>,
 {
     Page(P),
     Directory(D),
-    Resource(R),
+    Resource,
 }
 
-impl<P, D, R> Entry<P, D, R>
+impl<P, D> Entry<P, D>
 where
     P: Component<Kind = PageComponent>,
 {
@@ -97,22 +168,22 @@ where
     }
 
     pub fn is_resource(&self) -> bool {
-        matches!(self, Self::Resource(_))
+        matches!(self, Self::Resource)
     }
 
-    pub fn by_ref(&self) -> Entry<&P, &D, &R> {
+    pub fn by_ref(&self) -> Entry<&P, &D> {
         match self {
             Self::Page(page) => Entry::Page(page),
             Self::Directory(dir) => Entry::Directory(dir),
-            Self::Resource(resource) => Entry::Resource(resource),
+            Self::Resource => Entry::Resource,
         }
     }
 
-    pub fn by_mut(&mut self) -> Entry<&mut P, &mut D, &mut R> {
+    pub fn by_mut(&mut self) -> Entry<&mut P, &mut D> {
         match self {
             Self::Page(page) => Entry::Page(page),
             Self::Directory(dir) => Entry::Directory(dir),
-            Self::Resource(resource) => Entry::Resource(resource),
+            Self::Resource => Entry::Resource,
         }
     }
 }
@@ -160,14 +231,14 @@ impl<'dir, P> Accessor<&'dir Directory<P>> for InternalPath
 where
     P: Component<Kind = PageComponent>,
 {
-    type Output = Option<Entry<&'dir P, &'dir Directory<P>, &'dir PathBuf>>;
+    type Output = Option<Entry<&'dir P, &'dir Directory<P>>>;
 
     fn access(&self, directory: &'dir Directory<P>) -> Self::Output {
         let mut entry = Entry::Directory(directory);
         for fragment in &self.fragments {
             match entry {
                 Entry::Page(_) => None?,
-                Entry::Resource(_) => None?,
+                Entry::Resource => None?,
                 Entry::Directory(dir) => entry = dir.get(fragment)?.by_ref(),
             }
         }
@@ -179,15 +250,14 @@ impl<'dir, P> Accessor<&'dir mut Directory<P>> for InternalPath
 where
     P: Component<Kind = PageComponent>,
 {
-    type Output =
-        Option<Entry<&'dir mut P, &'dir mut Directory<P>, &'dir mut PathBuf>>;
+    type Output = Option<Entry<&'dir mut P, &'dir mut Directory<P>>>;
 
     fn access(&self, directory: &'dir mut Directory<P>) -> Self::Output {
         let mut entry = Entry::Directory(directory);
         for fragment in &self.fragments {
             match entry {
                 Entry::Page(_) => None?,
-                Entry::Resource(_) => None?,
+                Entry::Resource => None?,
                 Entry::Directory(dir) => {
                     entry = dir.get_mut(fragment)?.by_mut()
                 },
@@ -199,8 +269,6 @@ where
 
 #[cfg(test)]
 mod test {
-    use std::path::PathBuf;
-
     use katalogos::{hlist, HList};
 
     use crate::{
@@ -239,18 +307,15 @@ mod test {
                                 }),
                             ),
                             (
-                                Fragment::new("banana").unwrap(),
-                                Entry::Resource(PathBuf::from("image.png")),
+                                Fragment::new("audio.ogg").unwrap(),
+                                Entry::Resource,
                             ),
                         ]
                         .into_iter()
                         .collect(),
                     }),
                 ),
-                (
-                    Fragment::new("pineapple").unwrap(),
-                    Entry::Resource(PathBuf::from("audio.ogg")),
-                ),
+                (Fragment::new("pineapple").unwrap(), Entry::Resource),
             ]
             .into_iter()
             .collect(),

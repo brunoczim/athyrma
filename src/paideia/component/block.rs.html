@@ -63,11 +63,13 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
 <span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">pub mod </span>text;
+<span class="kw">pub mod </span>media;
 <span class="kw">pub mod </span>list;
 
 <span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]

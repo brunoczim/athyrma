@@ -133,3 +133,52 @@ where
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        component::{inline::text::Bold, BlockComponent},
+        location::{InternalPath, Location},
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    use super::{Figure, Image};
+
+    #[test]
+    fn image_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Image {
+                location: Location::internal("abc/hi.png"),
+                alt: String::from("img about hi"),
+            },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn figure_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Figure {
+                image: Image {
+                    location: Location::internal("haha/scream.png"),
+                    alt: String::from("imaaage"),
+                },
+                legend: Bold("stark image"),
+            },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+}

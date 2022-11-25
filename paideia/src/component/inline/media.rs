@@ -60,3 +60,34 @@ impl Render<Text> for Audio {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        component::InlineComponent,
+        location::{InternalPath, Location},
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+
+    use super::Audio;
+
+    #[test]
+    fn audio_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Audio {
+                location: Location::internal("abc/def.ogg"),
+                alt: String::from("audio about def"),
+            },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &InlineComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+}

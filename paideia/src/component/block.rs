@@ -5,6 +5,7 @@ use std::fmt::{self, Write};
 pub mod text;
 pub mod media;
 pub mod list;
+pub mod table;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct BlockComponent;

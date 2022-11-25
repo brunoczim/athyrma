@@ -3,6 +3,7 @@ use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
 
 pub mod text;
+pub mod media;
 pub mod list;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]

@@ -1,4 +1,4 @@
-use core::fmt;
+use std::{fmt, fmt::Write};
 
 use crate::{
     component::{block::BlockComponent, Component, ComponentKind},
@@ -6,33 +6,38 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct EntryComponent;
+pub struct CellComponent;
 
-impl ComponentKind for EntryComponent {}
+impl ComponentKind for CellComponent {}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+pub struct CellComponent;
+
+impl ComponentKind for CellComponent {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct EntryAttrs {
+pub struct CellAttrs {
     pub header: bool,
-    pub rows: u32,
-    pub columns: u32,
+    pub rowspan: u32,
+    pub colspan: u32,
 }
 
-impl Default for EntryAttrs {
+impl Default for CellAttrs {
     fn default() -> Self {
-        Self { header: false, rows: 1, columns: 1 }
+        Self { header: false, rowspan: 1, colspan: 1 }
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct Entry<T>
+pub struct Cell<T>
 where
     T: Component<Kind = BlockComponent>,
 {
     pub child: T,
-    pub attrs: EntryAttrs,
+    pub attrs: CellAttrs,
 }
 
-impl<T> Entry<T>
+impl<T> Cell<T>
 where
     T: Component<Kind = BlockComponent>,
 {
@@ -45,18 +50,36 @@ where
         R: Format + ?Sized,
         T: Render<R>,
     {
-        todo!()
+        if self.attrs.header {
+            write!(renderer, "<th class-name=\"paideia-table-header\"")?;
+        } else {
+            write!(renderer, "<td class-name=\"paideia-table-cell\"")?;
+        }
+        if self.attrs.rowspan != 1 {
+            write!(renderer, " rowspan=\"{}\"", self.attrs.rowspan)?;
+        }
+        if self.attrs.colspan != 1 {
+            write!(renderer, " colspan=\"{}\"", self.attrs.colspan)?;
+        }
+        write!(renderer, ">")?;
+        self.child.render(renderer, ctx.with_kind(&BlockComponent))?;
+        if self.attrs.header {
+            write!(renderer, "</th>")?;
+        } else {
+            write!(renderer, "</td>")?;
+        }
+        Ok(())
     }
 }
 
-impl<T> Component for Entry<T>
+impl<T> Component for Cell<T>
 where
     T: Component<Kind = BlockComponent>,
 {
-    type Kind = EntryComponent;
+    type Kind = CellComponent;
 }
 
-impl<T> Render<Html> for Entry<T>
+impl<T> Render<Html> for Cell<T>
 where
     T: Render<Html, Kind = BlockComponent>,
 {
@@ -69,7 +92,7 @@ where
     }
 }
 
-impl<T> Render<Markdown> for Entry<T>
+impl<T> Render<Markdown> for Cell<T>
 where
     T: Render<Markdown, Kind = BlockComponent>,
 {
@@ -82,7 +105,7 @@ where
     }
 }
 
-impl<T> Render<Text> for Entry<T>
+impl<T> Render<Text> for Cell<T>
 where
     T: Render<Text, Kind = BlockComponent>,
 {

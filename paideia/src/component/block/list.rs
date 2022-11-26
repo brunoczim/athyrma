@@ -389,7 +389,9 @@ mod test {
     #[test]
     fn unordered_list_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            UnorderedList(harray![InlineBlock("abc"), Paragraph("def")]),
+            UnorderedList(harray![
+                (InlineBlock("abc"), Paragraph("def")): BlockComponent
+            ]),
             &mut Html::default(),
             Context::new(&InternalPath::default(), &BlockComponent),
         )

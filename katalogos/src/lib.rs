@@ -195,4 +195,8 @@ mod test {
     #[allow(dead_code)]
     const F64_META_LIST: HArray![(bool, &str, i32): f64] =
         harray![false, "a", 2];
+
+    #[allow(dead_code)]
+    const MANUAL_F64_META_LIST: [Coproduct![(bool, &str, i32): f64]; 3] =
+        harray![false, "a", 2];
 }

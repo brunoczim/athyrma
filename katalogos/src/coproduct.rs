@@ -16,7 +16,7 @@ pub trait Coproduct {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum Void {}
 
-pub struct Conil<M = ()>(Void, PhantomData<M>)
+pub struct Conil<M>(Void, PhantomData<M>)
 where
     M: ?Sized;
 

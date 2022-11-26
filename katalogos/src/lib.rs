@@ -190,8 +190,9 @@ macro_rules! Coproduct {
 #[cfg(test)]
 mod test {
     #[allow(dead_code)]
-    const UNIT_META_LIST: HArray![&str, i32] = harray!["a", 2];
+    const UNIT_META_LIST: HArray![(&str, i32): ()] = harray!["a", 2];
 
     #[allow(dead_code)]
-    const BOOL_META_LIST: HArray![(&str, i32): bool] = harray!["a", 2];
+    const F64_META_LIST: HArray![(bool, &str, i32): f64] =
+        harray![false, "a", 2];
 }

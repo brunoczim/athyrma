@@ -32,15 +32,17 @@ macro_rules! hvec {
 
 #[macro_export]
 macro_rules! harray {
-    [
-        $($elems:expr),*
-    ] => {
+    [$($elems:expr),*] => {
         $crate::harray![
             @done_in = []
             @done_out = []
             @buf = []
             @todo = [$($elems),*]
         ]
+    };
+
+    [$($elems:expr,)*] => {
+        $crate::harray![$($elems),*]
     };
 
     [
@@ -97,6 +99,43 @@ macro_rules! harray {
 }
 
 #[macro_export]
+macro_rules! HArray {
+    [$($tys:ty),*] => {
+        $crate::HArray![
+            @revert = [$($tys),*]
+            @done = []
+        ]
+    };
+
+    [@revert = [$input:ty $(,$inputs:ty)*] @done = [$($tys:ty),*]] => {
+        $crate::HArray![
+            @revert = [$($inputs),*]
+            @done = [$input $(,$tys)*]
+        ]
+    };
+
+    [@revert = [] @done = [$($tys:ty),*]] => {
+        $crate::HArray![
+            @count = [0]
+            @buf = [$($tys),*]
+            @done = [$crate::coproduct::Conil]
+        ]
+    };
+
+    [@count = [$n:expr] @buf = [$ty:ty $(,$tys:ty)*]  @done = [$done:ty]] => {
+        $crate::HArray![
+            @count = [$n + 1]
+            @buf = [$($tys),*]
+            @done = [$crate::coproduct::Cocons<$ty, $done>]
+        ]
+    };
+
+    [@count = [$n:expr] @buf = []  @done = [$ty:ty]] => {
+        [$ty; $n]
+    };
+}
+
+#[macro_export]
 macro_rules! Coproduct {
     [(): $m:ty] => { $crate::coproduct::Conil<$m> };
     [($elem:ty $(, $elems:ty)*): $m:ty] => {
@@ -118,5 +157,5 @@ macro_rules! Coproduct {
 #[cfg(test)]
 mod test {
     #[allow(dead_code)]
-    const BOOL_META_LIST: [Coproduct![(&str, i32): bool]; 2] = harray!["a", 2];
+    const BOOL_META_LIST: HArray![&str, i32] = harray!["a", 2];
 }

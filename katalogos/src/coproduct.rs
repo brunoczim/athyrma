@@ -9,7 +9,7 @@ use std::{
     task::{Context, Poll},
 };
 
-pub trait Colist {
+pub trait Coproduct {
     type Meta: ?Sized;
 }
 
@@ -29,7 +29,7 @@ where
     }
 }
 
-impl<M> Colist for Conil<M>
+impl<M> Coproduct for Conil<M>
 where
     M: ?Sized,
 {
@@ -143,9 +143,9 @@ pub enum Cocons<H, T> {
     Tail(T),
 }
 
-impl<H, T> Colist for Cocons<H, T>
+impl<H, T> Coproduct for Cocons<H, T>
 where
-    T: Colist,
+    T: Coproduct,
 {
     type Meta = T::Meta;
 }

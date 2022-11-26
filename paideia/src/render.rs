@@ -14,10 +14,7 @@ pub use html::Html;
 pub use markdown::Markdown;
 pub use text::Text;
 
-use katalogos::{
-    coproduct::{Cocons, Conil},
-    list::{Cons, Nil},
-};
+use katalogos::coproduct::{Cocons, Conil};
 
 use crate::{
     component::{Component, ComponentKind},
@@ -147,7 +144,7 @@ where
     ) -> fmt::Result;
 }
 
-impl<C, W> Render<W> for Nil<C>
+impl<C, W> Render<W> for Conil<C>
 where
     C: ComponentKind,
     W: Format + ?Sized,
@@ -175,20 +172,6 @@ where
         self.head.render(renderer, ctx)?;
         self.tail.render(renderer, ctx)?;
         Ok(())
-    }
-}
-
-impl<C, W> Render<W> for Conil<C>
-where
-    C: ComponentKind,
-    W: Format + ?Sized,
-{
-    fn render(
-        &self,
-        _renderer: &mut Renderer<W>,
-        _ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        self.coerce()
     }
 }
 

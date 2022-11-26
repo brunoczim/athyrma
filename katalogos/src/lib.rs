@@ -100,21 +100,39 @@ macro_rules! harray {
 
 #[macro_export]
 macro_rules! HArray {
+    [($($tys:ty),*): $m:ty] => {
+        $crate::HArray![
+            @revert = [$($tys),*]
+            @done = []
+            @meta = [$m]
+        ]
+    };
+
     [$($tys:ty),*] => {
         $crate::HArray![
             @revert = [$($tys),*]
             @done = []
+            @meta = []
         ]
     };
 
-    [@revert = [$input:ty $(,$inputs:ty)*] @done = [$($tys:ty),*]] => {
+    [
+        @revert = [$input:ty $(,$inputs:ty)*]
+        @done = [$($tys:ty),*]
+        @meta = [$($tt:tt)*]
+    ] => {
         $crate::HArray![
             @revert = [$($inputs),*]
             @done = [$input $(,$tys)*]
+            @meta = [$($tt)*]
         ]
     };
 
-    [@revert = [] @done = [$($tys:ty),*]] => {
+    [
+        @revert = []
+        @done = [$($tys:ty),*]
+        @meta = []
+    ] => {
         $crate::HArray![
             @count = [0]
             @buf = [$($tys),*]
@@ -122,7 +140,22 @@ macro_rules! HArray {
         ]
     };
 
-    [@count = [$n:expr] @buf = [$ty:ty $(,$tys:ty)*]  @done = [$done:ty]] => {
+    [
+        @revert = []
+        @done = [$($tys:ty),*]
+        @meta = [$m:ty]
+    ] => {
+        $crate::HArray![
+            @count = [0]
+            @buf = [$($tys),*]
+            @done = [$crate::coproduct::Conil<$m>]
+        ]
+    };
+
+    [
+        @count = [$n:expr] @buf = [$ty:ty $(,$tys:ty)*]
+        @done = [$done:ty]
+    ] => {
         $crate::HArray![
             @count = [$n + 1]
             @buf = [$($tys),*]

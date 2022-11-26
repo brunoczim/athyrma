@@ -369,7 +369,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use katalogos::{hlist, HList};
+    use katalogos::harray;
 
     use super::{OrderedList, UnorderedList};
     use crate::{
@@ -389,9 +389,7 @@ mod test {
     #[test]
     fn unordered_list_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            UnorderedList::<
-                HList![(InlineBlock<&str>, Paragraph<&str>): BlockComponent],
-            >(hlist![InlineBlock("abc"), Paragraph("def")]),
+            UnorderedList(harray![InlineBlock("abc"), Paragraph("def")]),
             &mut Html::default(),
             Context::new(&InternalPath::default(), &BlockComponent),
         )
@@ -403,9 +401,7 @@ mod test {
     #[test]
     fn ordered_list_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            OrderedList::<
-                HList![(InlineBlock<&str>, Paragraph<&str>): BlockComponent],
-            >(hlist![InlineBlock("abc"), Paragraph("def")]),
+            OrderedList(harray![InlineBlock("abc"), Paragraph("def")]),
             &mut Html::default(),
             Context::new(&InternalPath::default(), &BlockComponent),
         )

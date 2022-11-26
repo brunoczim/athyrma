@@ -158,23 +158,6 @@ where
     }
 }
 
-impl<W, H, T> Render<W> for Cons<H, T>
-where
-    W: Format + ?Sized,
-    H: Render<W>,
-    T: Render<W, Kind = H::Kind>,
-{
-    fn render(
-        &self,
-        renderer: &mut Renderer<W>,
-        ctx: Context<Self::Kind>,
-    ) -> fmt::Result {
-        self.head.render(renderer, ctx)?;
-        self.tail.render(renderer, ctx)?;
-        Ok(())
-    }
-}
-
 impl<W, H, T> Render<W> for Cocons<H, T>
 where
     W: Format + ?Sized,
@@ -260,6 +243,23 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         (**self).render(renderer, ctx)
+    }
+}
+
+impl<T, R, const N: usize> Render<R> for [T; N]
+where
+    T: Render<R>,
+    R: Format + ?Sized,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        for element in self {
+            element.render(renderer, ctx)?;
+        }
+        Ok(())
     }
 }
 

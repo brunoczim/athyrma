@@ -66,6 +66,13 @@ where
     type Kind = H::Kind;
 }
 
+impl<T, const N: usize> Component for [T; N]
+where
+    T: Component,
+{
+    type Kind = T::Kind;
+}
+
 impl<'this, K> ComponentKind for &'this K where K: ComponentKind + ?Sized {}
 
 impl<'this, K> ComponentKind for &'this mut K where K: ComponentKind + ?Sized {}

@@ -5,7 +5,7 @@ pub mod asset;
 pub mod page;
 
 use katalogos::{
-    colist::{Cocons, Conil},
+    coproduct::{Cocons, Conil},
     list::{Cons, Nil},
 };
 use std::{fmt, rc::Rc, sync::Arc};

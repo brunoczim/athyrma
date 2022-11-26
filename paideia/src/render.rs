@@ -15,7 +15,7 @@ pub use markdown::Markdown;
 pub use text::Text;
 
 use katalogos::{
-    colist::{Cocons, Conil},
+    coproduct::{Cocons, Conil},
     list::{Cons, Nil},
 };
 

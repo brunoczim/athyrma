@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["list",""],["media",""],["text",""]],"struct":[["BlockComponent",""],["InlineBlock",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["list",""],["media",""],["table",""],["text",""]],"struct":[["BlockComponent",""],["InlineBlock",""]]};

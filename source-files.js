@@ -6,7 +6,7 @@ var sourcesIndex = JSON.parse('{\
 "idna":["",[],["lib.rs","punycode.rs","uts46.rs"]],\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs"]]],["arbitrary.rs","equivalent.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
 "katalogos":["",[],["by_ref.rs","colist.rs","combinator.rs","function.rs","lib.rs","list.rs"]],\
-"paideia":["",[["component",[["block",[],["list.rs","media.rs","text.rs"]],["inline",[],["media.rs","text.rs"]]],["asset.rs","block.rs","inline.rs","page.rs","section.rs"]],["render",[],["common_text.rs","html.rs","markdown.rs","text.rs"]]],["component.rs","lib.rs","location.rs","render.rs","site.rs"]],\
+"paideia":["",[["component",[["block",[],["list.rs","media.rs","table.rs","text.rs"]],["inline",[],["media.rs","text.rs"]]],["asset.rs","block.rs","inline.rs","page.rs","section.rs"]],["render",[],["common_text.rs","html.rs","markdown.rs","text.rs"]]],["component.rs","lib.rs","location.rs","render.rs","site.rs"]],\
 "paignion":["",[],["lib.rs"]],\
 "percent_encoding":["",[],["lib.rs"]],\
 "phonetikos":["",[],["consonant.rs","diacritic.rs","lib.rs","vowel.rs"]],\

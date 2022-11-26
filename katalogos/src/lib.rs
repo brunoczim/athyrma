@@ -5,6 +5,20 @@ pub mod by_ref;
 
 #[macro_export]
 macro_rules! hiter {
+    [(): $m:ty] => {
+        ::std::iter::empty<$crate::coproduct::Conil<$m>>()
+    };
+    [($elem:expr $(, $elems:expr)*): $m:ty] => {
+        ::std::iter::once($crate::coproduct::Cocons::Head($elem))
+            .chain(
+                $crate::hiter![($($elems),*): $m]
+                .map($ccrate::coproduct::Cocons::Tail)
+            )
+    };
+    [($($elems:expr,)*): $m:ty] => {
+        $crate::hiter![($($elems),*): $m]
+    };
+
     [] => {
         ::std::iter::empty<$crate::coproduct::Conil>()
     };
@@ -22,6 +36,13 @@ macro_rules! hiter {
 
 #[macro_export]
 macro_rules! hvec {
+    [($($elems:expr),*): $m:ty] => {
+        $crate::hiter![($($elems),*): $m].collect::<Vec<_>>()
+    };
+    [($($elems:expr,)*): $m:ty] => {
+        $crate::hvec![($($elems),*): $m]
+    };
+
     [$($elems:expr),*] => {
         $crate::hiter![$($elems),*].collect::<Vec<_>>()
     };
@@ -32,12 +53,25 @@ macro_rules! hvec {
 
 #[macro_export]
 macro_rules! harray {
+    [($($elems:expr),*): $m:ty] => {
+        $crate::harray![
+            @done_in = []
+            @done_out = []
+            @buf = []
+            @todo = [$($elems),*]
+            @count = [0]
+            @ty  = [$crate::coproduct::Conil<$m>]
+        ]
+    };
+
     [$($elems:expr),*] => {
         $crate::harray![
             @done_in = []
             @done_out = []
             @buf = []
             @todo = [$($elems),*]
+            @count = [0]
+            @ty  = [$crate::coproduct::Conil<_>]
         ]
     };
 
@@ -45,17 +79,25 @@ macro_rules! harray {
         $crate::harray![$($elems),*]
     };
 
+    [($($elems:expr,)*): $m:ty] => {
+        $crate::harray![($($elems),*): $m]
+    };
+
     [
         @done_in = []
         @done_out = [$($done:expr),*]
         @buf = []
         @todo = [$elem:expr $(,$elems:expr)*]
+        @count = [$n:expr]
+        @ty = [$ty:ty]
     ] => {
         $crate::harray![
             @done_in = [$($done),*]
             @done_out = []
             @buf = [$crate::coproduct::Cocons::Head($elem)]
             @todo = [$($elems),*]
+            @count = [$n + 1]
+            @ty = [$crate::coproduct::Cocons<_, $ty>]
         ]
     };
 
@@ -65,8 +107,10 @@ macro_rules! harray {
         @done_out = [$($done:expr),*]
         @buf = []
         @todo = []
+        @count = [$n:expr]
+        @ty = [$ty:ty]
     ] => {
-        [$($done),*]
+        ([$($done),*] as [$ty; $n])
     };
 
     [
@@ -74,12 +118,16 @@ macro_rules! harray {
         @done_out = [$($done_out:expr),*]
         @buf = [$buf:expr]
         @todo = [$($elems:expr),*]
+        @count = [$n:expr]
+        @ty = [$ty:ty]
     ] => {
         $crate::harray![
             @done_in = []
             @done_out = [$($done_out,)* $buf]
             @buf = []
             @todo = [$($elems),*]
+            @count = [$n]
+            @ty = [$ty]
         ]
     };
 
@@ -88,12 +136,16 @@ macro_rules! harray {
         @done_out = [$($done_out:expr),*]
         @buf = [$buf:expr]
         @todo = [$($elems:expr),*]
+        @count = [$n:expr]
+        @ty = [$ty:ty]
     ] => {
         $crate::harray![
             @done_in = [$($done_in),*]
             @done_out = [$($done_out,)* $done]
             @buf = [$crate::coproduct::Cocons::Tail($buf)]
             @todo = [$($elems),*]
+            @count = [$n]
+            @ty = [$ty]
         ]
     };
 }
@@ -153,7 +205,8 @@ macro_rules! HArray {
     };
 
     [
-        @count = [$n:expr] @buf = [$ty:ty $(,$tys:ty)*]
+        @count = [$n:expr]
+        @buf = [$ty:ty $(,$tys:ty)*]
         @done = [$done:ty]
     ] => {
         $crate::HArray![

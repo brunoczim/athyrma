@@ -498,6 +498,43 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports items related to rendering components.
 
 </span><span class="kw">use </span>std::{
@@ -826,7 +863,44 @@
 
 <span class="doccomment">/// An auto-trait for components that implement rendering for all supported
 /// formats.
-</span><span class="kw">pub trait </span>FullRender: Render&lt;Html&gt; + Render&lt;Markdown&gt; + Render&lt;Text&gt; {}
+</span><span class="kw">pub trait </span>FullRender: Render&lt;Html&gt; + Render&lt;Markdown&gt; + Render&lt;Text&gt; {
+    <span class="doccomment">/// Converts the fully renderable component into a trait object wrapped by a
+    /// shared reference. This method is intended for thread-safe components. If
+    /// your component is not thread-safe or does not care about it, use
+    /// [`FullRender::into_dyn_unsync`] instead.
+    ///
+    /// This method is intended to improve ergonomics of programmers who opt for
+    /// dynamic dispatch.
+    </span><span class="kw">fn </span>into_dyn&lt;<span class="lifetime">&#39;obj</span>&gt;(<span class="self">self</span>) -&gt; DynFullComponent&lt;<span class="lifetime">&#39;obj</span>, <span class="self">Self</span>::Kind&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + Send + Sync + <span class="lifetime">&#39;obj</span>,
+    {
+        Arc::new(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Converts the fully renderable component into a trait object wrapped by a
+    /// shared reference. This method is intended for non-thread-safe
+    /// components, or for components that do not care about thread-safety.
+    /// If your component is thread-safe and cares about it, use
+    /// [`FullRender::into_dyn`] instead.
+    ///
+    /// This method is intended to improve ergonomics of programmers who opt for
+    /// dynamic dispatch.
+    </span><span class="kw">fn </span>into_dyn_unsync&lt;<span class="lifetime">&#39;obj</span>&gt;(<span class="self">self</span>) -&gt; DynFullComponentUnsync&lt;<span class="lifetime">&#39;obj</span>, <span class="self">Self</span>::Kind&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + <span class="lifetime">&#39;obj</span>,
+    {
+        Rc::new(<span class="self">self</span>)
+    }
+}
+
+<span class="doccomment">/// A dynamic trait object for thread-safe components with full render support.
+</span><span class="kw">pub type </span>DynFullComponent&lt;<span class="lifetime">&#39;obj</span>, K&gt; =
+    Arc&lt;<span class="kw">dyn </span>FullRender&lt;Kind = K&gt; + Send + Sync + <span class="lifetime">&#39;obj</span>&gt;;
+
+<span class="doccomment">/// A dynamic trait object for thread-unsafe components with full render
+/// support.
+</span><span class="kw">pub type </span>DynFullComponentUnsync&lt;<span class="lifetime">&#39;obj</span>, K&gt; = Rc&lt;<span class="kw">dyn </span>FullRender&lt;Kind = K&gt; + <span class="lifetime">&#39;obj</span>&gt;;
 
 <span class="kw">impl</span>&lt;T&gt; FullRender <span class="kw">for </span>T <span class="kw">where
     </span>T: Render&lt;Html&gt; + Render&lt;Markdown&gt; + Render&lt;Text&gt; + <span class="question-mark">?</span>Sized
@@ -941,12 +1015,12 @@
     }
 
     <span class="doccomment">/// Yields the current nesting level of sections, starting from 0.
-    </span><span class="kw">pub fn </span>level(<span class="self">self</span>) -&gt; u32 {
+    </span><span class="kw">pub fn </span>section_level(<span class="self">self</span>) -&gt; u32 {
         <span class="self">self</span>.level
     }
 
     <span class="doccomment">/// Enters another section level, by incrementing it.
-    </span><span class="kw">pub fn </span>enter(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>enter_section(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ level: <span class="self">self</span>.level + <span class="number">1</span>, ..<span class="self">self </span>}
     }
 

@@ -1,5 +1,6 @@
-//! This tool allows you to generate static sites using Rust code, dealing with
-//! "components" of web pages that will output pure HTML, no JavaScript!
+//! This tool allows you to generate static sites in encyclopedia-like format,
+//! using Rust code. With this tool, you'll deal with "components" of web pages.
+//! No JavaScript dependency required for the build output.
 
 pub mod render;
 pub mod component;

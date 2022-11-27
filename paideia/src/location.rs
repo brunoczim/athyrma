@@ -47,6 +47,11 @@ impl From<Url> for Location {
 }
 
 impl Location {
+    /// Parses a URL and yields a location.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the url string is invalid.
     pub fn url<S>(contents: S) -> Self
     where
         S: AsRef<str>,
@@ -55,6 +60,10 @@ impl Location {
     }
 
     /// Parses an internal location but returns a generic location.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the location string is invalid.
     pub fn internal<S>(contents: S) -> Self
     where
         S: AsRef<str>,

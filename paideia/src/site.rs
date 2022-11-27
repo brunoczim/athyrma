@@ -1,3 +1,6 @@
+//! This module provides a "filesystem-like" utility for organizing a site's
+//! pages and effectively generating them.
+
 use std::{
     collections::HashMap,
     fs,
@@ -11,9 +14,12 @@ use crate::{
     render::{self, Context, Render, RenderAsDisplay},
 };
 
+/// An error that may happen when building a site.
 #[derive(Debug)]
 pub struct BuildError {
+    /// Path of the problematic file.
     pub path: InternalPath,
+    /// IO error that caused the build error.
     pub cause: io::Error,
 }
 
@@ -23,11 +29,13 @@ impl From<BuildError> for io::Error {
     }
 }
 
+/// A site's filesystem.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Site<P>
 where
     P: Component<Kind = PageComponent>,
 {
+    /// Root directory.
     pub root: Directory<P>,
 }
 
@@ -35,11 +43,17 @@ impl<P> Site<P>
 where
     P: Component<Kind = PageComponent>,
 {
+    /// Builds the site into a concrete filesystem, given a render format,
+    /// an output directory path, a resource directory path.
+    ///
+    /// The output and resource directories must be a mutable reference because
+    /// they will be used to navigate to the site, but they will be restored,
+    /// unless a panic occurs.
     pub fn build<W>(
         &self,
         format: &mut W,
-        parent: &mut PathBuf,
-        resources: &mut PathBuf,
+        output_dir: &mut PathBuf,
+        resource_dir: &mut PathBuf,
     ) -> Result<(), BuildError>
     where
         W: render::Format + ?Sized,
@@ -54,8 +68,8 @@ where
             Pop,
         }
 
-        let dest = parent;
-        let source = resources;
+        let dest = output_dir;
+        let source = resource_dir;
         let mut internal_path = InternalPath::default();
 
         fs::remove_dir_all(&dest).map_err(|cause| BuildError {
@@ -118,11 +132,13 @@ where
     }
 }
 
+/// A site's directory.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Directory<P>
 where
     P: Component<Kind = PageComponent>,
 {
+    /// Entries of the directory, mapped by a name (i.e. a fragment of path).
     pub entries: HashMap<Fragment, Entry<P>>,
 }
 
@@ -130,6 +146,7 @@ impl<P> Directory<P>
 where
     P: Component<Kind = PageComponent>,
 {
+    /// Gets an entry from the directory given an accessor.
     pub fn get<'this, A>(&'this self, accessor: A) -> A::Output
     where
         A: Accessor<&'this Self>,
@@ -137,6 +154,7 @@ where
         accessor.access(self)
     }
 
+    /// Mutabily gets an entry from the directory given an accessor.
     pub fn get_mut<'this, A>(&'this mut self, accessor: A) -> A::Output
     where
         A: Accessor<&'this mut Self>,
@@ -145,13 +163,18 @@ where
     }
 }
 
+/// An entry at a directory. Parametrized so pages and directories can be
+/// replaced by references to them, e.g. `Entry<P, D> -> Entry<&P, &D>`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Entry<P, D = Directory<P>>
 where
     P: Component<Kind = PageComponent>,
 {
+    /// This entry is a page to be rendered.
     Page(P),
+    /// This entry is a directory with more entries.
     Directory(D),
+    /// This entry is an external resource.
     Resource,
 }
 
@@ -159,18 +182,22 @@ impl<P, D> Entry<P, D>
 where
     P: Component<Kind = PageComponent>,
 {
+    /// Is this entry a page?
     pub fn is_page(&self) -> bool {
         matches!(self, Self::Page(_))
     }
 
+    /// Is this entry a directory?
     pub fn is_directory(&self) -> bool {
         matches!(self, Self::Directory(_))
     }
 
+    /// Is this entry a resource?
     pub fn is_resource(&self) -> bool {
         matches!(self, Self::Resource)
     }
 
+    /// Replaces this entry's data by references to them.
     pub fn by_ref(&self) -> Entry<&P, &D> {
         match self {
             Self::Page(page) => Entry::Page(page),
@@ -179,6 +206,7 @@ where
         }
     }
 
+    /// Replaces this entry's data by mutable references to them.
     pub fn by_mut(&mut self) -> Entry<&mut P, &mut D> {
         match self {
             Self::Page(page) => Entry::Page(page),
@@ -188,9 +216,12 @@ where
     }
 }
 
+/// An accessor over a directory.
 pub trait Accessor<D> {
+    /// The output value of such access.
     type Output;
 
+    /// Access an entry of the directory.
     fn access(&self, directory: D) -> Self::Output;
 }
 

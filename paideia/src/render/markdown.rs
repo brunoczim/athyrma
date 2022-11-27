@@ -1,3 +1,5 @@
+//! This module provides utilities about the markdown rendering format.
+
 use super::{
     common_text::{self, CommonText},
     Format,
@@ -5,12 +7,15 @@ use super::{
 };
 use std::fmt;
 
+/// The html-mixed markdown rendering format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Markdown {
     inner: CommonText,
 }
 
 impl Markdown {
+    /// Creates a new markdown format renderer given indentation size in number
+    /// of spaces.
     pub fn new(indent_size: u32) -> Self {
         Self { inner: CommonText::new(indent_size) }
     }
@@ -26,6 +31,8 @@ impl Format for Markdown {
     }
 }
 
+/// Nesting scope: advances indentation level every entering, except for the
+/// first.
 #[derive(Debug, Clone, Copy)]
 pub struct Nest;
 

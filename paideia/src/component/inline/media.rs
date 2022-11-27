@@ -1,3 +1,5 @@
+//! This module defines media that can be inlined in the text.
+
 use std::fmt::{self, Write};
 
 use crate::{
@@ -8,9 +10,12 @@ use crate::{
 
 use super::InlineComponent;
 
+/// A playable audio.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Audio {
+    /// Where the audio file is.
     pub location: Location,
+    /// Alternative text description of the audio.
     pub alt: String,
 }
 

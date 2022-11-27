@@ -1,3 +1,5 @@
+//! This module exports components that are of type block, as well their kind.
+
 use super::{Component, ComponentKind, InlineComponent};
 use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
@@ -7,11 +9,17 @@ pub mod media;
 pub mod list;
 pub mod table;
 
+/// A block component. Such component is one that cannot appear in the middle of
+/// reading text and can appear directly in the body of a section.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct BlockComponent;
 
 impl ComponentKind for BlockComponent {}
 
+/// Wrapper over inline components to make them a block component. Note,
+/// however, that if you just use this in a section body, the outcome might not
+/// be desirable, but if you use this in a table cell, for example, it makes
+/// perfect sense.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct InlineBlock<C>(pub C)
 where

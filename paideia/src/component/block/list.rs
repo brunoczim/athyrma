@@ -11,6 +11,8 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+/// An unordered list (typically displayed with bullets). The unnamed field can
+/// be a vector, an array, or anything that iterates by ref over a component.
 pub struct UnorderedList<L>(pub L)
 where
     L: IntoIterRef,
@@ -181,6 +183,9 @@ where
     }
 }
 
+/// An ordered list (typically displayed with item numbers). The unnamed field
+/// can be a vector, an array, or anything that iterates by ref over a
+/// component.
 pub struct OrderedList<L>(pub L)
 where
     L: IntoIterRef,

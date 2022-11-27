@@ -1,3 +1,5 @@
+//! This module exports block text components.
+
 use std::fmt::{self, Write};
 
 use super::BlockComponent;
@@ -6,6 +8,7 @@ use crate::{
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
+/// This components wraps another component and its text bold.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Bold<C>(pub C)
 where
@@ -63,6 +66,7 @@ where
     }
 }
 
+/// This components wraps another component and its text italic.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Italic<C>(pub C)
 where
@@ -120,6 +124,8 @@ where
     }
 }
 
+/// This components wraps another component and its text preformatted. Suitable
+/// for code.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Preformatted<C>(pub C)
 where
@@ -177,6 +183,8 @@ where
     }
 }
 
+/// Component that takes a portion of inline components and puts it into a
+/// paragraph.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Paragraph<C>(pub C)
 where

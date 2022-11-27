@@ -1,3 +1,5 @@
+//! This module exports components that are of type inline, as well their kind.
+
 use super::{Component, ComponentKind};
 use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
 use std::fmt::{self, Write};
@@ -5,6 +7,8 @@ use std::fmt::{self, Write};
 pub mod text;
 pub mod media;
 
+/// An inline component. Such component is one that can appear in the middle of
+/// reading text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct InlineComponent;
 

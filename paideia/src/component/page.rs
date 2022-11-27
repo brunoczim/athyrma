@@ -1,3 +1,5 @@
+//! This module exports page component related utilities.
+
 use katalogos::IntoIterRef;
 
 use super::{
@@ -15,11 +17,14 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+/// The kind of page components. A page component is the outermost component in
+/// a page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct PageComponent;
 
 impl ComponentKind for PageComponent {}
 
+/// The page: the outermost component in an article/page.
 pub struct Page<A, B, L>
 where
     A: IntoIterRef,
@@ -28,9 +33,15 @@ where
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
+    /// Title of the page/article.
     pub title: String,
+    /// List of asset components. Can be an array, a vector, or anything that
+    /// iterates by reference.
     pub assets: A,
+    /// The body of the page.
     pub body: B,
+    /// Child sections of the page. Can be an array, a vector, or anything that
+    /// iterates by reference.
     pub children: L,
 }
 

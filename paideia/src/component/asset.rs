@@ -1,3 +1,5 @@
+//! This module exports page assets components.
+
 use std::fmt::{self, Write};
 
 use crate::{
@@ -7,13 +9,18 @@ use crate::{
 
 use super::{Component, ComponentKind, InlineComponent};
 
+/// The kind of an asset component. Such component is an external resource vital
+/// to an encyclopedia presentation or functioning as opposed to optional (e.g.
+/// images).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct AssetComponent;
 
 impl ComponentKind for AssetComponent {}
 
+/// Stylesheet asset.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Stylesheet {
+    /// Location to the stylesheet.
     pub location: Location,
 }
 
@@ -34,8 +41,10 @@ impl Render<Html> for Stylesheet {
     }
 }
 
+/// JavaScript script asset.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Script {
+    /// Location to the script.
     pub location: Location,
 }
 

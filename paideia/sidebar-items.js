@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["component",""],["location","This module provides location, paths, Urls."],["render",""],["site",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["component","This module exports the component trait and components provided by this crate."],["location","This module provides location, paths, Urls."],["render","This module exports items related to rendering components."],["site","This module provides a “filesystem-like” utility for organizing a site’s pages and effectively generating them."]]};

@@ -36,10 +36,16 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Format;
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module provides utilities about the HTML rendering format.
+
+</span><span class="kw">use </span><span class="kw">super</span>::Format;
 <span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+<span class="doccomment">/// HTML5 rendering format.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 </span><span class="kw">pub struct </span>Html;
 
 <span class="kw">impl </span>Format <span class="kw">for </span>Html {

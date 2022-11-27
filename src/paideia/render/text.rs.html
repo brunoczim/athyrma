@@ -44,20 +44,32 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module provides utilities about the plaintext rendering format.
+
+</span><span class="kw">use super</span>::{
     common_text::{<span class="self">self</span>, CommonText},
     Format,
     Scope,
 };
 <span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+<span class="doccomment">/// The plaintext rendering format.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 </span><span class="kw">pub struct </span>Text {
     inner: CommonText,
 }
 
 <span class="kw">impl </span>Text {
-    <span class="kw">pub fn </span>new(indent_size: u32) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Creates a new plaintext format renderer given indentation size in number
+    /// of spaces.
+    </span><span class="kw">pub fn </span>new(indent_size: u32) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ inner: CommonText::new(indent_size) }
     }
 }
@@ -72,7 +84,9 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy)]
+<span class="doccomment">/// Nesting scope: advances indentation level every entering, except for the
+/// first.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub struct </span>Nest;
 
 <span class="kw">impl </span>Scope <span class="kw">for </span>Nest {

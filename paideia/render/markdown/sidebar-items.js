@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Markdown",""],["Nest",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["Markdown","The html-mixed markdown rendering format."],["Nest","Nesting scope: advances indentation level every entering, except for the first."]]};

@@ -1,3 +1,5 @@
+use katalogos::IntoIterRef;
+
 use super::BlockComponent;
 use crate::{
     component::Component,
@@ -11,17 +13,17 @@ use std::{
 
 pub struct UnorderedList<L>(pub L)
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>;
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>;
 
 impl<L> fmt::Debug for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_tuple("UnorderedList");
-        for element in &self.0 {
+        for element in self.0.iter() {
             debug_fmtr.field(&element);
         }
         debug_fmtr.finish()
@@ -30,9 +32,8 @@ where
 
 impl<L> Clone for UnorderedList<L>
 where
-    L: Clone,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef + Clone,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -41,64 +42,58 @@ where
 
 impl<L> Copy for UnorderedList<L>
 where
-    L: Copy,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef + Copy,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
 }
 
 impl<L> PartialEq for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + PartialEq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.0.into_iter().eq(other.0.into_iter())
+        self.0.iter().eq(other.0.iter())
     }
 }
 
 impl<L> Eq for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + Eq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Eq,
 {
 }
 
 impl<L> PartialOrd for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + PartialOrd,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.0.into_iter().partial_cmp(other.0.into_iter())
+        self.0.iter().partial_cmp(other.0.iter())
     }
 }
 
 impl<L> Ord for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + Ord,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.0.into_iter().cmp(other.0.into_iter())
+        self.0.iter().cmp(other.0.iter())
     }
 }
 
 impl<L> Hash for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + Hash,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
     {
-        for (i, element) in self.0.into_iter().enumerate() {
+        for (i, element) in self.0.iter().enumerate() {
             i.hash(state);
             element.hash(state);
         }
@@ -107,9 +102,8 @@ where
 
 impl<L> Default for UnorderedList<L>
 where
-    L: Default,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef + Default,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     fn default() -> Self {
         Self(L::default())
@@ -118,16 +112,16 @@ where
 
 impl<L> Component for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     type Kind = BlockComponent;
 }
 
 impl<L> Render<Html> for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Render<Html, Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Html, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -135,7 +129,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<ul class=\"paideia-ulist\">")?;
-        for element in &self.0 {
+        for element in self.0.iter() {
             renderer.write_str("<li class=\"paideia-list-elem\">")?;
             element.render(renderer, ctx)?;
             renderer.write_str("</li>")?;
@@ -147,9 +141,8 @@ where
 
 impl<L> Render<Markdown> for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Markdown, Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -157,7 +150,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(markdown::Nest, |renderer| {
-            for element in &self.0 {
+            for element in self.0.iter() {
                 renderer.write_str("-")?;
                 element.render(renderer, ctx)?;
                 renderer.write_str("\n")?;
@@ -169,8 +162,8 @@ where
 
 impl<L> Render<Text> for UnorderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -178,7 +171,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(text::Nest, |renderer| {
-            for element in &self.0 {
+            for element in self.0.iter() {
                 renderer.write_str("-")?;
                 element.render(renderer, ctx)?;
                 renderer.write_str("\n")?;
@@ -190,17 +183,17 @@ where
 
 pub struct OrderedList<L>(pub L)
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>;
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>;
 
 impl<L> fmt::Debug for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_tuple("OrderedList");
-        for element in &self.0 {
+        for element in self.0.iter() {
             debug_fmtr.field(&element);
         }
         debug_fmtr.finish()
@@ -209,9 +202,8 @@ where
 
 impl<L> Clone for OrderedList<L>
 where
-    L: Clone,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef + Clone,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -220,64 +212,58 @@ where
 
 impl<L> Copy for OrderedList<L>
 where
-    L: Copy,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef + Copy,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
 }
 
 impl<L> PartialEq for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + PartialEq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.0.into_iter().eq(other.0.into_iter())
+        self.0.iter().eq(other.0.iter())
     }
 }
 
 impl<L> Eq for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + Eq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Eq,
 {
 }
 
 impl<L> PartialOrd for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + PartialOrd,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.0.into_iter().partial_cmp(other.0.into_iter())
+        self.0.iter().partial_cmp(other.0.iter())
     }
 }
 
 impl<L> Ord for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + Ord,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.0.into_iter().cmp(other.0.into_iter())
+        self.0.iter().cmp(other.0.iter())
     }
 }
 
 impl<L> Hash for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = BlockComponent> + Hash,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
     {
-        for (i, element) in self.0.into_iter().enumerate() {
+        for (i, element) in self.0.iter().enumerate() {
             i.hash(state);
             element.hash(state);
         }
@@ -286,9 +272,8 @@ where
 
 impl<L> Default for OrderedList<L>
 where
-    L: Default,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef + Default,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     fn default() -> Self {
         Self(L::default())
@@ -297,16 +282,16 @@ where
 
 impl<L> Component for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
 {
     type Kind = BlockComponent;
 }
 
 impl<L> Render<Html> for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Render<Html, Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Html, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -314,7 +299,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<ol class=\"paideia-olist\">")?;
-        for element in &self.0 {
+        for element in self.0.iter() {
             renderer.write_str("<li class=\"paideia-list-elem\">")?;
             element.render(renderer, ctx)?;
             renderer.write_str("</li>")?;
@@ -326,9 +311,8 @@ where
 
 impl<L> Render<Markdown> for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Markdown, Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -336,8 +320,8 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(markdown::Nest, |renderer| {
-            for (i, element) in self.0.into_iter().enumerate() {
-                write!(renderer, "{}. ", i)?;
+            for element in self.0.iter() {
+                renderer.write_str("-")?;
                 element.render(renderer, ctx)?;
                 renderer.write_str("\n")?;
             }
@@ -348,8 +332,8 @@ where
 
 impl<L> Render<Text> for OrderedList<L>
 where
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Render<Text, Kind = BlockComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -357,7 +341,7 @@ where
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(text::Nest, |renderer| {
-            for (i, element) in self.0.into_iter().enumerate() {
+            for (i, element) in self.0.iter().enumerate() {
                 write!(renderer, "{}. ", i)?;
                 element.render(renderer, ctx)?;
                 renderer.write_str("\n")?;
@@ -403,7 +387,9 @@ mod test {
     #[test]
     fn ordered_list_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            OrderedList(harray![InlineBlock("abc"), Paragraph("def")]),
+            OrderedList(harray![
+                (InlineBlock("abc"), Paragraph("def")): BlockComponent
+            ]),
             &mut Html::default(),
             Context::new(&InternalPath::default(), &BlockComponent),
         )

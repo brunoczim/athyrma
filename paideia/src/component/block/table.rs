@@ -7,7 +7,7 @@ use std::{
 
 use crate::{
     component::{block::BlockComponent, Component, ComponentKind},
-    render::{Context, Format, Html, Markdown, Render, Renderer, Text},
+    render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]

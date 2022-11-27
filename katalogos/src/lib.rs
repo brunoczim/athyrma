@@ -3,6 +3,27 @@ pub mod function;
 pub mod combinator;
 pub mod by_ref;
 
+pub trait IntoIterRef {
+    type Item;
+    type IntoIter<'item>: Iterator<Item = &'item Self::Item>
+    where
+        Self: 'item;
+
+    fn iter<'item>(&'item self) -> Self::IntoIter<'item>;
+}
+
+impl<T, I> IntoIterRef for T
+where
+    for<'this> &'this T: IntoIterator<Item = &'this I>,
+{
+    type Item = I;
+    type IntoIter<'item> = <&'item T as IntoIterator>::IntoIter where T: 'item;
+
+    fn iter<'item>(&'item self) -> Self::IntoIter<'item> {
+        self.into_iter()
+    }
+}
+
 #[macro_export]
 macro_rules! hiter {
     [(): $m:ty] => {
@@ -109,9 +130,10 @@ macro_rules! harray {
         @todo = []
         @count = [$n:expr]
         @ty = [$ty:ty]
-    ] => {
-        ([$($done),*] as [$ty; $n])
-    };
+    ] => {{
+        let array: [$ty; $n] = [$($done),*];
+        array
+    }};
 
     [
         @done_in = []
@@ -188,7 +210,7 @@ macro_rules! HArray {
         $crate::HArray![
             @count = [0]
             @buf = [$($tys),*]
-            @done = [$crate::coproduct::Conil]
+            @done = [$crate::coproduct::Conil<_>]
         ]
     };
 

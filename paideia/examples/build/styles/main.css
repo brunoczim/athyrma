@@ -1,0 +1,151 @@
+@font-face {
+    font-family: "Star Folk Alphabet";
+    src: url("../fonts/Star Folk Alphabet.ttf");
+}
+
+* {
+    color: black;
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    font: inherit;
+    line-height: 1.25;
+    border: 0;
+    font-family: 'Noto Sans', Cantarell, Arial, sans-serif;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+html, body, #page-wrapper {
+    width: 100%;
+    height: auto;
+}
+
+b.bold, b.bold * {
+    font-weight: bold;
+}
+
+i.italic, i.italic * {
+    font-style: italic;
+}
+
+ul {
+    list-style: disc;
+}
+
+ol {
+    list-style: decimal;
+}
+
+table {
+    border-collapse: collapse;
+    border: 0;
+    margin-bottom: 14pt;
+}
+
+td, th {
+    text-align: center;
+    padding: 7pt;
+    border: 1px solid black;
+}
+
+th {
+    font-weight: bold;
+}
+
+h1, h2 > a, h3 > a, h4 > a, h5 > a, h6 > a {
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 200%;
+    padding-top: 20pt;
+    padding-bottom: 10pt;
+}
+
+h2 {
+    font-size: 175%;
+    padding-top: 16pt;
+    padding-bottom: 8pt;
+}
+
+h3 {
+    font-size: 140%;
+    padding-top: 14pt;
+    padding-bottom: 7pt;
+}
+
+h4 {
+    font-size: 122.5%;
+    padding-top: 12pt;
+    padding-bottom: 6pt;
+}
+
+h5 {
+    font-size: 115.5%;
+    padding-top: 10pt;
+    padding-bottom: 5pt;
+}
+
+h6 {
+    font-size: 110%;
+    padding-top: 8pt;
+    padding-bottom: 4pt;
+}
+
+a.link, a.link * {
+    color: #003850;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a.link:visited {
+    color: #00214B;
+}
+
+p {
+    text-indent: 14pt;
+    text-align: justify;
+    margin-bottom: 5pt;
+    line-height: 1.25;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+.paideia-section-body {
+    padding-left: 10pt;
+    border-left: solid 1pt #000000;
+}
+
+img {
+    max-width: 500pt;
+    max-height: 98vh;
+    width: 100%;
+    background-color: white;
+}
+
+.paideia-figure {
+    background: #F7F7F7;
+    padding: 5pt;
+    border: 1pt solid #B0B0B0;
+    display: inline-block;
+}
+
+.paideia-figure-legend {
+    margin: 2pt;
+}
+
+ul, ol {
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    margin-left: 20pt;
+    margin-right: 5pt;
+}
+
+li {
+    line-height: 1.5;
+}

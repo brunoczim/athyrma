@@ -47,7 +47,7 @@ where
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-        let mut debug_fmtr = fmtr.debug_struct("UnorderedList");
+        let mut debug_fmtr = fmtr.debug_struct("Section");
         debug_fmtr
             .field("title", &self.title)
             .field("id", &self.id)
@@ -221,9 +221,9 @@ where
         if self.id.is_some() {
             renderer.write_str("</a>")?;
         }
-        write!(renderer, "</{}><div class=\"paideia-body\">", tag)?;
+        write!(renderer, "</{}><div class=\"paideia-section-body\">", tag)?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        renderer.write_str("</div><div class=\"paideia-children\">")?;
+        renderer.write_str("</div><div class=\"paideia-section-children\">")?;
         for child in self.children.iter() {
             child.render(
                 renderer,

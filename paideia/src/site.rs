@@ -2,7 +2,9 @@
 //! pages and effectively generating them.
 
 use std::{
-    collections::HashMap,
+    collections::{hash_map, HashMap},
+    error::Error,
+    fmt,
     fs,
     io::{self, Write},
     path::PathBuf,
@@ -29,6 +31,42 @@ impl From<BuildError> for io::Error {
     }
 }
 
+impl fmt::Display for BuildError {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}: {}", self.path, self.cause)
+    }
+}
+
+impl Error for BuildError {}
+
+/// Error that may happen when inserting a path into a directory.
+#[derive(Debug, Clone, Copy)]
+pub enum InsertPathError {
+    /// Empty path given, which is not accepted since it would be replacing the
+    /// directory entirely.
+    EmptyPath,
+    /// A non-directory sub-segment was found.
+    NonDirEntry,
+    /// Path already exists.
+    AlreadyExists,
+}
+
+impl fmt::Display for InsertPathError {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::EmptyPath => write!(fmtr, "cannot insert at empty path"),
+            Self::NonDirEntry => {
+                write!(fmtr, "cannot create directory at non-directory entry")
+            },
+            Self::AlreadyExists => {
+                write!(fmtr, "path already exists")
+            },
+        }
+    }
+}
+
+impl Error for InsertPathError {}
+
 /// A site's filesystem.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Site<P>
@@ -37,6 +75,15 @@ where
 {
     /// Root directory.
     pub root: Directory<P>,
+}
+
+impl<P> Default for Site<P>
+where
+    P: Component<Kind = PageComponent>,
+{
+    fn default() -> Self {
+        Self { root: Directory::default() }
+    }
 }
 
 impl<P> Site<P>
@@ -95,9 +142,10 @@ where
                 },
 
                 Operation::Build(Entry::Page(page)) => {
-                    let mut file = fs::File::open(&dest).map_err(|cause| {
-                        BuildError { path: internal_path.clone(), cause }
-                    })?;
+                    let mut file =
+                        fs::File::create(&dest).map_err(|cause| {
+                            BuildError { path: internal_path.clone(), cause }
+                        })?;
 
                     let context = Context::new(&internal_path, &PageComponent);
                     let renderer = RenderAsDisplay::new(page, format, context);
@@ -142,6 +190,15 @@ where
     pub entries: HashMap<Fragment, Entry<P>>,
 }
 
+impl<P> Default for Directory<P>
+where
+    P: Component<Kind = PageComponent>,
+{
+    fn default() -> Self {
+        Self { entries: HashMap::default() }
+    }
+}
+
 impl<P> Directory<P>
 where
     P: Component<Kind = PageComponent>,
@@ -161,6 +218,57 @@ where
     {
         accessor.access(self)
     }
+
+    /// Inserts the given new entry at the given path. Path cannot fully exist,
+    /// and if part of it exists, it must be a sequence of directories.
+    ///
+    /// # Panic
+    /// Panics if any error is found.
+    pub fn insert_path(&mut self, path: &InternalPath, new_entry: Entry<P>) {
+        self.try_insert_path(path, new_entry)
+            .expect("error found inserting path")
+    }
+
+    /// Inserts the given new entry at the given path. Path cannot fully exist,
+    /// and if part of it exists, it must be a sequence of directories.
+    /// Returns an `Err` if any error is found.
+    pub fn try_insert_path(
+        &mut self,
+        path: &InternalPath,
+        new_entry: Entry<P>,
+    ) -> Result<(), InsertPathError> {
+        let mut entry = Entry::Directory(self);
+        let (last, init) =
+            path.fragments.split_last().ok_or(InsertPathError::EmptyPath)?;
+
+        for fragment in init {
+            match entry {
+                Entry::Directory(directory) => {
+                    entry = directory
+                        .entries
+                        .entry(fragment.clone())
+                        .or_default()
+                        .by_mut();
+                },
+                _ => Err(InsertPathError::NonDirEntry)?,
+            }
+        }
+
+        match entry {
+            Entry::Directory(directory) => {
+                match directory.entries.entry(last.clone()) {
+                    hash_map::Entry::Occupied(_) => {
+                        Err(InsertPathError::AlreadyExists)
+                    },
+                    hash_map::Entry::Vacant(entry) => {
+                        entry.insert(new_entry);
+                        Ok(())
+                    },
+                }
+            },
+            _ => Err(InsertPathError::NonDirEntry),
+        }
+    }
 }
 
 /// An entry at a directory. Parametrized so pages and directories can be
@@ -176,6 +284,16 @@ where
     Directory(D),
     /// This entry is an external resource.
     Resource,
+}
+
+impl<P, D> Default for Entry<P, D>
+where
+    P: Component<Kind = PageComponent>,
+    D: Default,
+{
+    fn default() -> Self {
+        Self::Directory(D::default())
+    }
 }
 
 impl<P, D> Entry<P, D>

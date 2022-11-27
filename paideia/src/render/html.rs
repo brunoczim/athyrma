@@ -1,6 +1,9 @@
+//! This module provides utilities about the HTML rendering format.
+
 use super::Format;
 use std::fmt;
 
+/// HTML5 rendering format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Html;
 

@@ -456,7 +456,8 @@ where
     }
 }
 
-/// A helper type that will render a component using Rust's [`Display`] trait.
+/// A helper type that will render a component using Rust's [`fmt::Display`]
+/// trait.
 #[derive(Debug)]
 pub struct RenderAsDisplay<'loc, 'kind, 'format, C, W>
 where

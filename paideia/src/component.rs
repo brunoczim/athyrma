@@ -1,3 +1,6 @@
+//! This module exports the component trait and components provided by this
+//! crate.
+
 pub mod inline;
 pub mod block;
 pub mod section;
@@ -10,9 +13,14 @@ use std::{fmt, rc::Rc, sync::Arc};
 pub use block::BlockComponent;
 pub use inline::InlineComponent;
 
+/// A component kind is a way of "typing" (i.e. give types) to components at a
+/// trait level.
 pub trait ComponentKind {}
 
+/// A component's base trait. A component is a piece of data or UI logic that
+/// will be rendered into UI.
 pub trait Component: fmt::Debug {
+    /// The kind, i.e. the "type", of this component.
     type Kind: ComponentKind + ?Sized;
 }
 

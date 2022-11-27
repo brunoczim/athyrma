@@ -1,3 +1,5 @@
+//! This module exports items related to rendering components.
+
 use std::{
     fmt,
     rc::Rc,
@@ -21,7 +23,10 @@ use crate::{
     location::InternalPath,
 };
 
+/// A rendering format: e.g. HTML, Markdown, etc.
 pub trait Format {
+    /// A proxy method for writes to a target formatter that is used when
+    /// rendering.
     fn write_str(
         &mut self,
         input: &str,
@@ -55,9 +60,14 @@ where
     }
 }
 
+/// A scope of a render format. The scope allows a component to change rendering
+/// configuration by entering the scope.
 pub trait Scope {
+    /// Rendering format associated with this scope.
     type Format: Format + ?Sized;
 
+    /// Enters this scope during the call of the given consumer function; exits
+    /// when this method terminates.
     fn enter<F, T>(&self, format: &mut Self::Format, consumer: F) -> T
     where
         F: FnOnce(&mut Self::Format) -> T;
@@ -314,6 +324,8 @@ where
     }
 }
 
+/// An auto-trait for components that implement rendering for all supported
+/// formats.
 pub trait FullRender: Render<Html> + Render<Markdown> + Render<Text> {}
 
 impl<T> FullRender for T where
@@ -321,6 +333,7 @@ impl<T> FullRender for T where
 {
 }
 
+/// A proxy formatter for rendering using Rust's formatting and a render format.
 pub struct Renderer<'format, 'target, 'obj, W>
 where
     W: Format + ?Sized,
@@ -346,6 +359,7 @@ impl<'format, 'target, 'obj, W> Renderer<'format, 'target, 'obj, W>
 where
     W: Format + ?Sized,
 {
+    /// Creates a new renderer given a render format and a target formatter.
     pub fn new(
         format: &'format mut W,
         target: &'target mut (dyn fmt::Write + 'obj),
@@ -353,6 +367,8 @@ where
         Self { format, target }
     }
 
+    /// Given a scope over the render format and a scope consumer, enters the
+    /// given scope.
     pub fn scoped<S, F, T>(&mut self, scope: S, consumer: F) -> T
     where
         F: FnOnce(&mut Renderer<W>) -> T,
@@ -377,6 +393,7 @@ where
     }
 }
 
+/// Context data of a session of rendering.
 #[derive(Debug)]
 pub struct Context<'loc, 'kind, K>
 where
@@ -405,10 +422,12 @@ impl<'loc, 'kind, K> Context<'loc, 'kind, K>
 where
     K: ComponentKind + ?Sized,
 {
+    /// Creates a context from page location and component kind.
     pub fn new(location: &'loc InternalPath, kind: &'kind K) -> Self {
         Self { location, level: 0, kind }
     }
 
+    /// Recreates the context but with another  component kind.
     pub fn with_kind<Q>(self, kind: &'kind Q) -> Context<'loc, 'kind, Q>
     where
         Q: ComponentKind + ?Sized,
@@ -416,23 +435,28 @@ where
         Context { location: self.location, level: self.level, kind }
     }
 
+    /// Yields the location of the page being rendered.
     pub fn location(self) -> &'loc InternalPath {
         self.location
     }
 
+    /// Yields the current nesting level of sections, starting from 0.
     pub fn level(self) -> u32 {
         self.level
     }
 
+    /// Enters another section level, by incrementing it.
     pub fn enter(self) -> Self {
         Self { level: self.level + 1, ..self }
     }
 
+    /// Yields the component kind.
     pub fn kind(self) -> &'kind K {
         self.kind
     }
 }
 
+/// A helper type that will render a component using Rust's [`Display`] trait.
 #[derive(Debug)]
 pub struct RenderAsDisplay<'loc, 'kind, 'format, C, W>
 where
@@ -449,6 +473,8 @@ where
     C: Render<W>,
     W: Format + ?Sized,
 {
+    /// Creates a new display rendering helper given a component, a render
+    /// format and an initial context.
     pub fn new(
         component: C,
         format: &'format mut W,

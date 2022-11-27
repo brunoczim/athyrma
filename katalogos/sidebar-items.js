@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":[["HColist",""],["HList",""],["hcolist",""],["hlist",""]],"mod":[["by_ref",""],["colist",""],["combinator",""],["function",""],["list",""]]};
+window.SIDEBAR_ITEMS = {"macro":[["Coproduct",""],["HArray",""],["harray",""],["hiter",""],["hvec",""]],"mod":[["by_ref",""],["combinator",""],["coproduct",""],["function",""]],"trait":[["IntoIterRef",""]]};

@@ -348,12 +348,6 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     fs,
@@ -625,14 +619,12 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span>katalogos::{hlist, HList};
+    <span class="kw">use </span>katalogos::harray;
 
     <span class="kw">use crate</span>::{
         component::{
-            asset::AssetComponent,
             block::text::Paragraph,
             page::{Page, PageComponent},
-            section::SectionComponent,
         },
         location::{Fragment, InternalPath},
         render::FullRender,
@@ -651,15 +643,11 @@
                         entries: [
                             (
                                 Fragment::new(<span class="string">&quot;apple&quot;</span>).unwrap(),
-                                Entry::Page(Page::&lt;
-                                    <span class="macro">HList!</span>[(): AssetComponent],
-                                    <span class="kw">_</span>,
-                                    <span class="macro">HList!</span>[(): SectionComponent],
-                                &gt; {
+                                Entry::Page(Page {
                                     title: String::from(<span class="string">&quot;My Page&quot;</span>),
-                                    assets: <span class="macro">hlist!</span>[],
+                                    assets: <span class="macro">harray!</span>[],
                                     body: Paragraph(<span class="string">&quot;hello&quot;</span>),
-                                    children: <span class="macro">hlist!</span>[],
+                                    children: <span class="macro">harray!</span>[],
                                 }),
                             ),
                             (

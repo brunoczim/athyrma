@@ -380,25 +380,9 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
+</pre><pre class="rust"><code><span class="kw">use </span>katalogos::IntoIterRef;
+
+<span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
 <span class="kw">use crate</span>::{
     location::{Id, InternalLoc, Location},
     render::{Context, Html, Markdown, Render, Renderer, Text},
@@ -418,8 +402,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">pub </span>title: T,
     <span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;Id&gt;,
@@ -431,8 +415,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;UnorderedList&quot;</span>);
@@ -440,7 +424,7 @@
             .field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title)
             .field(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
             .field(<span class="string">&quot;body&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.body);
-        <span class="kw">for </span>(i, element) <span class="kw">in </span><span class="self">self</span>.children.into_iter().enumerate() {
+        <span class="kw">for </span>(i, element) <span class="kw">in </span><span class="self">self</span>.children.iter().enumerate() {
             debug_fmtr.field(<span class="kw-2">&amp;</span>i.to_string(), <span class="kw-2">&amp;</span>element);
         }
         debug_fmtr.finish()
@@ -451,9 +435,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + Clone,
     B: Component&lt;Kind = BlockComponent&gt; + Clone,
-    L: Clone,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
+    L: IntoIterRef + Clone,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -469,14 +452,13 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + PartialEq,
     B: Component&lt;Kind = BlockComponent&gt; + PartialEq,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Component&lt;Kind = SectionComponent&gt; + PartialEq,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + PartialEq,
 {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="self">self</span>.title == other.title
             &amp;&amp; <span class="self">self</span>.body == other.body
-            &amp;&amp; <span class="self">self</span>.children.into_iter().eq(other.children.into_iter())
+            &amp;&amp; <span class="self">self</span>.children.iter().eq(other.children.iter())
     }
 }
 
@@ -484,9 +466,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + Eq,
     B: Component&lt;Kind = BlockComponent&gt; + Eq,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Component&lt;Kind = SectionComponent&gt; + Eq,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Eq,
 {
 }
 
@@ -494,20 +475,15 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + PartialOrd,
     B: Component&lt;Kind = BlockComponent&gt; + PartialOrd,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Component&lt;Kind = SectionComponent&gt; + PartialOrd,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + PartialOrd,
 {
     <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
         <span class="kw">let </span>ordering = <span class="self">self
             </span>.title
             .partial_cmp(<span class="kw-2">&amp;</span>other.title)<span class="question-mark">?
             </span>.then(<span class="self">self</span>.body.partial_cmp(<span class="kw-2">&amp;</span>other.body)<span class="question-mark">?</span>)
-            .then(
-                <span class="self">self</span>.children
-                    .into_iter()
-                    .partial_cmp(other.children.into_iter())<span class="question-mark">?</span>,
-            );
+            .then(<span class="self">self</span>.children.iter().partial_cmp(other.children.iter())<span class="question-mark">?</span>);
         <span class="prelude-val">Some</span>(ordering)
     }
 }
@@ -516,17 +492,14 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + Ord,
     B: Component&lt;Kind = BlockComponent&gt; + Ord,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Component&lt;Kind = SectionComponent&gt; + Ord,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Ord,
 {
     <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
         <span class="self">self</span>.title
             .cmp(<span class="kw-2">&amp;</span>other.title)
             .then_with(|| <span class="self">self</span>.body.cmp(<span class="kw-2">&amp;</span>other.body))
-            .then_with(|| {
-                <span class="self">self</span>.children.into_iter().cmp(other.children.into_iter())
-            })
+            .then_with(|| <span class="self">self</span>.children.iter().cmp(other.children.iter()))
     }
 }
 
@@ -534,9 +507,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + Hash,
     B: Component&lt;Kind = BlockComponent&gt; + Hash,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Component&lt;Kind = SectionComponent&gt; + Hash,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Hash,
 {
     <span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H)
     <span class="kw">where
@@ -544,7 +516,7 @@
     {
         <span class="self">self</span>.title.hash(state);
         <span class="self">self</span>.body.hash(state);
-        <span class="kw">for </span>(i, child) <span class="kw">in </span><span class="self">self</span>.children.into_iter().enumerate() {
+        <span class="kw">for </span>(i, child) <span class="kw">in </span><span class="self">self</span>.children.iter().enumerate() {
             i.hash(state);
             child.hash(state);
         }
@@ -555,9 +527,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt; + Default,
     B: Component&lt;Kind = BlockComponent&gt; + Default,
-    L: Default,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
+    L: IntoIterRef + Default,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Hash,
 {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -573,8 +544,8 @@
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Hash,
 {
     <span class="kw">type </span>Kind = SectionComponent;
 }
@@ -583,9 +554,8 @@
 <span class="kw">where
     </span>T: Render&lt;Html, Kind = InlineComponent&gt;,
     B: Render&lt;Html, Kind = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Render&lt;Html, Kind = SectionComponent&gt;,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Html, Kind = SectionComponent&gt; + Hash,
 {
     <span class="kw">fn </span>render(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -626,7 +596,7 @@
         <span class="macro">write!</span>(renderer, <span class="string">&quot;&lt;/{}&gt;&lt;div class=\&quot;paideia-body\&quot;&gt;&quot;</span>, tag)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div class=\&quot;paideia-children\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
+        <span class="kw">for </span>child <span class="kw">in </span><span class="self">self</span>.children.iter() {
             child.render(renderer, ctx.enter().with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
         renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
@@ -638,9 +608,8 @@
 <span class="kw">where
     </span>T: Render&lt;Markdown, Kind = InlineComponent&gt;,
     B: Render&lt;Markdown, Kind = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Render&lt;Markdown, Kind = SectionComponent&gt;,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Markdown, Kind = SectionComponent&gt; + Hash,
 {
     <span class="kw">fn </span>render(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -674,7 +643,7 @@
         }
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
-        <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
+        <span class="kw">for </span>child <span class="kw">in </span><span class="self">self</span>.children.iter() {
             child.render(renderer, ctx.enter().with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
@@ -685,9 +654,8 @@
 <span class="kw">where
     </span>T: Render&lt;Text, Kind = InlineComponent&gt;,
     B: Render&lt;Text, Kind = BlockComponent&gt;,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L: IntoIterator,
-    <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>L <span class="kw">as </span>IntoIterator&gt;::Item:
-        Render&lt;Text, Kind = SectionComponent&gt;,
+    L: IntoIterRef,
+    &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Text, Kind = SectionComponent&gt; + Hash,
 {
     <span class="kw">fn </span>render(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -697,7 +665,7 @@
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
-        <span class="kw">for </span>child <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.children {
+        <span class="kw">for </span>child <span class="kw">in </span><span class="self">self</span>.children.iter() {
             child.render(renderer, ctx.enter().with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
@@ -717,16 +685,16 @@
             RenderAsDisplay,
         },
     };
-    <span class="kw">use </span>katalogos::{hlist, HList};
+    <span class="kw">use </span>katalogos::harray;
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>section_with_id_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
-            Section::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="macro">HList!</span>[(): SectionComponent]&gt; {
+            Section {
                 title: <span class="string">&quot;Hello&quot;</span>,
                 id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;hello&quot;</span>).unwrap()),
                 body: Paragraph(<span class="string">&quot;World!&quot;</span>),
-                children: <span class="macro">hlist!</span>[],
+                children: <span class="macro">harray!</span>[],
             },
             <span class="kw-2">&amp;mut </span>Html::default(),
             Context::new(<span class="kw-2">&amp;</span>InternalPath::default(), <span class="kw-2">&amp;</span>SectionComponent),
@@ -739,11 +707,11 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>section_without_id_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
-            Section::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="macro">HList!</span>[(): SectionComponent]&gt; {
+            Section {
                 title: <span class="string">&quot;Hello&quot;</span>,
                 id: <span class="prelude-val">None</span>,
                 body: Paragraph(<span class="string">&quot;World!&quot;</span>),
-                children: <span class="macro">hlist!</span>[],
+                children: <span class="macro">harray!</span>[],
             },
             <span class="kw-2">&amp;mut </span>Html::default(),
             Context::new(<span class="kw-2">&amp;</span>InternalPath::default(), <span class="kw-2">&amp;</span>SectionComponent),
@@ -756,37 +724,33 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>section_with_children_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
-            Section::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="macro">HList!</span>[(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>): SectionComponent]&gt; {
+            Section {
                 title: <span class="string">&quot;Hello&quot;</span>,
                 id: <span class="prelude-val">None</span>,
                 body: Paragraph(<span class="string">&quot;World!&quot;</span>),
-                children: <span class="macro">hlist!</span>[
-                    Section::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="macro">HList!</span>[(): SectionComponent]&gt; {
+                children: <span class="macro">harray!</span>[
+                    Section {
                         title: <span class="string">&quot;Hey&quot;</span>,
                         id: <span class="prelude-val">None</span>,
                         body: Paragraph(<span class="string">&quot;Hey!&quot;</span>),
-                        children: <span class="macro">hlist!</span>[],
+                        children: <span class="macro">harray!</span>[],
                     },
-                    Section::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="macro">HList!</span>[(<span class="kw">_</span>): SectionComponent]&gt; {
+                    Section {
                         title: <span class="string">&quot;Good&quot;</span>,
                         id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;good&quot;</span>).unwrap()),
                         body: Paragraph(<span class="string">&quot;Afternoon!&quot;</span>),
-                        children: <span class="macro">hlist!</span>[Section::&lt;
-                            <span class="kw">_</span>,
-                            <span class="kw">_</span>,
-                            <span class="macro">HList!</span>[(): SectionComponent],
-                        &gt; {
+                        children: <span class="macro">harray!</span>[Section {
                             title: <span class="string">&quot;By&quot;</span>,
                             id: <span class="prelude-val">None</span>,
                             body: Paragraph(<span class="string">&quot;Bye!&quot;</span>),
-                            children: <span class="macro">hlist!</span>[],
+                            children: <span class="macro">harray!</span>[],
                         }],
                     },
-                    Section::&lt;<span class="kw">_</span>, <span class="kw">_</span>, <span class="macro">HList!</span>[(): SectionComponent]&gt; {
+                    Section {
                         title: <span class="string">&quot;Hay&quot;</span>,
                         id: <span class="prelude-val">None</span>,
                         body: Paragraph(<span class="string">&quot;Bay!&quot;</span>),
-                        children: <span class="macro">hlist!</span>[],
+                        children: <span class="macro">harray!</span>[],
                     },
                 ],
             },

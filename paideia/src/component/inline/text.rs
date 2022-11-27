@@ -1,3 +1,5 @@
+//! This module exports inline text components.
+
 use super::InlineComponent;
 use crate::{
     component::Component,
@@ -6,6 +8,7 @@ use crate::{
 };
 use std::fmt::{self, Write};
 
+/// This components wraps another component and its text bold.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Bold<C>(pub C)
 where
@@ -63,6 +66,7 @@ where
     }
 }
 
+/// This components wraps another component and its text italic.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Italic<C>(pub C)
 where
@@ -120,6 +124,8 @@ where
     }
 }
 
+/// This components wraps another component and its text preformatted. Suitable
+/// for code.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Preformatted<C>(pub C)
 where
@@ -177,12 +183,15 @@ where
     }
 }
 
+/// This component is embeds a link to another resource in a component.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Link<C>
 where
     C: Component<Kind = InlineComponent>,
 {
+    /// Target displayed component.
     pub target: C,
+    /// The embedded link.
     pub location: Location,
 }
 

@@ -1,3 +1,5 @@
+use katalogos::IntoIterRef;
+
 use super::{
     asset::AssetComponent,
     section::SectionComponent,
@@ -20,11 +22,11 @@ impl ComponentKind for PageComponent {}
 
 pub struct Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     pub title: String,
     pub assets: A,
@@ -34,19 +36,19 @@ where
 
 impl<A, B, L> fmt::Debug for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_struct("UnorderedList");
         debug_fmtr.field("title", &self.title).field("body", &self.body);
-        for (i, element) in self.assets.into_iter().enumerate() {
+        for (i, element) in self.assets.iter().enumerate() {
             debug_fmtr.field(&format!("asset[{}]", i), &element);
         }
-        for (i, element) in self.children.into_iter().enumerate() {
+        for (i, element) in self.children.iter().enumerate() {
             debug_fmtr.field(&format!("children[{}]", i), &element);
         }
         debug_fmtr.finish()
@@ -55,13 +57,11 @@ where
 
 impl<A, B, L> Clone for Page<A, B, L>
 where
-    A: Clone,
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef + Clone,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent> + Clone,
-    L: Clone,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef + Clone,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn clone(&self) -> Self {
         Self {
@@ -75,105 +75,85 @@ where
 
 impl<A, B, L> PartialEq for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item:
-        Component<Kind = AssetComponent> + PartialEq,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + PartialEq,
     B: Component<Kind = BlockComponent> + PartialEq,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + PartialEq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.title == other.title
-            && self.assets.into_iter().eq(other.assets.into_iter())
+            && self.assets.iter().eq(other.assets.iter())
             && self.body == other.body
-            && self.children.into_iter().eq(other.children.into_iter())
+            && self.children.iter().eq(other.children.iter())
     }
 }
 
 impl<A, B, L> Eq for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item:
-        Component<Kind = AssetComponent> + Eq,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + Eq,
     B: Component<Kind = BlockComponent> + Eq,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + Eq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Eq,
 {
 }
 
 impl<A, B, L> PartialOrd for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item:
-        Component<Kind = AssetComponent> + PartialOrd,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + PartialOrd,
     B: Component<Kind = BlockComponent> + PartialOrd,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + PartialOrd,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let ordering = self
             .title
             .partial_cmp(&other.title)?
-            .then(
-                self.assets
-                    .into_iter()
-                    .partial_cmp(other.assets.into_iter())?,
-            )
+            .then(self.assets.iter().partial_cmp(other.assets.iter())?)
             .then(self.body.partial_cmp(&other.body)?)
-            .then(
-                self.children
-                    .into_iter()
-                    .partial_cmp(other.children.into_iter())?,
-            );
+            .then(self.children.iter().partial_cmp(other.children.iter())?);
         Some(ordering)
     }
 }
 
 impl<A, B, L> Ord for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item:
-        Component<Kind = AssetComponent> + Ord,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + Ord,
     B: Component<Kind = BlockComponent> + Ord,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + Ord,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.title
             .cmp(&other.title)
-            .then_with(|| self.assets.into_iter().cmp(other.assets.into_iter()))
+            .then_with(|| self.assets.iter().cmp(other.assets.iter()))
             .then_with(|| self.body.cmp(&other.body))
-            .then_with(|| {
-                self.children.into_iter().cmp(other.children.into_iter())
-            })
+            .then_with(|| self.children.iter().cmp(other.children.iter()))
     }
 }
 
 impl<A, B, L> Hash for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item:
-        Component<Kind = AssetComponent> + Hash,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + Hash,
     B: Component<Kind = BlockComponent> + Hash,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + Hash,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
         H: Hasher,
     {
         self.title.hash(state);
-        for (i, asset) in self.assets.into_iter().enumerate() {
+        for (i, asset) in self.assets.iter().enumerate() {
             i.hash(state);
             asset.hash(state);
         }
         self.body.hash(state);
-        for (i, child) in self.children.into_iter().enumerate() {
+        for (i, child) in self.children.iter().enumerate() {
             i.hash(state);
             child.hash(state);
         }
@@ -181,13 +161,11 @@ where
 }
 impl<A, B, L> Default for Page<A, B, L>
 where
-    A: Default,
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef + Default,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent> + Default,
-    L: Default,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef + Default,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn default() -> Self {
         Self {
@@ -201,23 +179,22 @@ where
 
 impl<A, B, L> Component for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator + Clone,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     type Kind = PageComponent;
 }
 
 impl<A, B, L> Render<Html> for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator,
-    for<'a> <&'a A as IntoIterator>::Item: Render<Html, Kind = AssetComponent>,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Render<Html, Kind = AssetComponent>,
     B: Render<Html, Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Html, Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Html, Kind = SectionComponent>,
 {
     fn render(
         &self,
@@ -229,7 +206,7 @@ where
              name=\"viewport\" content=\"width=device-width, \
              initial-scale=1.0\">",
         )?;
-        for asset in &self.assets {
+        for asset in self.assets.iter() {
             asset.render(renderer, ctx.with_kind(&AssetComponent))?;
         }
         renderer.write_str("<title>")?;
@@ -243,7 +220,7 @@ where
         write!(renderer, "</a></h1><div class=\"paideia-body\">")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         renderer.write_str("</div><div class=\"paideia-children\">")?;
-        for child in &self.children {
+        for child in self.children.iter() {
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         renderer.write_str("</div></div></body></html>")?;
@@ -253,12 +230,11 @@ where
 
 impl<A, B, L> Render<Markdown> for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator + Clone,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Render<Markdown, Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Markdown, Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Markdown, Kind = SectionComponent>,
 {
     fn render(
         &self,
@@ -269,7 +245,7 @@ where
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        for child in &self.children {
+        for child in self.children.iter() {
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         Ok(())
@@ -278,12 +254,11 @@ where
 
 impl<A, B, L> Render<Text> for Page<A, B, L>
 where
-    for<'a> &'a A: IntoIterator + Clone,
-    for<'a> <&'a A as IntoIterator>::Item: Component<Kind = AssetComponent>,
+    A: IntoIterRef,
+    <A as IntoIterRef>::Item: Render<Text, Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Text, Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Text, Kind = SectionComponent>,
 {
     fn render(
         &self,
@@ -293,7 +268,7 @@ where
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        for child in &self.children {
+        for child in self.children.iter() {
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
         Ok(())
@@ -302,14 +277,14 @@ where
 
 #[cfg(test)]
 mod test {
-    use katalogos::{hlist, HList};
+    use katalogos::harray;
 
     use super::{Page, PageComponent};
     use crate::{
         component::{
-            asset::{AssetComponent, Script, Stylesheet},
+            asset::{Script, Stylesheet},
             block::text::Paragraph,
-            section::{Section, SectionComponent},
+            section::Section,
         },
         location::{Id, InternalPath, Location},
         render::{
@@ -322,22 +297,17 @@ mod test {
 
     #[test]
     fn page_without_assets_is_valid_html() {
-        let rendered =
-            RenderAsDisplay::new(
-                Page::<
-                    HList![(): AssetComponent],
-                    _,
-                    HList![(): SectionComponent],
-                > {
-                    title: String::from("Hello"),
-                    assets: hlist![],
-                    body: Paragraph("World!"),
-                    children: hlist![],
-                },
-                &mut Html::default(),
-                Context::new(&InternalPath::default(), &PageComponent),
-            )
-            .to_string();
+        let rendered = RenderAsDisplay::new(
+            Page {
+                title: String::from("Hello"),
+                assets: harray![],
+                body: Paragraph("World!"),
+                children: harray![],
+            },
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &PageComponent),
+        )
+        .to_string();
 
         validate_html_document(&rendered).unwrap();
     }
@@ -345,20 +315,16 @@ mod test {
     #[test]
     fn page_with_assets_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            Page::<
-                HList![(_, _): AssetComponent],
-                _,
-                HList![(): SectionComponent],
-            > {
+            Page {
                 title: String::from("Hello"),
-                assets: hlist![
+                assets: harray![
                     Stylesheet {
                         location: Location::internal("styles/main.css"),
                     },
                     Script { location: Location::internal("js/main.js") }
                 ],
                 body: Paragraph("World!"),
-                children: hlist![],
+                children: harray![],
             },
             &mut Html::default(),
             Context::new(&InternalPath::default(), &PageComponent),
@@ -371,43 +337,35 @@ mod test {
     #[test]
     fn page_with_children_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            Page::<
-                HList![(_): AssetComponent],
-                _,
-                HList![(_, _, _): SectionComponent],
-            > {
+            Page {
                 title: String::from("Hello"),
-                assets: hlist![Stylesheet {
+                assets: harray![Stylesheet {
                     location: Location::internal("styles/main.css"),
-                },],
+                }],
                 body: Paragraph("World, aaaa!"),
-                children: hlist![
-                    Section::<_, _, HList![(): SectionComponent]> {
+                children: harray![
+                    Section {
                         title: "Hey",
                         id: None,
                         body: Paragraph("Hey!"),
-                        children: hlist![],
+                        children: harray![],
                     },
-                    Section::<_, _, HList![(_): SectionComponent]> {
+                    Section {
                         title: "Good",
                         id: Some(Id::new("good").unwrap()),
                         body: Paragraph("Afternoon!"),
-                        children: hlist![Section::<
-                            _,
-                            _,
-                            HList![(): SectionComponent],
-                        > {
+                        children: harray![Section {
                             title: "By",
                             id: None,
                             body: Paragraph("Bye!"),
-                            children: hlist![],
+                            children: harray![],
                         }],
                     },
-                    Section::<_, _, HList![(): SectionComponent]> {
+                    Section {
                         title: "Hay",
                         id: None,
                         body: Paragraph("Bay!"),
-                        children: hlist![],
+                        children: harray![],
                     },
                 ],
             },

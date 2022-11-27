@@ -269,14 +269,12 @@ where
 
 #[cfg(test)]
 mod test {
-    use katalogos::{hlist, HList};
+    use katalogos::harray;
 
     use crate::{
         component::{
-            asset::AssetComponent,
             block::text::Paragraph,
             page::{Page, PageComponent},
-            section::SectionComponent,
         },
         location::{Fragment, InternalPath},
         render::FullRender,
@@ -295,15 +293,11 @@ mod test {
                         entries: [
                             (
                                 Fragment::new("apple").unwrap(),
-                                Entry::Page(Page::<
-                                    HList![(): AssetComponent],
-                                    _,
-                                    HList![(): SectionComponent],
-                                > {
+                                Entry::Page(Page {
                                     title: String::from("My Page"),
-                                    assets: hlist![],
+                                    assets: harray![],
                                     body: Paragraph("hello"),
-                                    children: hlist![],
+                                    children: harray![],
                                 }),
                             ),
                             (

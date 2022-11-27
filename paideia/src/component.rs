@@ -4,10 +4,7 @@ pub mod section;
 pub mod asset;
 pub mod page;
 
-use katalogos::{
-    colist::{Cocons, Conil},
-    list::{Cons, Nil},
-};
+use katalogos::coproduct::{Cocons, Conil};
 use std::{fmt, rc::Rc, sync::Arc};
 
 pub use block::BlockComponent;
@@ -54,21 +51,6 @@ where
     type Kind = T::Kind;
 }
 
-impl<C> Component for Nil<C>
-where
-    C: ComponentKind,
-{
-    type Kind = C;
-}
-
-impl<H, T> Component for Cons<H, T>
-where
-    H: Component,
-    T: Component<Kind = H::Kind>,
-{
-    type Kind = H::Kind;
-}
-
 impl<C> Component for Conil<C>
 where
     C: ComponentKind,
@@ -82,6 +64,13 @@ where
     T: Component<Kind = H::Kind>,
 {
     type Kind = H::Kind;
+}
+
+impl<T, const N: usize> Component for [T; N]
+where
+    T: Component,
+{
+    type Kind = T::Kind;
 }
 
 impl<'this, K> ComponentKind for &'this K where K: ComponentKind + ?Sized {}

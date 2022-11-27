@@ -1,3 +1,5 @@
+use katalogos::IntoIterRef;
+
 use super::{BlockComponent, Component, ComponentKind, InlineComponent};
 use crate::{
     location::{Id, InternalLoc, Location},
@@ -18,8 +20,8 @@ pub struct Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     pub title: T,
     pub id: Option<Id>,
@@ -31,8 +33,8 @@ impl<T, B, L> fmt::Debug for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_struct("UnorderedList");
@@ -40,7 +42,7 @@ where
             .field("title", &self.title)
             .field("id", &self.id)
             .field("body", &self.body);
-        for (i, element) in self.children.into_iter().enumerate() {
+        for (i, element) in self.children.iter().enumerate() {
             debug_fmtr.field(&i.to_string(), &element);
         }
         debug_fmtr.finish()
@@ -51,9 +53,8 @@ impl<T, B, L> Clone for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + Clone,
     B: Component<Kind = BlockComponent> + Clone,
-    L: Clone,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef + Clone,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn clone(&self) -> Self {
         Self {
@@ -69,14 +70,13 @@ impl<T, B, L> PartialEq for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + PartialEq,
     B: Component<Kind = BlockComponent> + PartialEq,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + PartialEq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.title == other.title
             && self.body == other.body
-            && self.children.into_iter().eq(other.children.into_iter())
+            && self.children.iter().eq(other.children.iter())
     }
 }
 
@@ -84,9 +84,8 @@ impl<T, B, L> Eq for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + Eq,
     B: Component<Kind = BlockComponent> + Eq,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + Eq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Eq,
 {
 }
 
@@ -94,20 +93,15 @@ impl<T, B, L> PartialOrd for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + PartialOrd,
     B: Component<Kind = BlockComponent> + PartialOrd,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + PartialOrd,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let ordering = self
             .title
             .partial_cmp(&other.title)?
             .then(self.body.partial_cmp(&other.body)?)
-            .then(
-                self.children
-                    .into_iter()
-                    .partial_cmp(other.children.into_iter())?,
-            );
+            .then(self.children.iter().partial_cmp(other.children.iter())?);
         Some(ordering)
     }
 }
@@ -116,17 +110,14 @@ impl<T, B, L> Ord for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + Ord,
     B: Component<Kind = BlockComponent> + Ord,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + Ord,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.title
             .cmp(&other.title)
             .then_with(|| self.body.cmp(&other.body))
-            .then_with(|| {
-                self.children.into_iter().cmp(other.children.into_iter())
-            })
+            .then_with(|| self.children.iter().cmp(other.children.iter()))
     }
 }
 
@@ -134,9 +125,8 @@ impl<T, B, L> Hash for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + Hash,
     B: Component<Kind = BlockComponent> + Hash,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Component<Kind = SectionComponent> + Hash,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -144,7 +134,7 @@ where
     {
         self.title.hash(state);
         self.body.hash(state);
-        for (i, child) in self.children.into_iter().enumerate() {
+        for (i, child) in self.children.iter().enumerate() {
             i.hash(state);
             child.hash(state);
         }
@@ -155,9 +145,8 @@ impl<T, B, L> Default for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent> + Default,
     B: Component<Kind = BlockComponent> + Default,
-    L: Default,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef + Default,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
 {
     fn default() -> Self {
         Self {
@@ -173,8 +162,8 @@ impl<T, B, L> Component for Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item: Component<Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
 {
     type Kind = SectionComponent;
 }
@@ -183,9 +172,8 @@ impl<T, B, L> Render<Html> for Section<T, B, L>
 where
     T: Render<Html, Kind = InlineComponent>,
     B: Render<Html, Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Html, Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Html, Kind = SectionComponent> + Hash,
 {
     fn render(
         &self,
@@ -226,7 +214,7 @@ where
         write!(renderer, "</{}><div class=\"paideia-body\">", tag)?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         renderer.write_str("</div><div class=\"paideia-children\">")?;
-        for child in &self.children {
+        for child in self.children.iter() {
             child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
         }
         renderer.write_str("</div></div>")?;
@@ -238,9 +226,8 @@ impl<T, B, L> Render<Markdown> for Section<T, B, L>
 where
     T: Render<Markdown, Kind = InlineComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Markdown, Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Markdown, Kind = SectionComponent> + Hash,
 {
     fn render(
         &self,
@@ -274,7 +261,7 @@ where
         }
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        for child in &self.children {
+        for child in self.children.iter() {
             child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
         }
         Ok(())
@@ -285,9 +272,8 @@ impl<T, B, L> Render<Text> for Section<T, B, L>
 where
     T: Render<Text, Kind = InlineComponent>,
     B: Render<Text, Kind = BlockComponent>,
-    for<'a> &'a L: IntoIterator,
-    for<'a> <&'a L as IntoIterator>::Item:
-        Render<Text, Kind = SectionComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Text, Kind = SectionComponent> + Hash,
 {
     fn render(
         &self,
@@ -297,7 +283,7 @@ where
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        for child in &self.children {
+        for child in self.children.iter() {
             child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
         }
         Ok(())
@@ -317,16 +303,16 @@ mod test {
             RenderAsDisplay,
         },
     };
-    use katalogos::{hlist, HList};
+    use katalogos::harray;
 
     #[test]
     fn section_with_id_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            Section::<_, _, HList![(): SectionComponent]> {
+            Section {
                 title: "Hello",
                 id: Some(Id::new("hello").unwrap()),
                 body: Paragraph("World!"),
-                children: hlist![],
+                children: harray![],
             },
             &mut Html::default(),
             Context::new(&InternalPath::default(), &SectionComponent),
@@ -339,11 +325,11 @@ mod test {
     #[test]
     fn section_without_id_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            Section::<_, _, HList![(): SectionComponent]> {
+            Section {
                 title: "Hello",
                 id: None,
                 body: Paragraph("World!"),
-                children: hlist![],
+                children: harray![],
             },
             &mut Html::default(),
             Context::new(&InternalPath::default(), &SectionComponent),
@@ -356,37 +342,33 @@ mod test {
     #[test]
     fn section_with_children_is_valid_html() {
         let rendered = RenderAsDisplay::new(
-            Section::<_, _, HList![(_, _, _): SectionComponent]> {
+            Section {
                 title: "Hello",
                 id: None,
                 body: Paragraph("World!"),
-                children: hlist![
-                    Section::<_, _, HList![(): SectionComponent]> {
+                children: harray![
+                    Section {
                         title: "Hey",
                         id: None,
                         body: Paragraph("Hey!"),
-                        children: hlist![],
+                        children: harray![],
                     },
-                    Section::<_, _, HList![(_): SectionComponent]> {
+                    Section {
                         title: "Good",
                         id: Some(Id::new("good").unwrap()),
                         body: Paragraph("Afternoon!"),
-                        children: hlist![Section::<
-                            _,
-                            _,
-                            HList![(): SectionComponent],
-                        > {
+                        children: harray![Section {
                             title: "By",
                             id: None,
                             body: Paragraph("Bye!"),
-                            children: hlist![],
+                            children: harray![],
                         }],
                     },
-                    Section::<_, _, HList![(): SectionComponent]> {
+                    Section {
                         title: "Hay",
                         id: None,
                         body: Paragraph("Bay!"),
-                        children: hlist![],
+                        children: harray![],
                     },
                 ],
             },

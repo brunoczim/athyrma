@@ -326,7 +326,44 @@ where
 
 /// An auto-trait for components that implement rendering for all supported
 /// formats.
-pub trait FullRender: Render<Html> + Render<Markdown> + Render<Text> {}
+pub trait FullRender: Render<Html> + Render<Markdown> + Render<Text> {
+    /// Converts the fully renderable component into a trait object wrapped by a
+    /// shared reference. This method is intended for thread-safe components. If
+    /// your component is not thread-safe or does not care about it, use
+    /// [`FullRender::into_dyn_unsync`] instead.
+    ///
+    /// This method is intended to improve ergonomics of programmers who opt for
+    /// dynamic dispatch.
+    fn into_dyn<'obj>(self) -> DynFullComponent<'obj, Self::Kind>
+    where
+        Self: Sized + Send + Sync + 'obj,
+    {
+        Arc::new(self)
+    }
+
+    /// Converts the fully renderable component into a trait object wrapped by a
+    /// shared reference. This method is intended for non-thread-safe
+    /// components, or for components that do not care about thread-safety.
+    /// If your component is thread-safe and cares about it, use
+    /// [`FullRender::into_dyn`] instead.
+    ///
+    /// This method is intended to improve ergonomics of programmers who opt for
+    /// dynamic dispatch.
+    fn into_dyn_unsync<'obj>(self) -> DynFullComponentUnsync<'obj, Self::Kind>
+    where
+        Self: Sized + 'obj,
+    {
+        Rc::new(self)
+    }
+}
+
+/// A dynamic trait object for thread-safe components with full render support.
+pub type DynFullComponent<'obj, K> =
+    Arc<dyn FullRender<Kind = K> + Send + Sync + 'obj>;
+
+/// A dynamic trait object for thread-unsafe components with full render
+/// support.
+pub type DynFullComponentUnsync<'obj, K> = Rc<dyn FullRender<Kind = K> + 'obj>;
 
 impl<T> FullRender for T where
     T: Render<Html> + Render<Markdown> + Render<Text> + ?Sized
@@ -441,12 +478,12 @@ where
     }
 
     /// Yields the current nesting level of sections, starting from 0.
-    pub fn level(self) -> u32 {
+    pub fn section_level(self) -> u32 {
         self.level
     }
 
     /// Enters another section level, by incrementing it.
-    pub fn enter(self) -> Self {
+    pub fn enter_section(self) -> Self {
         Self { level: self.level + 1, ..self }
     }
 

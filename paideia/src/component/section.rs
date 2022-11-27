@@ -190,7 +190,7 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        let tag = match ctx.level() {
+        let tag = match ctx.section_level() {
             0 => "h2",
             1 => "h3",
             2 => "h4",
@@ -200,7 +200,7 @@ where
         write!(
             renderer,
             "<div class=\"paideia-section paideia-section-{}\"",
-            ctx.level()
+            ctx.section_level()
         )?;
         if let Some(id) = &self.id {
             renderer.write_str(" id=\"")?;
@@ -225,7 +225,10 @@ where
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         renderer.write_str("</div><div class=\"paideia-children\">")?;
         for child in self.children.iter() {
-            child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
+            child.render(
+                renderer,
+                ctx.enter_section().with_kind(&SectionComponent),
+            )?;
         }
         renderer.write_str("</div></div>")?;
         Ok(())
@@ -244,7 +247,7 @@ where
         renderer: &mut Renderer<Markdown>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        let tag = match ctx.level() {
+        let tag = match ctx.section_level() {
             0 => "##",
             1 => "###",
             2 => "####",
@@ -272,7 +275,10 @@ where
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         for child in self.children.iter() {
-            child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
+            child.render(
+                renderer,
+                ctx.enter_section().with_kind(&SectionComponent),
+            )?;
         }
         Ok(())
     }
@@ -294,7 +300,10 @@ where
         renderer.write_str("\n\n")?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         for child in self.children.iter() {
-            child.render(renderer, ctx.enter().with_kind(&SectionComponent))?;
+            child.render(
+                renderer,
+                ctx.enter_section().with_kind(&SectionComponent),
+            )?;
         }
         Ok(())
     }

@@ -91,7 +91,14 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module defines media that can be inlined in the text.
+
+</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">use crate</span>::{
     component::Component,
@@ -101,10 +108,13 @@
 
 <span class="kw">use </span><span class="kw">super</span>::InlineComponent;
 
-<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+<span class="doccomment">/// A playable audio.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub struct </span>Audio {
-    <span class="kw">pub </span>location: Location,
-    <span class="kw">pub </span>alt: String,
+    <span class="doccomment">/// Where the audio file is.
+    </span><span class="kw">pub </span>location: Location,
+    <span class="doccomment">/// Alternative text description of the audio.
+    </span><span class="kw">pub </span>alt: String,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>Audio {

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["AssetComponent",""],["Script",""],["Stylesheet",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["AssetComponent","The kind of an asset component. Such component is an external resource vital to an encyclopedia presentation or functioning as opposed to optional (e.g. images)."],["Script","JavaScript script asset."],["Stylesheet","Stylesheet asset."]]};

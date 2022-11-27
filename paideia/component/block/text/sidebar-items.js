@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Bold",""],["Italic",""],["Paragraph",""],["Preformatted",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["Bold","This components wraps another component and its text bold."],["Italic","This components wraps another component and its text italic."],["Paragraph","Component that takes a portion of inline components and puts it into a paragraph."],["Preformatted","This components wraps another component and its text preformatted. Suitable for code."]]};

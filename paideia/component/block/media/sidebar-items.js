@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Figure",""],["Image",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["Figure","A figure component, an image with legend."],["Image","An image component."]]};

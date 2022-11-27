@@ -297,7 +297,17 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports block text components.
+
+</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">use </span><span class="kw">super</span>::BlockComponent;
 <span class="kw">use crate</span>::{
@@ -305,7 +315,8 @@
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This components wraps another component and its text bold.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Bold&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = BlockComponent&gt;;
@@ -362,7 +373,8 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This components wraps another component and its text italic.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Italic&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = BlockComponent&gt;;
@@ -419,7 +431,9 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This components wraps another component and its text preformatted. Suitable
+/// for code.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Preformatted&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = BlockComponent&gt;;
@@ -476,7 +490,9 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// Component that takes a portion of inline components and puts it into a
+/// paragraph.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Paragraph&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;

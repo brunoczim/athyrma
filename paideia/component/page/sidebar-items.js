@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Page",""],["PageComponent",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["Page","The page: the outermost component in an article/page."],["PageComponent","The kind of page components. A page component is the outermost component in a page."]]};

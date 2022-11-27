@@ -716,7 +716,29 @@
 <span id="716">716</span>
 <span id="717">717</span>
 <span id="718">718</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports a table component.
+
+</span><span class="kw">use </span>std::{
     cmp::Ordering,
     fmt,
     fmt::Write,
@@ -735,21 +757,27 @@
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// Cell component kind. Components of this kind are usable as cells in a table.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>CellComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>CellComponent {}
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// Row component kind. Components of this kind are usable as rows in a table.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>RowComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>RowComponent {}
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+<span class="doccomment">/// Attributes of a table cell.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub struct </span>CellAttrs {
-    <span class="kw">pub </span>header: bool,
-    <span class="kw">pub </span>rowspan: u32,
-    <span class="kw">pub </span>colspan: u32,
+    <span class="doccomment">/// Is this cell a header?
+    </span><span class="kw">pub </span>header: bool,
+    <span class="doccomment">/// Span size in the row direction of this cell.
+    </span><span class="kw">pub </span>rowspan: u32,
+    <span class="doccomment">/// Span size in the column direction of this cell.
+    </span><span class="kw">pub </span>colspan: u32,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>CellAttrs {
@@ -849,7 +877,9 @@
     }
 }
 
-<span class="kw">pub struct </span>Row&lt;C&gt;(<span class="kw">pub </span>C)
+<span class="doccomment">/// A row in a table. The single unnamed field could be an array, a vec, or
+/// anything that iterates by ref yielding cell components.
+</span><span class="kw">pub struct </span>Row&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: IntoIterRef,
     &lt;C <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = CellComponent&gt;;
@@ -1012,7 +1042,9 @@
     }
 }
 
-<span class="kw">pub struct </span>Table&lt;L&gt;(<span class="kw">pub </span>L)
+<span class="doccomment">/// A table. The single unnamed field could be an array, a vec, or
+/// anything that iterates by ref yielding row components.
+</span><span class="kw">pub struct </span>Table&lt;L&gt;(<span class="kw">pub </span>L)
 <span class="kw">where
     </span>L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;;
@@ -1176,97 +1208,102 @@
     }
 }
 
-<span class="kw">pub struct </span>TitledTable&lt;T, L&gt;
+<span class="doccomment">/// A table with a title/caption at the top.
+</span><span class="kw">pub struct </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt;,
+    </span>C: Component&lt;Kind = InlineComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;,
 {
-    title: T,
-    table: Table&lt;L&gt;,
+    <span class="doccomment">/// The caption of this table.
+    </span>caption: C,
+    <span class="doccomment">/// The table itself.
+    </span>table: Table&lt;L&gt;,
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; fmt::Debug <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; fmt::Debug <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt;,
+    </span>C: Component&lt;Kind = InlineComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;,
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        fmtr.debug_struct(<span class="string">&quot;TitledTable&quot;</span>)
-            .field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title)
+        fmtr.debug_struct(<span class="string">&quot;CaptionedTable&quot;</span>)
+            .field(<span class="string">&quot;caption&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.caption)
             .field(<span class="string">&quot;table&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.table)
             .finish()
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Clone <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Clone <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Clone,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + Clone,
     L: IntoIterRef + Clone,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;,
 {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ title: <span class="self">self</span>.title.clone(), table: <span class="self">self</span>.table.clone() }
+        <span class="self">Self </span>{ caption: <span class="self">self</span>.caption.clone(), table: <span class="self">self</span>.table.clone() }
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Copy <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Copy <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Copy,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + Copy,
     L: IntoIterRef + Copy,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;,
 {
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; PartialEq <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; PartialEq <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + PartialEq,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + PartialEq,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt; + PartialEq,
 {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.title == other.title &amp;&amp; <span class="self">self</span>.table == other.table
+        <span class="self">self</span>.caption == other.caption &amp;&amp; <span class="self">self</span>.table == other.table
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Eq <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Eq <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Eq,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + Eq,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt; + Eq,
 {
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; PartialOrd <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; PartialOrd <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + PartialOrd,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + PartialOrd,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt; + PartialOrd,
 {
     <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
         <span class="prelude-val">Some</span>(
-            <span class="self">self</span>.title
-                .partial_cmp(<span class="kw-2">&amp;</span>other.title)<span class="question-mark">?
+            <span class="self">self</span>.caption
+                .partial_cmp(<span class="kw-2">&amp;</span>other.caption)<span class="question-mark">?
                 </span>.then(<span class="self">self</span>.table.partial_cmp(<span class="kw-2">&amp;</span>other.table)<span class="question-mark">?</span>),
         )
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Ord <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Ord <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Ord,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + Ord,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt; + Ord,
 {
     <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
-        <span class="self">self</span>.title.cmp(<span class="kw-2">&amp;</span>other.title).then_with(|| <span class="self">self</span>.table.cmp(<span class="kw-2">&amp;</span>other.table))
+        <span class="self">self</span>.caption
+            .cmp(<span class="kw-2">&amp;</span>other.caption)
+            .then_with(|| <span class="self">self</span>.table.cmp(<span class="kw-2">&amp;</span>other.table))
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Hash <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Hash <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Hash,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + Hash,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt; + Hash,
 {
@@ -1274,34 +1311,34 @@
     <span class="kw">where
         </span>H: Hasher,
     {
-        <span class="self">self</span>.title.hash(state);
+        <span class="self">self</span>.caption.hash(state);
         <span class="self">self</span>.table.hash(state);
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Default <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Default <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt; + Default,
+    </span>C: Component&lt;Kind = InlineComponent&gt; + Default,
     L: IntoIterRef + Default,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;,
 {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ title: T::default(), table: Table::default() }
+        <span class="self">Self </span>{ caption: C::default(), table: Table::default() }
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Component <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Component <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Component&lt;Kind = InlineComponent&gt;,
+    </span>C: Component&lt;Kind = InlineComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = RowComponent&gt;,
 {
     <span class="kw">type </span>Kind = BlockComponent;
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Render&lt;Html&gt; <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Render&lt;Html&gt; <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Render&lt;Html, Kind = InlineComponent&gt;,
+    </span>C: Render&lt;Html, Kind = InlineComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Html, Kind = RowComponent&gt;,
 {
@@ -1310,21 +1347,20 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Html&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        renderer.write_str(
-            <span class="string">&quot;&lt;div class=\&quot;paideia-titled-table\&quot;&gt;&lt;div \
-             class=\&quot;paideia-table-title\&quot;&gt;&quot;</span>,
-        )<span class="question-mark">?</span>;
-        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.table.render(renderer, ctx)<span class="question-mark">?</span>;
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;div class=\&quot;paideia-table\&quot;&gt;&lt;table&gt;&lt;caption&gt;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.caption.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/caption&gt;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>row <span class="kw">in </span><span class="self">self</span>.table.<span class="number">0</span>.iter() {
+            row.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>RowComponent))<span class="question-mark">?</span>;
+        }
+        renderer.write_str(<span class="string">&quot;&lt;/table&gt;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Render&lt;Markdown, Kind = InlineComponent&gt;,
+    </span>C: Render&lt;Markdown, Kind = InlineComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Markdown, Kind = RowComponent&gt;,
 {
@@ -1333,16 +1369,20 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Markdown&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
-        renderer.write_str(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.table.render(renderer, ctx)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;table&gt;&lt;caption&gt;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.caption.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/caption&gt;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>row <span class="kw">in </span><span class="self">self</span>.table.<span class="number">0</span>.iter() {
+            row.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>RowComponent))<span class="question-mark">?</span>;
+        }
+        renderer.write_str(<span class="string">&quot;&lt;/table&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span>&lt;T, L&gt; Render&lt;Text&gt; <span class="kw">for </span>TitledTable&lt;T, L&gt;
+<span class="kw">impl</span>&lt;C, L&gt; Render&lt;Text&gt; <span class="kw">for </span>CaptionedTable&lt;C, L&gt;
 <span class="kw">where
-    </span>T: Render&lt;Text, Kind = InlineComponent&gt;,
+    </span>C: Render&lt;Text, Kind = InlineComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Text, Kind = RowComponent&gt;,
 {
@@ -1351,7 +1391,7 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Text&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
-        <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
+        <span class="self">self</span>.caption.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.table.render(renderer, ctx)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -1360,7 +1400,7 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use super</span>::{Cell, CellAttrs, Row, Table, TitledTable};
+    <span class="kw">use super</span>::{CaptionedTable, Cell, CellAttrs, Row, Table};
     <span class="kw">use crate</span>::{
         component::{
             block::{text::Paragraph, InlineBlock},
@@ -1407,8 +1447,8 @@
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>titled_table_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
-            TitledTable {
-                title: Bold(<span class="string">&quot;aaaaaaa&quot;</span>),
+            CaptionedTable {
+                caption: Bold(<span class="string">&quot;aaaaaaa&quot;</span>),
                 table: Table(<span class="macro">harray!</span>[
                     Row(<span class="macro">harray!</span>[
                         Cell {

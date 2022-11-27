@@ -398,6 +398,11 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
 </pre><pre class="rust"><code><span class="kw">use </span>katalogos::IntoIterRef;
 
 <span class="kw">use </span><span class="kw">super</span>::BlockComponent;
@@ -411,7 +416,9 @@
     hash::{Hash, Hasher},
 };
 
-<span class="kw">pub struct </span>UnorderedList&lt;L&gt;(<span class="kw">pub </span>L)
+<span class="doccomment">/// An unordered list (typically displayed with bullets). The unnamed field can
+/// be a vector, an array, or anything that iterates by ref over a component.
+</span><span class="kw">pub struct </span>UnorderedList&lt;L&gt;(<span class="kw">pub </span>L)
 <span class="kw">where
     </span>L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = BlockComponent&gt;;
@@ -581,7 +588,10 @@
     }
 }
 
-<span class="kw">pub struct </span>OrderedList&lt;L&gt;(<span class="kw">pub </span>L)
+<span class="doccomment">/// An ordered list (typically displayed with item numbers). The unnamed field
+/// can be a vector, an array, or anything that iterates by ref over a
+/// component.
+</span><span class="kw">pub struct </span>OrderedList&lt;L&gt;(<span class="kw">pub </span>L)
 <span class="kw">where
     </span>L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = BlockComponent&gt;;

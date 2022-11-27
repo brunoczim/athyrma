@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["OrderedList",""],["UnorderedList",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["OrderedList","An ordered list (typically displayed with item numbers). The unnamed field can be a vector, an array, or anything that iterates by ref over a component."],["UnorderedList","An unordered list (typically displayed with bullets). The unnamed field can be a vector, an array, or anything that iterates by ref over a component."]]};

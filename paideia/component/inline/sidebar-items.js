@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["media",""],["text",""]],"struct":[["InlineComponent",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["media","This module defines media that can be inlined in the text."],["text","This module exports inline text components."]],"struct":[["InlineComponent","An inline component. Such component is one that can appear in the middle of reading text."]]};

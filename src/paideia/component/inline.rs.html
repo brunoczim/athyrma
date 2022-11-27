@@ -197,14 +197,22 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{Component, ComponentKind};
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports components that are of type inline, as well their kind.
+
+</span><span class="kw">use super</span>::{Component, ComponentKind};
 <span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">pub mod </span>text;
 <span class="kw">pub mod </span>media;
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// An inline component. Such component is one that can appear in the middle of
+/// reading text.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>InlineComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>InlineComponent {}

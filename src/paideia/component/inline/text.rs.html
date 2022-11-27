@@ -304,7 +304,18 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::InlineComponent;
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports inline text components.
+
+</span><span class="kw">use </span><span class="kw">super</span>::InlineComponent;
 <span class="kw">use crate</span>::{
     component::Component,
     location::Location,
@@ -312,7 +323,8 @@
 };
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This components wraps another component and its text bold.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Bold&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;
@@ -369,7 +381,8 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This components wraps another component and its text italic.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Italic&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;
@@ -426,7 +439,9 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This components wraps another component and its text preformatted. Suitable
+/// for code.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Preformatted&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;
@@ -483,13 +498,16 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// This component is embeds a link to another resource in a component.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>Link&lt;C&gt;
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;,
 {
-    <span class="kw">pub </span>target: C,
-    <span class="kw">pub </span>location: Location,
+    <span class="doccomment">/// Target displayed component.
+    </span><span class="kw">pub </span>target: C,
+    <span class="doccomment">/// The embedded link.
+    </span><span class="kw">pub </span>location: Location,
 }
 
 <span class="kw">impl</span>&lt;C&gt; Component <span class="kw">for </span>Link&lt;C&gt;

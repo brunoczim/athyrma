@@ -65,7 +65,17 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-</pre><pre class="rust"><code><span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports components that are of type block, as well their kind.
+
+</span><span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
 <span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
@@ -74,12 +84,18 @@
 <span class="kw">pub mod </span>list;
 <span class="kw">pub mod </span>table;
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// A block component. Such component is one that cannot appear in the middle of
+/// reading text and can appear directly in the body of a section.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>BlockComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>BlockComponent {}
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// Wrapper over inline components to make them a block component. Note,
+/// however, that if you just use this in a section body, the outcome might not
+/// be desirable, but if you use this in a table cell, for example, it makes
+/// perfect sense.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>InlineBlock&lt;C&gt;(<span class="kw">pub </span>C)
 <span class="kw">where
     </span>C: Component&lt;Kind = InlineComponent&gt;;

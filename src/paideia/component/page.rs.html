@@ -377,7 +377,20 @@
 <span id="377">377</span>
 <span id="378">378</span>
 <span id="379">379</span>
-</pre><pre class="rust"><code><span class="kw">use </span>katalogos::IntoIterRef;
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports page component related utilities.
+
+</span><span class="kw">use </span>katalogos::IntoIterRef;
 
 <span class="kw">use super</span>::{
     asset::AssetComponent,
@@ -394,12 +407,15 @@
     hash::{Hash, Hasher},
 };
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// The kind of page components. A page component is the outermost component in
+/// a page.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>PageComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>PageComponent {}
 
-<span class="kw">pub struct </span>Page&lt;A, B, L&gt;
+<span class="doccomment">/// The page: the outermost component in an article/page.
+</span><span class="kw">pub struct </span>Page&lt;A, B, L&gt;
 <span class="kw">where
     </span>A: IntoIterRef,
     &lt;A <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
@@ -407,10 +423,16 @@
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
-    <span class="kw">pub </span>title: String,
-    <span class="kw">pub </span>assets: A,
-    <span class="kw">pub </span>body: B,
-    <span class="kw">pub </span>children: L,
+    <span class="doccomment">/// Title of the page/article.
+    </span><span class="kw">pub </span>title: String,
+    <span class="doccomment">/// List of asset components. Can be an array, a vector, or anything that
+    /// iterates by reference.
+    </span><span class="kw">pub </span>assets: A,
+    <span class="doccomment">/// The body of the page.
+    </span><span class="kw">pub </span>body: B,
+    <span class="doccomment">/// Child sections of the page. Can be an array, a vector, or anything that
+    /// iterates by reference.
+    </span><span class="kw">pub </span>children: L,
 }
 
 <span class="kw">impl</span>&lt;A, B, L&gt; fmt::Debug <span class="kw">for </span>Page&lt;A, B, L&gt;

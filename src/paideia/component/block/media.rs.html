@@ -182,7 +182,17 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports block media components.
+
+</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">use crate</span>::{
     component::{Component, InlineComponent},
@@ -192,10 +202,13 @@
 
 <span class="kw">use </span><span class="kw">super</span>::BlockComponent;
 
-<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+<span class="doccomment">/// An image component.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub struct </span>Image {
-    <span class="kw">pub </span>location: Location,
-    <span class="kw">pub </span>alt: String,
+    <span class="doccomment">/// Where the image is.
+    </span><span class="kw">pub </span>location: Location,
+    <span class="doccomment">/// Alternative text describing the image.
+    </span><span class="kw">pub </span>alt: String,
 }
 
 <span class="kw">impl </span>Component <span class="kw">for </span>Image {
@@ -245,13 +258,16 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+<span class="doccomment">/// A figure component, an image with legend.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub struct </span>Figure&lt;L&gt;
 <span class="kw">where
     </span>L: Component&lt;Kind = InlineComponent&gt;,
 {
-    <span class="kw">pub </span>image: Image,
-    <span class="kw">pub </span>legend: L,
+    <span class="doccomment">/// The targetted image.
+    </span><span class="kw">pub </span>image: Image,
+    <span class="doccomment">/// Legend of the image.
+    </span><span class="kw">pub </span>legend: L,
 }
 
 <span class="kw">impl</span>&lt;L&gt; Component <span class="kw">for </span>Figure&lt;L&gt;

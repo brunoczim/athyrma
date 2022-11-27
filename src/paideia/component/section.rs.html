@@ -380,7 +380,19 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-</pre><pre class="rust"><code><span class="kw">use </span>katalogos::IntoIterRef;
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module exports section components-related utilites.
+
+</span><span class="kw">use </span>katalogos::IntoIterRef;
 
 <span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
 <span class="kw">use crate</span>::{
@@ -393,22 +405,30 @@
     hash::{Hash, Hasher},
 };
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+<span class="doccomment">/// The kind of section-type components. A section component represent an
+/// article&#39;s section.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 </span><span class="kw">pub struct </span>SectionComponent;
 
 <span class="kw">impl </span>ComponentKind <span class="kw">for </span>SectionComponent {}
 
-<span class="kw">pub struct </span>Section&lt;T, B, L&gt;
+<span class="doccomment">/// A page/article section.
+</span><span class="kw">pub struct </span>Section&lt;T, B, L&gt;
 <span class="kw">where
     </span>T: Component&lt;Kind = InlineComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
-    <span class="kw">pub </span>title: T,
-    <span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;Id&gt;,
-    <span class="kw">pub </span>body: B,
-    <span class="kw">pub </span>children: L,
+    <span class="doccomment">/// Title of the section.
+    </span><span class="kw">pub </span>title: T,
+    <span class="doccomment">/// ID used to reference it.
+    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;Id&gt;,
+    <span class="doccomment">/// Body of the section.
+    </span><span class="kw">pub </span>body: B,
+    <span class="doccomment">/// List of child sections, can be an array, a vector, or anything that
+    /// iterates by ref.
+    </span><span class="kw">pub </span>children: L,
 }
 
 <span class="kw">impl</span>&lt;T, B, L&gt; fmt::Debug <span class="kw">for </span>Section&lt;T, B, L&gt;

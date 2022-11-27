@@ -1,3 +1,5 @@
+//! This module exports section components-related utilites.
+
 use katalogos::IntoIterRef;
 
 use super::{BlockComponent, Component, ComponentKind, InlineComponent};
@@ -11,11 +13,14 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+/// The kind of section-type components. A section component represent an
+/// article's section.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct SectionComponent;
 
 impl ComponentKind for SectionComponent {}
 
+/// A page/article section.
 pub struct Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,
@@ -23,9 +28,14 @@ where
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
+    /// Title of the section.
     pub title: T,
+    /// ID used to reference it.
     pub id: Option<Id>,
+    /// Body of the section.
     pub body: B,
+    /// List of child sections, can be an array, a vector, or anything that
+    /// iterates by ref.
     pub children: L,
 }
 

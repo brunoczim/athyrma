@@ -452,3 +452,49 @@ where
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::{Cell, CellAttrs, Row, Table};
+    use crate::{
+        component::{
+            block::{text::Paragraph, InlineBlock},
+            BlockComponent,
+        },
+        location::{Id, InternalPath},
+        render::{
+            html::test::validate_html_fragment,
+            Context,
+            Html,
+            RenderAsDisplay,
+        },
+    };
+    use katalogos::harray;
+
+    #[test]
+    fn table_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            Table(harray![
+                Row(harray![
+                    Cell {
+                        child: InlineBlock("abc"),
+                        attrs: CellAttrs::default()
+                    },
+                    Cell {
+                        child: Paragraph("123"),
+                        attrs: CellAttrs::default()
+                    },
+                ]),
+                Row(harray![Cell {
+                    child: Paragraph("a c r m f m"),
+                    attrs: CellAttrs::default()
+                }])
+            ]),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+}

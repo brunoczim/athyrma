@@ -8,7 +8,12 @@ use std::{
 use katalogos::IntoIterRef;
 
 use crate::{
-    component::{block::BlockComponent, Component, ComponentKind},
+    component::{
+        block::BlockComponent,
+        Component,
+        ComponentKind,
+        InlineComponent,
+    },
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
 
@@ -406,11 +411,11 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.write_str("<table class=\"paideia-table\">")?;
+        renderer.write_str("<div class=\"paideia-table\"><table>")?;
         for row in self.0.iter() {
             row.render(renderer, ctx.with_kind(&RowComponent))?;
         }
-        renderer.write_str("</table>")?;
+        renderer.write_str("</table></div>")?;
         Ok(())
     }
 }
@@ -453,15 +458,198 @@ where
     }
 }
 
+pub struct TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+{
+    title: T,
+    table: Table<L>,
+}
+
+impl<T, L> fmt::Debug for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        fmtr.debug_struct("TitledTable")
+            .field("title", &self.title)
+            .field("table", &self.table)
+            .finish()
+    }
+}
+
+impl<T, L> Clone for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + Clone,
+    L: IntoIterRef + Clone,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+{
+    fn clone(&self) -> Self {
+        Self { title: self.title.clone(), table: self.table.clone() }
+    }
+}
+
+impl<T, L> Copy for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + Copy,
+    L: IntoIterRef + Copy,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+{
+}
+
+impl<T, L> PartialEq for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + PartialEq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.title == other.title && self.table == other.table
+    }
+}
+
+impl<T, L> Eq for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + Eq,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Eq,
+{
+}
+
+impl<T, L> PartialOrd for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + PartialOrd,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(
+            self.title
+                .partial_cmp(&other.title)?
+                .then(self.table.partial_cmp(&other.table)?),
+        )
+    }
+}
+
+impl<T, L> Ord for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + Ord,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.title.cmp(&other.title).then_with(|| self.table.cmp(&other.table))
+    }
+}
+
+impl<T, L> Hash for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + Hash,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Hash,
+{
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+        self.title.hash(state);
+        self.table.hash(state);
+    }
+}
+
+impl<T, L> Default for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent> + Default,
+    L: IntoIterRef + Default,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+{
+    fn default() -> Self {
+        Self { title: T::default(), table: Table::default() }
+    }
+}
+
+impl<T, L> Component for TitledTable<T, L>
+where
+    T: Component<Kind = InlineComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+{
+    type Kind = BlockComponent;
+}
+
+impl<T, L> Render<Html> for TitledTable<T, L>
+where
+    T: Render<Html, Kind = InlineComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Html, Kind = RowComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Html>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        renderer.write_str(
+            "<div class=\"paideia-titled-table\"><div \
+             class=\"paideia-table-title\">",
+        )?;
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
+        renderer.write_str("</div>")?;
+        self.table.render(renderer, ctx)?;
+        renderer.write_str("</div>")?;
+        Ok(())
+    }
+}
+
+impl<T, L> Render<Markdown> for TitledTable<T, L>
+where
+    T: Render<Markdown, Kind = InlineComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Markdown, Kind = RowComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Markdown>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
+        renderer.write_str("\n")?;
+        self.table.render(renderer, ctx)?;
+        Ok(())
+    }
+}
+
+impl<T, L> Render<Text> for TitledTable<T, L>
+where
+    T: Render<Text, Kind = InlineComponent>,
+    L: IntoIterRef,
+    <L as IntoIterRef>::Item: Render<Text, Kind = RowComponent>,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<Text>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
+        renderer.write_str("\n")?;
+        self.table.render(renderer, ctx)?;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod test {
-    use super::{Cell, CellAttrs, Row, Table};
+    use super::{Cell, CellAttrs, Row, Table, TitledTable};
     use crate::{
         component::{
             block::{text::Paragraph, InlineBlock},
+            inline::text::Bold,
             BlockComponent,
         },
-        location::{Id, InternalPath},
+        location::InternalPath,
         render::{
             html::test::validate_html_fragment,
             Context,
@@ -490,6 +678,36 @@ mod test {
                     attrs: CellAttrs::default()
                 }])
             ]),
+            &mut Html::default(),
+            Context::new(&InternalPath::default(), &BlockComponent),
+        )
+        .to_string();
+
+        validate_html_fragment(&rendered).unwrap();
+    }
+
+    #[test]
+    fn titled_table_is_valid_html() {
+        let rendered = RenderAsDisplay::new(
+            TitledTable {
+                title: Bold("aaaaaaa"),
+                table: Table(harray![
+                    Row(harray![
+                        Cell {
+                            child: InlineBlock("abc"),
+                            attrs: CellAttrs::default()
+                        },
+                        Cell {
+                            child: Paragraph("123"),
+                            attrs: CellAttrs::default()
+                        },
+                    ]),
+                    Row(harray![Cell {
+                        child: Paragraph("a c r m f m"),
+                        attrs: CellAttrs::default()
+                    }])
+                ]),
+            },
             &mut Html::default(),
             Context::new(&InternalPath::default(), &BlockComponent),
         )

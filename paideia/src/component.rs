@@ -73,6 +73,28 @@ where
     type Kind = T::Kind;
 }
 
+impl<T> Component for [T]
+where
+    T: Component,
+{
+    type Kind = T::Kind;
+}
+
+impl<T> Component for Vec<T>
+where
+    T: Component,
+{
+    type Kind = T::Kind;
+}
+
+impl<A, B> Component for (A, B)
+where
+    A: Component,
+    B: Component<Kind = A::Kind>,
+{
+    type Kind = A::Kind;
+}
+
 impl<'this, K> ComponentKind for &'this K where K: ComponentKind + ?Sized {}
 
 impl<'this, K> ComponentKind for &'this mut K where K: ComponentKind + ?Sized {}

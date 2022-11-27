@@ -263,6 +263,57 @@ where
     }
 }
 
+impl<T, R> Render<R> for [T]
+where
+    T: Render<R>,
+    R: Format + ?Sized,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        for element in self {
+            element.render(renderer, ctx)?;
+        }
+        Ok(())
+    }
+}
+
+impl<T, R> Render<R> for Vec<T>
+where
+    T: Render<R>,
+    R: Format + ?Sized,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        for element in self {
+            element.render(renderer, ctx)?;
+        }
+        Ok(())
+    }
+}
+
+impl<A, B, R> Render<R> for (A, B)
+where
+    A: Render<R>,
+    B: Render<R, Kind = A::Kind>,
+    R: Format + ?Sized,
+{
+    fn render(
+        &self,
+        renderer: &mut Renderer<R>,
+        ctx: Context<Self::Kind>,
+    ) -> fmt::Result {
+        self.0.render(renderer, ctx)?;
+        self.1.render(renderer, ctx)?;
+        Ok(())
+    }
+}
+
 pub trait FullRender: Render<Html> + Render<Markdown> + Render<Text> {}
 
 impl<T> FullRender for T where

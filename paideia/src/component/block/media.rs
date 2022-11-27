@@ -1,3 +1,5 @@
+//! This module exports block media components.
+
 use std::fmt::{self, Write};
 
 use crate::{
@@ -8,9 +10,12 @@ use crate::{
 
 use super::BlockComponent;
 
+/// An image component.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Image {
+    /// Where the image is.
     pub location: Location,
+    /// Alternative text describing the image.
     pub alt: String,
 }
 
@@ -61,12 +66,15 @@ impl Render<Text> for Image {
     }
 }
 
+/// A figure component, an image with legend.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Figure<L>
 where
     L: Component<Kind = InlineComponent>,
 {
+    /// The targetted image.
     pub image: Image,
+    /// Legend of the image.
     pub legend: L,
 }
 

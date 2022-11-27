@@ -7,7 +7,7 @@ use std::fmt::{self, Write};
 pub mod text;
 pub mod media;
 
-/// An  inline component. Such component is one that can appear in the middle of
+/// An inline component. Such component is one that can appear in the middle of
 /// reading text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct InlineComponent;

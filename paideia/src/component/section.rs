@@ -221,7 +221,12 @@ where
         if self.id.is_some() {
             renderer.write_str("</a>")?;
         }
-        write!(renderer, "</{}><div class=\"paideia-section-body\">", tag)?;
+        write!(
+            renderer,
+            "</{}><div class=\"paideia-section-body-wrapper\"><div \
+             class=\"paideia-section-body\">",
+            tag
+        )?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
         renderer.write_str("</div><div class=\"paideia-section-children\">")?;
         for child in self.children.iter() {
@@ -230,7 +235,7 @@ where
                 ctx.enter_section().with_kind(&SectionComponent),
             )?;
         }
-        renderer.write_str("</div></div>")?;
+        renderer.write_str("</div></div></div>")?;
         Ok(())
     }
 }

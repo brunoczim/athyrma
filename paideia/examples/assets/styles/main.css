@@ -16,9 +16,22 @@
     text-decoration: none;
 }
 
-html, body, #page-wrapper {
+html, body, #paideia-page-wrapper {
     width: 100%;
     height: auto;
+}
+
+#paideia-page-top {
+    margin: 5px;
+}
+
+#paideia-page-body {
+    padding: 10pt;
+}
+
+#paideia-page-body-wrapper, .paideia-section-body-wrapper {
+    padding-left: 10pt;
+    border-left: solid 1pt #000000;
 }
 
 b.bold, b.bold * {
@@ -114,11 +127,6 @@ p {
 
 p:last-child {
     margin-bottom: 0;
-}
-
-.paideia-section-body {
-    padding-left: 10pt;
-    border-left: solid 1pt #000000;
 }
 
 img {

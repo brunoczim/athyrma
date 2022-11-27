@@ -7,8 +7,9 @@ use paideia::{
         block::{list::UnorderedList, text::Paragraph, InlineBlock},
         inline::text::Link,
         page::{Page, PageComponent},
+        section::Section,
     },
-    location::{InternalPath, Location},
+    location::{Id, InternalPath, Location},
     render::{DynFullComponent, FullRender, Html},
     site::{Entry, Site},
 };
@@ -35,7 +36,37 @@ fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
                 }),
             ]),
         ],
-        children: harray![],
+        children: harray![
+            Section {
+                title: "Random Section",
+                id: Some(Id::new("random").unwrap()),
+                body: Paragraph("This is a random paragraph."),
+                children: harray![
+                    Section {
+                        title: "Randomly First",
+                        id: Some(Id::new("random-first").unwrap()),
+                        body: Paragraph(
+                            "This the first (really?) random paragraph."
+                        ),
+                        children: harray![],
+                    },
+                    Section {
+                        title: "Randomly Second",
+                        id: Some(Id::new("random-second").unwrap()),
+                        body: Paragraph(
+                            "This the second (really??) random paragraph."
+                        ),
+                        children: harray![],
+                    }
+                ],
+            },
+            Section {
+                title: "Weird Title",
+                id: Some(Id::new("weird").unwrap()),
+                body: Paragraph("Weird paragraph as an example"),
+                children: harray![],
+            }
+        ],
     }
 }
 

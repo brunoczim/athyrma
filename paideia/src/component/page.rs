@@ -223,18 +223,21 @@ where
         renderer.write_str("<title>")?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str(
-            "</title></head><body><div class=\"paideia-page-wrapper\" \
-             id=\"paideia-page-root\"><h1 class=\"paideia-title\"><a \
-             href=\"#paideia-page-root\">",
+            "</title></head><body><div id=\"paideia-page-top\" ><h1 \
+             class=\"paideia-title\"><a href=\"#paideia-page-root\">",
         )?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
-        write!(renderer, "</a></h1><div class=\"paideia-page-body\">")?;
+        write!(
+            renderer,
+            "</a></h1><div id=\"paideia-page-body-wrapper\"><div \
+             id=\"paideia-page-body\">"
+        )?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        renderer.write_str("</div><div class=\"paideia-page-children\">")?;
+        renderer.write_str("</div><div id=\"paideia-page-children\">")?;
         for child in self.children.iter() {
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
-        renderer.write_str("</div></div></body></html>")?;
+        renderer.write_str("</div></div></div></body></html>")?;
         Ok(())
     }
 }

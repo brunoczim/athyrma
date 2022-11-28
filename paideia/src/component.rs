@@ -7,11 +7,10 @@ pub mod section;
 pub mod asset;
 pub mod page;
 
-use katalogos::coproduct::{Cocons, Conil};
-use std::{fmt, rc::Rc, sync::Arc};
-
 pub use block::BlockComponent;
 pub use inline::InlineComponent;
+use katalogos::coproduct::{Cocons, Conil};
+use std::{fmt, rc::Rc, sync::Arc};
 
 /// A component kind is a way of "typing" (i.e. give types) to components at a
 /// trait level.

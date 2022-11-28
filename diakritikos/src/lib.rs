@@ -1,10 +1,9 @@
 pub mod pos;
 pub mod slot;
 
-use std::{collections::HashSet, fmt, ops::Range};
-
 pub use pos::Position;
 pub use slot::Slot;
+use std::{collections::HashSet, fmt, ops::Range};
 
 pub trait Diacritic {
     fn renderings(&self) -> pos::PartialMap<&str>;
@@ -248,37 +247,28 @@ mod test {
         let solution =
             solve(pos::TotalMap::default(), [PhoneticDiacritic::Nasalized])
                 .unwrap();
-        assert_eq!(
-            solution,
-            pos::TotalMap {
-                top: Slot { diacritics: vec![PhoneticDiacritic::Nasalized] },
-                left: Slot { diacritics: Vec::new() },
-                bottom: Slot { diacritics: Vec::new() },
-                right: Slot { diacritics: Vec::new() },
-            }
-        );
+        assert_eq!(solution, pos::TotalMap {
+            top: Slot { diacritics: vec![PhoneticDiacritic::Nasalized] },
+            left: Slot { diacritics: Vec::new() },
+            bottom: Slot { diacritics: Vec::new() },
+            right: Slot { diacritics: Vec::new() },
+        });
     }
 
     #[test]
     fn triple_diacritic() {
-        let solution = solve(
-            pos::TotalMap::default(),
-            [
-                PhoneticDiacritic::Nasalized,
-                PhoneticDiacritic::Lowered,
-                PhoneticDiacritic::Voiceless,
-            ],
-        )
+        let solution = solve(pos::TotalMap::default(), [
+            PhoneticDiacritic::Nasalized,
+            PhoneticDiacritic::Lowered,
+            PhoneticDiacritic::Voiceless,
+        ])
         .unwrap();
 
-        assert_eq!(
-            solution,
-            pos::TotalMap {
-                top: Slot { diacritics: vec![PhoneticDiacritic::Nasalized] },
-                left: Slot { diacritics: vec![PhoneticDiacritic::Lowered] },
-                bottom: Slot { diacritics: vec![PhoneticDiacritic::Voiceless] },
-                right: Slot { diacritics: Vec::new() },
-            }
-        );
+        assert_eq!(solution, pos::TotalMap {
+            top: Slot { diacritics: vec![PhoneticDiacritic::Nasalized] },
+            left: Slot { diacritics: vec![PhoneticDiacritic::Lowered] },
+            bottom: Slot { diacritics: vec![PhoneticDiacritic::Voiceless] },
+            right: Slot { diacritics: Vec::new() },
+        });
     }
 }

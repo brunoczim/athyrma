@@ -1,12 +1,11 @@
 //! This module exports section components-related utilites.
 
-use katalogos::IntoIterRef;
-
 use super::{BlockComponent, Component, ComponentKind, InlineComponent};
 use crate::{
     location::{Id, InternalLoc, Location},
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
+use katalogos::IntoIterRef;
 use std::{
     cmp::Ordering,
     fmt::{self, Write},

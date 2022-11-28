@@ -1,6 +1,11 @@
 //! This module provides a "filesystem-like" utility for organizing a site's
 //! pages and effectively generating them.
 
+use crate::{
+    component::{page::PageComponent, Component},
+    location::{Fragment, InternalPath},
+    render::{self, Context, Render, RenderAsDisplay},
+};
 use std::{
     collections::{hash_map, HashMap},
     error::Error,
@@ -8,12 +13,6 @@ use std::{
     fs,
     io::{self, Write},
     path::PathBuf,
-};
-
-use crate::{
-    component::{page::PageComponent, Component},
-    location::{Fragment, InternalPath},
-    render::{self, Context, Render, RenderAsDisplay},
 };
 
 /// An error that may happen when building a site.
@@ -418,8 +417,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use katalogos::harray;
-
+    use super::{Directory, Entry};
     use crate::{
         component::{
             block::text::Paragraph,
@@ -428,8 +426,7 @@ mod test {
         location::{Fragment, InternalPath},
         render::FullRender,
     };
-
-    use super::{Directory, Entry};
+    use katalogos::harray;
 
     fn make_directory() -> Directory<
         impl FullRender<Kind = PageComponent> + Eq + Send + Sync + 'static,

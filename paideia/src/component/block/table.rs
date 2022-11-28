@@ -1,14 +1,5 @@
 //! This module exports a table component.
 
-use std::{
-    cmp::Ordering,
-    fmt,
-    fmt::Write,
-    hash::{Hash, Hasher},
-};
-
-use katalogos::IntoIterRef;
-
 use crate::{
     component::{
         block::BlockComponent,
@@ -17,6 +8,13 @@ use crate::{
         InlineComponent,
     },
     render::{Context, Html, Markdown, Render, Renderer, Text},
+};
+use katalogos::IntoIterRef;
+use std::{
+    cmp::Ordering,
+    fmt,
+    fmt::Write,
+    hash::{Hash, Hasher},
 };
 
 /// Cell component kind. Components of this kind are usable as cells in a table.

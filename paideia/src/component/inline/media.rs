@@ -1,14 +1,12 @@
 //! This module defines media that can be inlined in the text.
 
-use std::fmt::{self, Write};
-
+use super::InlineComponent;
 use crate::{
     component::Component,
     location::Location,
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
-
-use super::InlineComponent;
+use std::fmt::{self, Write};
 
 /// A playable audio.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -68,6 +66,7 @@ impl Render<Text> for Audio {
 
 #[cfg(test)]
 mod test {
+    use super::Audio;
     use crate::{
         component::InlineComponent,
         location::{InternalPath, Location},
@@ -78,8 +77,6 @@ mod test {
             RenderAsDisplay,
         },
     };
-
-    use super::Audio;
 
     #[test]
     fn audio_is_valid_html() {

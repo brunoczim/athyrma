@@ -54,7 +54,7 @@ where
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-        let mut debug_fmtr = fmtr.debug_struct("UnorderedList");
+        let mut debug_fmtr = fmtr.debug_struct("Page");
         debug_fmtr.field("title", &self.title).field("body", &self.body);
         for (i, element) in self.assets.iter().enumerate() {
             debug_fmtr.field(&format!("asset[{}]", i), &element);
@@ -223,18 +223,21 @@ where
         renderer.write_str("<title>")?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str(
-            "</title></head><body><div class=\"paideia-page-wrapper\" \
-             id=\"paideia-page-root\"><h1 class=\"paideia-title\"><a \
-             href=\"#paideia-page-root\">",
+            "</title></head><body><div id=\"paideia-page-top\" ><h1 \
+             class=\"paideia-title\"><a href=\"#paideia-page-root\">",
         )?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
-        write!(renderer, "</a></h1><div class=\"paideia-body\">")?;
+        write!(
+            renderer,
+            "</a></h1><div id=\"paideia-page-body-wrapper\"><div \
+             id=\"paideia-page-body\">"
+        )?;
         self.body.render(renderer, ctx.with_kind(&BlockComponent))?;
-        renderer.write_str("</div><div class=\"paideia-children\">")?;
+        renderer.write_str("</div><div id=\"paideia-page-children\">")?;
         for child in self.children.iter() {
             child.render(renderer, ctx.with_kind(&SectionComponent))?;
         }
-        renderer.write_str("</div></div></body></html>")?;
+        renderer.write_str("</div></div></div></body></html>")?;
         Ok(())
     }
 }
@@ -242,7 +245,7 @@ where
 impl<A, B, L> Render<Markdown> for Page<A, B, L>
 where
     A: IntoIterRef,
-    <A as IntoIterRef>::Item: Render<Markdown, Kind = AssetComponent>,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Render<Markdown, Kind = SectionComponent>,
@@ -266,7 +269,7 @@ where
 impl<A, B, L> Render<Text> for Page<A, B, L>
 where
     A: IntoIterRef,
-    <A as IntoIterRef>::Item: Render<Text, Kind = AssetComponent>,
+    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Render<Text, Kind = SectionComponent>,

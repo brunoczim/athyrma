@@ -399,6 +399,11 @@
 <span id="399">399</span>
 <span id="400">400</span>
 <span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports section components-related utilites.
 
 </span><span class="kw">use </span>katalogos::IntoIterRef;
@@ -448,7 +453,7 @@
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;UnorderedList&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;Section&quot;</span>);
         debug_fmtr
             .field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title)
             .field(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
@@ -622,16 +627,21 @@
         <span class="kw">if </span><span class="self">self</span>.id.is_some() {
             renderer.write_str(<span class="string">&quot;&lt;/a&gt;&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="macro">write!</span>(renderer, <span class="string">&quot;&lt;/{}&gt;&lt;div class=\&quot;paideia-body\&quot;&gt;&quot;</span>, tag)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(
+            renderer,
+            <span class="string">&quot;&lt;/{}&gt;&lt;div class=\&quot;paideia-section-body-wrapper\&quot;&gt;&lt;div \
+             class=\&quot;paideia-section-body\&quot;&gt;&quot;</span>,
+            tag
+        )<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div class=\&quot;paideia-children\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div class=\&quot;paideia-section-children\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="self">self</span>.children.iter() {
             child.render(
                 renderer,
                 ctx.enter_section().with_kind(<span class="kw-2">&amp;</span>SectionComponent),
             )<span class="question-mark">?</span>;
         }
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }

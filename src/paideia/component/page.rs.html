@@ -388,6 +388,9 @@
 <span id="388">388</span>
 <span id="389">389</span>
 <span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports page component related utilities.
 
 </span><span class="kw">use </span>katalogos::IntoIterRef;
@@ -444,7 +447,7 @@
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;UnorderedList&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;Page&quot;</span>);
         debug_fmtr.field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title).field(<span class="string">&quot;body&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.body);
         <span class="kw">for </span>(i, element) <span class="kw">in </span><span class="self">self</span>.assets.iter().enumerate() {
             debug_fmtr.field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;asset[{}]&quot;</span>, i), <span class="kw-2">&amp;</span>element);
@@ -613,18 +616,21 @@
         renderer.write_str(<span class="string">&quot;&lt;title&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(
-            <span class="string">&quot;&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=\&quot;paideia-page-wrapper\&quot; \
-             id=\&quot;paideia-page-root\&quot;&gt;&lt;h1 class=\&quot;paideia-title\&quot;&gt;&lt;a \
-             href=\&quot;#paideia-page-root\&quot;&gt;&quot;</span>,
+            <span class="string">&quot;&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=\&quot;paideia-page-top\&quot; &gt;&lt;h1 \
+             class=\&quot;paideia-title\&quot;&gt;&lt;a href=\&quot;#paideia-page-root\&quot;&gt;&quot;</span>,
         )<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(renderer, <span class="string">&quot;&lt;/a&gt;&lt;/h1&gt;&lt;div class=\&quot;paideia-body\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(
+            renderer,
+            <span class="string">&quot;&lt;/a&gt;&lt;/h1&gt;&lt;div id=\&quot;paideia-page-body-wrapper\&quot;&gt;&lt;div \
+             id=\&quot;paideia-page-body\&quot;&gt;&quot;
+        </span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div class=\&quot;paideia-children\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div id=\&quot;paideia-page-children\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="self">self</span>.children.iter() {
             child.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>SectionComponent))<span class="question-mark">?</span>;
         }
-        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>)<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -632,7 +638,7 @@
 <span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
     </span>A: IntoIterRef,
-    &lt;A <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Markdown, Kind = AssetComponent&gt;,
+    &lt;A <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     B: Render&lt;Markdown, Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Markdown, Kind = SectionComponent&gt;,
@@ -656,7 +662,7 @@
 <span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Text&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
 <span class="kw">where
     </span>A: IntoIterRef,
-    &lt;A <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Text, Kind = AssetComponent&gt;,
+    &lt;A <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = AssetComponent&gt;,
     B: Render&lt;Text, Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Text, Kind = SectionComponent&gt;,

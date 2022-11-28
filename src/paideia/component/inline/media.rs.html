@@ -93,20 +93,15 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module defines media that can be inlined in the text.
 
-</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
-
+</span><span class="kw">use </span><span class="kw">super</span>::InlineComponent;
 <span class="kw">use crate</span>::{
     component::Component,
     location::Location,
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
-
-<span class="kw">use </span><span class="kw">super</span>::InlineComponent;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="doccomment">/// A playable audio.
 </span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -166,6 +161,7 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::Audio;
     <span class="kw">use crate</span>::{
         component::InlineComponent,
         location::{InternalPath, Location},
@@ -176,8 +172,6 @@
             RenderAsDisplay,
         },
     };
-
-    <span class="kw">use </span><span class="kw">super</span>::Audio;
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>audio_is_valid_html() {

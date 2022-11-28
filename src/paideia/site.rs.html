@@ -494,25 +494,21 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module provides a &quot;filesystem-like&quot; utility for organizing a site&#39;s
 //! pages and effectively generating them.
 
-</span><span class="kw">use </span>std::{
+</span><span class="kw">use crate</span>::{
+    component::{page::PageComponent, Component},
+    location::{Fragment, InternalPath},
+    render::{<span class="self">self</span>, Context, Render, RenderAsDisplay},
+};
+<span class="kw">use </span>std::{
     collections::{hash_map, HashMap},
     error::Error,
     fmt,
     fs,
     io::{<span class="self">self</span>, Write},
     path::PathBuf,
-};
-
-<span class="kw">use crate</span>::{
-    component::{page::PageComponent, Component},
-    location::{Fragment, InternalPath},
-    render::{<span class="self">self</span>, Context, Render, RenderAsDisplay},
 };
 
 <span class="doccomment">/// An error that may happen when building a site.
@@ -917,8 +913,7 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span>katalogos::harray;
-
+    <span class="kw">use super</span>::{Directory, Entry};
     <span class="kw">use crate</span>::{
         component::{
             block::text::Paragraph,
@@ -927,8 +922,7 @@
         location::{Fragment, InternalPath},
         render::FullRender,
     };
-
-    <span class="kw">use super</span>::{Directory, Entry};
+    <span class="kw">use </span>katalogos::harray;
 
     <span class="kw">fn </span>make_directory() -&gt; Directory&lt;
         <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Eq + Send + Sync + <span class="lifetime">&#39;static</span>,

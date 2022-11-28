@@ -401,15 +401,12 @@
 <span id="401">401</span>
 <span id="402">402</span>
 <span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-</pre><pre class="rust"><code><span class="kw">use </span>katalogos::IntoIterRef;
-
-<span class="kw">use </span><span class="kw">super</span>::BlockComponent;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::BlockComponent;
 <span class="kw">use crate</span>::{
     component::Component,
     render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
 };
+<span class="kw">use </span>katalogos::IntoIterRef;
 <span class="kw">use </span>std::{
     cmp::Ordering,
     fmt::{<span class="self">self</span>, Write},
@@ -763,8 +760,6 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span>katalogos::harray;
-
     <span class="kw">use super</span>::{OrderedList, UnorderedList};
     <span class="kw">use crate</span>::{
         component::{
@@ -779,6 +774,7 @@
             RenderAsDisplay,
         },
     };
+    <span class="kw">use </span>katalogos::harray;
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>unordered_list_is_valid_html() {

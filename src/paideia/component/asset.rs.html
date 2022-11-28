@@ -100,18 +100,14 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports page assets components.
 
-</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
-
+</span><span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
 <span class="kw">use crate</span>::{
     location::Location,
     render::{Context, Html, Render, Renderer},
 };
-
-<span class="kw">use super</span>::{Component, ComponentKind, InlineComponent};
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="doccomment">/// The kind of an asset component. Such component is an external resource vital
 /// to an encyclopedia presentation or functioning as opposed to optional (e.g.

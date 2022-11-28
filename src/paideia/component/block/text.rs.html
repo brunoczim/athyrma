@@ -304,16 +304,14 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
-<span id="307">307</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports block text components.
 
-</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
-
-<span class="kw">use </span><span class="kw">super</span>::BlockComponent;
+</span><span class="kw">use </span><span class="kw">super</span>::BlockComponent;
 <span class="kw">use crate</span>::{
     component::{Component, InlineComponent},
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="doccomment">/// This components wraps another component and its text bold.
 </span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]

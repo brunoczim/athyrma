@@ -187,20 +187,15 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports block media components.
 
-</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
-
+</span><span class="kw">use </span><span class="kw">super</span>::BlockComponent;
 <span class="kw">use crate</span>::{
     component::{Component, InlineComponent},
     location::Location,
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
-
-<span class="kw">use </span><span class="kw">super</span>::BlockComponent;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="doccomment">/// An image component.
 </span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -336,6 +331,7 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{Figure, Image};
     <span class="kw">use crate</span>::{
         component::{inline::text::Bold, BlockComponent},
         location::{InternalPath, Location},
@@ -346,8 +342,6 @@
             RenderAsDisplay,
         },
     };
-
-    <span class="kw">use super</span>::{Figure, Image};
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>image_is_valid_html() {

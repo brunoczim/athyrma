@@ -389,13 +389,9 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports page component related utilities.
 
-</span><span class="kw">use </span>katalogos::IntoIterRef;
-
-<span class="kw">use super</span>::{
+</span><span class="kw">use super</span>::{
     asset::AssetComponent,
     section::SectionComponent,
     BlockComponent,
@@ -404,6 +400,7 @@
     InlineComponent,
 };
 <span class="kw">use </span><span class="kw">crate</span>::render::{Context, Html, Markdown, Render, Renderer, Text};
+<span class="kw">use </span>katalogos::IntoIterRef;
 <span class="kw">use </span>std::{
     cmp::Ordering,
     fmt::{<span class="self">self</span>, Write},
@@ -684,8 +681,6 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span>katalogos::harray;
-
     <span class="kw">use super</span>::{Page, PageComponent};
     <span class="kw">use crate</span>::{
         component::{
@@ -701,6 +696,7 @@
             RenderAsDisplay,
         },
     };
+    <span class="kw">use </span>katalogos::harray;
 
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>page_without_assets_is_valid_html() {

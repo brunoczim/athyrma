@@ -734,20 +734,9 @@
 <span id="734">734</span>
 <span id="735">735</span>
 <span id="736">736</span>
-<span id="737">737</span>
-<span id="738">738</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports a table component.
 
-</span><span class="kw">use </span>std::{
-    cmp::Ordering,
-    fmt,
-    fmt::Write,
-    hash::{Hash, Hasher},
-};
-
-<span class="kw">use </span>katalogos::IntoIterRef;
-
-<span class="kw">use crate</span>::{
+</span><span class="kw">use crate</span>::{
     component::{
         block::BlockComponent,
         Component,
@@ -755,6 +744,13 @@
         InlineComponent,
     },
     render::{Context, Html, Markdown, Render, Renderer, Text},
+};
+<span class="kw">use </span>katalogos::IntoIterRef;
+<span class="kw">use </span>std::{
+    cmp::Ordering,
+    fmt,
+    fmt::Write,
+    hash::{Hash, Hasher},
 };
 
 <span class="doccomment">/// Cell component kind. Components of this kind are usable as cells in a table.

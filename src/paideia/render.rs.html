@@ -533,8 +533,6 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports items related to rendering components.
 
 </span><span class="kw">use </span>std::{
@@ -549,16 +547,14 @@
 
 <span class="kw">mod </span>common_text;
 
-<span class="kw">pub use </span>html::Html;
-<span class="kw">pub use </span>markdown::Markdown;
-<span class="kw">pub use </span>text::Text;
-
-<span class="kw">use </span>katalogos::coproduct::{Cocons, Conil};
-
 <span class="kw">use crate</span>::{
     component::{Component, ComponentKind},
     location::InternalPath,
 };
+<span class="kw">pub use </span>html::Html;
+<span class="kw">use </span>katalogos::coproduct::{Cocons, Conil};
+<span class="kw">pub use </span>markdown::Markdown;
+<span class="kw">pub use </span>text::Text;
 
 <span class="doccomment">/// A rendering format: e.g. HTML, Markdown, etc.
 </span><span class="kw">pub trait </span>Format {

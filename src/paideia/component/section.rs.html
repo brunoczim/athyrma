@@ -403,16 +403,14 @@
 <span id="403">403</span>
 <span id="404">404</span>
 <span id="405">405</span>
-<span id="406">406</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports section components-related utilites.
 
-</span><span class="kw">use </span>katalogos::IntoIterRef;
-
-<span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
+</span><span class="kw">use super</span>::{BlockComponent, Component, ComponentKind, InlineComponent};
 <span class="kw">use crate</span>::{
     location::{Id, InternalLoc, Location},
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
+<span class="kw">use </span>katalogos::IntoIterRef;
 <span class="kw">use </span>std::{
     cmp::Ordering,
     fmt::{<span class="self">self</span>, Write},

@@ -1,7 +1,5 @@
 //! This module exports page component related utilities.
 
-use katalogos::IntoIterRef;
-
 use super::{
     asset::AssetComponent,
     section::SectionComponent,
@@ -11,6 +9,7 @@ use super::{
     InlineComponent,
 };
 use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
+use katalogos::IntoIterRef;
 use std::{
     cmp::Ordering,
     fmt::{self, Write},
@@ -291,8 +290,6 @@ where
 
 #[cfg(test)]
 mod test {
-    use katalogos::harray;
-
     use super::{Page, PageComponent};
     use crate::{
         component::{
@@ -308,6 +305,7 @@ mod test {
             RenderAsDisplay,
         },
     };
+    use katalogos::harray;
 
     #[test]
     fn page_without_assets_is_valid_html() {

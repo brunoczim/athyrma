@@ -12,16 +12,14 @@ pub mod text;
 
 mod common_text;
 
-pub use html::Html;
-pub use markdown::Markdown;
-pub use text::Text;
-
-use katalogos::coproduct::{Cocons, Conil};
-
 use crate::{
     component::{Component, ComponentKind},
     location::InternalPath,
 };
+pub use html::Html;
+use katalogos::coproduct::{Cocons, Conil};
+pub use markdown::Markdown;
+pub use text::Text;
 
 /// A rendering format: e.g. HTML, Markdown, etc.
 pub trait Format {

@@ -1,14 +1,12 @@
 //! This module exports block media components.
 
-use std::fmt::{self, Write};
-
+use super::BlockComponent;
 use crate::{
     component::{Component, InlineComponent},
     location::Location,
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
-
-use super::BlockComponent;
+use std::fmt::{self, Write};
 
 /// An image component.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -144,6 +142,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use super::{Figure, Image};
     use crate::{
         component::{inline::text::Bold, BlockComponent},
         location::{InternalPath, Location},
@@ -154,8 +153,6 @@ mod test {
             RenderAsDisplay,
         },
     };
-
-    use super::{Figure, Image};
 
     #[test]
     fn image_is_valid_html() {

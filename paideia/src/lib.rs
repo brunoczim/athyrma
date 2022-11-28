@@ -5,8 +5,6 @@
 //! # Example
 //!
 //! ```rust
-//! use std::{path::PathBuf, process};
-//!
 //! use katalogos::harray;
 //! use paideia::{
 //!     component::{
@@ -20,8 +18,10 @@
 //!     render::{DynFullComponent, FullRender, Html},
 //!     site::{Entry, Site},
 //! };
+//! use std::{path::PathBuf, process};
 //!
-//! fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static
+//! {
 //!     Page {
 //!         title: String::from("Simple Pedia"),
 //!         assets: [Stylesheet {
@@ -29,8 +29,8 @@
 //!         }],
 //!         body: harray![
 //!             Paragraph(
-//!                 "This is the initial page of the simple pedia. You can dive \
-//!                  down into the following:"
+//!                 "This is the initial page of the simple pedia. You can \
+//!                  dive down into the following:"
 //!             ),
 //!             UnorderedList(harray![
 //!                 InlineBlock(Link {
@@ -77,7 +77,8 @@
 //!     }
 //! }
 //!
-//! fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn foo_page(
+//! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Foo"),
 //!         assets: [Stylesheet {
@@ -88,7 +89,8 @@
 //!     }
 //! }
 //!
-//! fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn bar_page(
+//! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Bar"),
 //!         assets: [Stylesheet {
@@ -103,7 +105,8 @@
 //!     }
 //! }
 //!
-//! fn baz_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn baz_page(
+//! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Baz"),
 //!         assets: [Stylesheet {

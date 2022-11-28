@@ -1,13 +1,11 @@
 //! This module exports page assets components.
 
-use std::fmt::{self, Write};
-
+use super::{Component, ComponentKind, InlineComponent};
 use crate::{
     location::Location,
     render::{Context, Html, Render, Renderer},
 };
-
-use super::{Component, ComponentKind, InlineComponent};
+use std::fmt::{self, Write};
 
 /// The kind of an asset component. Such component is an external resource vital
 /// to an encyclopedia presentation or functioning as opposed to optional (e.g.

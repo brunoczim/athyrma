@@ -1,10 +1,9 @@
-use katalogos::IntoIterRef;
-
 use super::BlockComponent;
 use crate::{
     component::Component,
     render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
 };
+use katalogos::IntoIterRef;
 use std::{
     cmp::Ordering,
     fmt::{self, Write},
@@ -358,8 +357,6 @@ where
 
 #[cfg(test)]
 mod test {
-    use katalogos::harray;
-
     use super::{OrderedList, UnorderedList};
     use crate::{
         component::{
@@ -374,6 +371,7 @@ mod test {
             RenderAsDisplay,
         },
     };
+    use katalogos::harray;
 
     #[test]
     fn unordered_list_is_valid_html() {

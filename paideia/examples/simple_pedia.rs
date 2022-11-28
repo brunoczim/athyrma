@@ -1,5 +1,3 @@
-use std::{path::PathBuf, process};
-
 use katalogos::harray;
 use paideia::{
     component::{
@@ -13,6 +11,7 @@ use paideia::{
     render::{DynFullComponent, FullRender, Html},
     site::{Entry, Site},
 };
+use std::{path::PathBuf, process};
 
 fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {

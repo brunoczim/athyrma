@@ -1,12 +1,11 @@
 //! This module exports block text components.
 
-use std::fmt::{self, Write};
-
 use super::BlockComponent;
 use crate::{
     component::{Component, InlineComponent},
     render::{Context, Html, Markdown, Render, Renderer, Text},
 };
+use std::fmt::{self, Write};
 
 /// This components wraps another component and its text bold.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]

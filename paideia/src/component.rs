@@ -111,3 +111,9 @@ impl<K> ComponentKind for Box<K> where K: ComponentKind + ?Sized {}
 impl<K> ComponentKind for Rc<K> where K: ComponentKind + ?Sized {}
 
 impl<K> ComponentKind for Arc<K> where K: ComponentKind + ?Sized {}
+
+pub trait BuildComponent {
+    type Target: Component;
+
+    fn build(&self) -> Self::Target;
+}

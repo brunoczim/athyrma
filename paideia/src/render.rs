@@ -13,7 +13,7 @@ pub mod text;
 mod common_text;
 
 use crate::{
-    component::{Component, ComponentKind},
+    component::{BuildComponent, Component, ComponentKind},
     location::InternalPath,
 };
 pub use html::Html;

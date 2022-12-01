@@ -3,6 +3,7 @@ members = [
     "./",
     "./katalogos",
     "./paideia",
+    "./paideia/derive",
     "./diakritikos",
     "./glossa",
     "./glossa/phonetikos",

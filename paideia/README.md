@@ -43,7 +43,7 @@ https://brunoczim.github.io/athyrma/paideia/
 
 # Example
 
-```
+```rust
 use katalogos::harray;
 use paideia::{
     component::{

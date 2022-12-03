@@ -1,15 +1,23 @@
-pub mod coproduct;
-pub mod function;
-pub mod combinator;
-pub mod by_ref;
+#![warn(missing_docs)]
 
+//! Katalogos is a library for heterogenous lists and arbitrary enums, but only
+//! regarding to construction of such lists. If you need to retrive data from a
+//! list, this crate is not recommended.
+
+pub mod coproduct;
+
+/// A trait to make trait bounds more ergnomic relating to iteration by
+/// reference.
 pub trait IntoIterRef {
+    /// Item of the iterator.
     type Item;
-    type IntoIter<'item>: Iterator<Item = &'item Self::Item>
+    /// Type of the iterator.
+    type Iter<'item>: Iterator<Item = &'item Self::Item>
     where
         Self: 'item;
 
-    fn iter<'item>(&'item self) -> Self::IntoIter<'item>;
+    /// Converts the reference into an iterator.
+    fn iter<'item>(&'item self) -> Self::Iter<'item>;
 }
 
 impl<T, I> IntoIterRef for T
@@ -17,14 +25,16 @@ where
     for<'this> &'this T: IntoIterator<Item = &'this I>,
 {
     type Item = I;
-    type IntoIter<'item> = <&'item T as IntoIterator>::IntoIter where T: 'item;
+    type Iter<'item> = <&'item T as IntoIterator>::IntoIter where T: 'item;
 
-    fn iter<'item>(&'item self) -> Self::IntoIter<'item> {
+    fn iter<'item>(&'item self) -> Self::Iter<'item> {
         self.into_iter()
     }
 }
 
-
+/// Constructs an "heterogenous iterator", i.e. constructed with different types
+/// for different items, but iterates as if it were a type, preserving static
+/// dispatch.
 #[macro_export]
 macro_rules! hiter {
     [(): $m:ty] => {
@@ -56,6 +66,9 @@ macro_rules! hiter {
     };
 }
 
+/// Constructs an "heterogenous vector", i.e. constructed with different types
+/// for different elements, but ends up with a single same type for the whole
+/// vector, while preserving static dispatch.
 #[macro_export]
 macro_rules! hvec {
     [($($elems:expr),*): $m:ty] => {
@@ -73,6 +86,9 @@ macro_rules! hvec {
     };
 }
 
+/// Constructs an "heterogenous array", i.e. constructed with different types
+/// for different elements, but ends up with a single same type for the whole
+/// array, while preserving static dispatch.
 #[macro_export]
 macro_rules! harray {
     [($($elems:expr),*): $m:ty] => {
@@ -173,6 +189,7 @@ macro_rules! harray {
     };
 }
 
+/// Expands to the type of an heterogenous array.
 #[macro_export]
 macro_rules! HArray {
     [($($tys:ty),*): $m:ty] => {
@@ -244,6 +261,7 @@ macro_rules! HArray {
     };
 }
 
+/// Defines a corpoduct type, i.e. an arbitrary enum.
 #[macro_export]
 macro_rules! Coproduct {
     [(): $m:ty] => { $crate::coproduct::Conil<$m> };

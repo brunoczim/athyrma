@@ -1,3 +1,5 @@
+//! Coproduct: an arbitrary enum, or if will, an arbitrary-length coproduct.
+
 use std::{
     cmp::Ordering,
     error::Error,
@@ -9,13 +11,17 @@ use std::{
     task::{Context, Poll},
 };
 
+/// Types coproducts.
 pub trait Coproduct {
+    /// The meta-type of this coproduct.
     type Meta: ?Sized;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum Void {}
 
+/// Nil is the empty list. Conil is the dual of the empty list: an empty
+/// co-product, impossible to construct.
 pub struct Conil<M>(Void, PhantomData<M>)
 where
     M: ?Sized;
@@ -24,6 +30,8 @@ impl<M> Conil<M>
 where
     M: ?Sized,
 {
+    /// Coerces this coproduct into any type since it is impossible to be
+    /// constructed.
     pub const fn coerce<A>(self) -> A {
         match self.0 {}
     }
@@ -137,9 +145,13 @@ where
     }
 }
 
+/// Cons is a node in a list. Cocons is the dual of the cons. Cons is both head
+/// and tail, cocons is either a head or a tail.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Cocons<H, T> {
+    /// Head of the coproduct (i.e. first element in the type-list).
     Head(H),
+    /// Tail of the coproduct (i.e. not the first element in the type-list).
     Tail(T),
 }
 

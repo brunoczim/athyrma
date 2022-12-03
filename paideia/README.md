@@ -37,6 +37,10 @@ directories, as well copying asssets. Look at the function `static_site_main`.
 Note: paideia uses a crate `katalogos` for heterogenous lists, also from
 athyrma.
 
+# Documentation
+
+https://brunoczim.github.io/athyrma/paideia/
+
 # Example
 
 ```

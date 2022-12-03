@@ -1,24 +1,27 @@
 use katalogos::harray;
 use paideia::{
     component::{
-        asset::Stylesheet,
+        asset::{AssetComponent, Stylesheet},
         block::{list::UnorderedList, text::Paragraph, InlineBlock},
         inline::text::Link,
         page::{Page, PageComponent},
         section::Section,
     },
     location::{Id, InternalPath, Location},
-    render::{DynFullComponent, FullRender, Html},
+    render::{DynFullComponent, FullRender, Html, Render},
     site::{Entry, Site},
+    static_site_main,
 };
-use std::{path::PathBuf, process};
+
+fn default_assets(
+) -> impl Render<Html, Kind = AssetComponent> + Send + Sync + 'static {
+    [Stylesheet { location: Location::internal("styles/main.css") }]
+}
 
 fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Simple Pedia"),
-        assets: [Stylesheet {
-            location: Location::internal("styles/main.css"),
-        }],
+        assets: [default_assets()],
         body: harray![
             Paragraph(
                 "This is the initial page of the simple pedia. You can dive \
@@ -72,9 +75,7 @@ fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Foo"),
-        assets: [Stylesheet {
-            location: Location::internal("styles/main.css"),
-        }],
+        assets: [default_assets()],
         body: harray![Paragraph("Foo is a metavariable."),],
         children: harray![],
     }
@@ -83,9 +84,7 @@ fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Bar"),
-        assets: [Stylesheet {
-            location: Location::internal("styles/main.css"),
-        }],
+        assets: [default_assets()],
         body: harray![Paragraph(harray![
             "Bar is a metavariable. ",
             Link { location: Location::internal("bar/baz"), target: "Baz" },
@@ -98,9 +97,7 @@ fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 fn baz_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Baz"),
-        assets: [Stylesheet {
-            location: Location::internal("styles/main.css"),
-        }],
+        assets: [default_assets()],
         body: harray![Paragraph(harray![
             "Baz is a metavariable, similar to ",
             Link { location: Location::internal("bar"), target: "Bar" },
@@ -138,14 +135,7 @@ fn simple_pedia_site() -> Site<DynFullComponent<'static, PageComponent>> {
 fn main() {
     let site = simple_pedia_site();
 
-    let result = site.build(
-        &mut Html,
-        &mut PathBuf::from("paideia/examples/build"),
-        &mut PathBuf::from("paideia/examples/assets"),
+    static_site_main(
+        &site, &mut Html, "paideia/examples/build", "paideia/examples/assets",
     );
-
-    if let Err(error) = result {
-        eprintln!("{}", error);
-        process::exit(1);
-    }
 }

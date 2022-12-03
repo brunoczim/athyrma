@@ -21,7 +21,7 @@ fn default_assets(
 fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Simple Pedia"),
-        assets: [default_assets()],
+        assets: default_assets(),
         body: harray![
             Paragraph(
                 "This is the initial page of the simple pedia. You can dive \
@@ -75,7 +75,7 @@ fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Foo"),
-        assets: [default_assets()],
+        assets: default_assets(),
         body: harray![Paragraph("Foo is a metavariable."),],
         children: harray![],
     }
@@ -84,7 +84,7 @@ fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Bar"),
-        assets: [default_assets()],
+        assets: default_assets(),
         body: harray![Paragraph(harray![
             "Bar is a metavariable. ",
             Link { location: Location::internal("bar/baz"), target: "Baz" },
@@ -97,7 +97,7 @@ fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 fn baz_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
         title: String::from("Baz"),
-        assets: [default_assets()],
+        assets: default_assets(),
         body: harray![Paragraph(harray![
             "Baz is a metavariable, similar to ",
             Link { location: Location::internal("bar"), target: "Bar" },

@@ -29,7 +29,7 @@
 //! {
 //!     Page {
 //!         title: String::from("Simple Pedia"),
-//!         assets: [default_assets()],
+//!         assets: default_assets(),
 //!         body: harray![
 //!             Paragraph(
 //!                 "This is the initial page of the simple pedia. You can \
@@ -84,7 +84,7 @@
 //! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Foo"),
-//!         assets: [default_assets()],
+//!         assets: default_assets(),
 //!         body: harray![Paragraph("Foo is a metavariable."),],
 //!         children: harray![],
 //!     }
@@ -94,7 +94,7 @@
 //! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Bar"),
-//!         assets: [default_assets()],
+//!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![
 //!             "Bar is a metavariable. ",
 //!             Link { location: Location::internal("bar/baz"), target: "Baz" },
@@ -108,7 +108,7 @@
 //! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Baz"),
-//!         assets: [default_assets()],
+//!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![
 //!             "Baz is a metavariable, similar to ",
 //!             Link { location: Location::internal("bar"), target: "Bar" },
@@ -144,11 +144,12 @@
 //! }
 //!
 //! fn main() {
+//! # if false {
 //!     let site = simple_pedia_site();
 //!
 //!     static_site_main(&site, &mut Html, "example/build", "example/assets");
-//! }
 //! # }
+//! }
 //! ```
 
 use component::page::PageComponent;
@@ -162,6 +163,8 @@ pub mod site;
 use render::{Format, Render};
 use site::Site;
 
+/// Main function of a static site targetting one format. A convenience over
+/// [`site::Site::build`].
 pub fn static_site_main<P, W, O, R>(
     site: &Site<P>,
     format: &mut W,

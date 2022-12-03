@@ -1,4 +1,4 @@
-name: Paígnion CI - GH Pages
+name: Áthyrma CI - GH Pages
 on: 
   push:
     branches:

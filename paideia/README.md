@@ -35,7 +35,7 @@ directories. The build process consists of generating pages into actual
 directories, as well copying asssets. Look at the function `static_site_main`.
 
 Note: paideia uses a crate `katalogos` for heterogenous lists, also from
-paignion.
+athyrma.
 
 # Example
 

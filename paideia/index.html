@@ -1,29 +1,32 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This tool allows you to generate static sites in encyclopedia-like format, using Rust code. With this tool, you’ll deal with “components” of web pages. No JavaScript dependency required for the build output."><meta name="keywords" content="rust, rustlang, rust-lang, paideia"><title>paideia - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../normalize.css"><link rel="stylesheet" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../ayu.css" disabled><link rel="stylesheet" href="../dark.css" disabled><link rel="stylesheet" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="../crates.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate paideia</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#modules">Modules</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../paideia/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">paideia</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/paideia/lib.rs.html#1-170">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This tool allows you to generate static sites in encyclopedia-like format,
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This tool allows you to generate static sites in encyclopedia-like format, using Rust code. With this tool, you’ll deal with “components” of web pages. No JavaScript dependency required for the build output."><meta name="keywords" content="rust, rustlang, rust-lang, paideia"><title>paideia - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../normalize.css"><link rel="stylesheet" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../ayu.css" disabled><link rel="stylesheet" href="../dark.css" disabled><link rel="stylesheet" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="../crates.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../paideia/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate paideia</a></h2><div class="sidebar-elems"><div class="block"><ul><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul></div><section><div class="block"><ul><li><a href="#modules">Modules</a></li><li><a href="#functions">Functions</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../paideia/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">paideia</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/paideia/lib.rs.html#1-186">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This tool allows you to generate static sites in encyclopedia-like format,
 using Rust code. With this tool, you’ll deal with “components” of web pages.
 No JavaScript dependency required for the build output.</p>
 <h2 id="example"><a href="#example">Example</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>katalogos::harray;
 <span class="kw">use </span>paideia::{
     component::{
-        asset::Stylesheet,
+        asset::{AssetComponent, Stylesheet},
         block::{list::UnorderedList, text::Paragraph, InlineBlock},
         inline::text::Link,
         page::{Page, PageComponent},
         section::Section,
     },
     location::{Id, InternalPath, Location},
-    render::{DynFullComponent, FullRender, Html},
+    render::{DynFullComponent, FullRender, Html, Render},
     site::{Entry, Site},
+    static_site_main,
 };
-<span class="kw">use </span>std::{path::PathBuf, process};
+
+<span class="kw">fn </span>default_assets(
+) -&gt; <span class="kw">impl </span>Render&lt;Html, Kind = AssetComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
+    [Stylesheet { location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>) }]
+}
 
 <span class="kw">fn </span>index() -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static
 </span>{
     Page {
         title: String::from(<span class="string">&quot;Simple Pedia&quot;</span>),
-        assets: [Stylesheet {
-            location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>),
-        }],
+        assets: default_assets(),
         body: <span class="macro">harray!</span>[
             Paragraph(
                 <span class="string">&quot;This is the initial page of the simple pedia. You can \
@@ -78,9 +81,7 @@ No JavaScript dependency required for the build output.</p>
 ) -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
     Page {
         title: String::from(<span class="string">&quot;Foo&quot;</span>),
-        assets: [Stylesheet {
-            location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>),
-        }],
+        assets: default_assets(),
         body: <span class="macro">harray!</span>[Paragraph(<span class="string">&quot;Foo is a metavariable.&quot;</span>),],
         children: <span class="macro">harray!</span>[],
     }
@@ -90,9 +91,7 @@ No JavaScript dependency required for the build output.</p>
 ) -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
     Page {
         title: String::from(<span class="string">&quot;Bar&quot;</span>),
-        assets: [Stylesheet {
-            location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>),
-        }],
+        assets: default_assets(),
         body: <span class="macro">harray!</span>[Paragraph(<span class="macro">harray!</span>[
             <span class="string">&quot;Bar is a metavariable. &quot;</span>,
             Link { location: Location::internal(<span class="string">&quot;bar/baz&quot;</span>), target: <span class="string">&quot;Baz&quot; </span>},
@@ -106,9 +105,7 @@ No JavaScript dependency required for the build output.</p>
 ) -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
     Page {
         title: String::from(<span class="string">&quot;Baz&quot;</span>),
-        assets: [Stylesheet {
-            location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>),
-        }],
+        assets: default_assets(),
         body: <span class="macro">harray!</span>[Paragraph(<span class="macro">harray!</span>[
             <span class="string">&quot;Baz is a metavariable, similar to &quot;</span>,
             Link { location: Location::internal(<span class="string">&quot;bar&quot;</span>), target: <span class="string">&quot;Bar&quot; </span>},
@@ -146,17 +143,9 @@ No JavaScript dependency required for the build output.</p>
 <span class="kw">fn </span>main() {
     <span class="kw">let </span>site = simple_pedia_site();
 
-    <span class="kw">let </span>result = site.build(
-        <span class="kw-2">&amp;mut </span>Html,
-        <span class="kw-2">&amp;mut </span>PathBuf::from(<span class="string">&quot;paideia/examples/build&quot;</span>),
-        <span class="kw-2">&amp;mut </span>PathBuf::from(<span class="string">&quot;paideia/examples/assets&quot;</span>),
-    );
-
-    <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = result {
-        <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, error);
-        process::exit(<span class="number">1</span>);
-    }
+    static_site_main(<span class="kw-2">&amp;</span>site, <span class="kw-2">&amp;mut </span>Html, <span class="string">&quot;example/build&quot;</span>, <span class="string">&quot;example/assets&quot;</span>);
 }</code></pre></div>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="component/index.html" title="paideia::component mod">component</a></div><div class="item-right docblock-short">This module exports the component trait and components provided by this
 crate.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="location/index.html" title="paideia::location mod">location</a></div><div class="item-right docblock-short">This module provides location, paths, Urls.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="render/index.html" title="paideia::render mod">render</a></div><div class="item-right docblock-short">This module exports items related to rendering components.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="site/index.html" title="paideia::site mod">site</a></div><div class="item-right docblock-short">This module provides a “filesystem-like” utility for organizing a site’s
-pages and effectively generating them.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="paideia" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
+pages and effectively generating them.</div></div></div><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.static_site_main.html" title="paideia::static_site_main fn">static_site_main</a></div><div class="item-right docblock-short">Main function of a static site targetting one format. A convenience over
+<a href="site/struct.Site.html#method.build" title="site::Site::build"><code>site::Site::build</code></a>.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="paideia" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

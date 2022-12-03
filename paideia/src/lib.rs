@@ -8,25 +8,28 @@
 //! use katalogos::harray;
 //! use paideia::{
 //!     component::{
-//!         asset::Stylesheet,
+//!         asset::{AssetComponent, Stylesheet},
 //!         block::{list::UnorderedList, text::Paragraph, InlineBlock},
 //!         inline::text::Link,
 //!         page::{Page, PageComponent},
 //!         section::Section,
 //!     },
 //!     location::{Id, InternalPath, Location},
-//!     render::{DynFullComponent, FullRender, Html},
+//!     render::{DynFullComponent, FullRender, Html, Render},
 //!     site::{Entry, Site},
+//!     static_site_main,
 //! };
-//! use std::{path::PathBuf, process};
+//!
+//! fn default_assets(
+//! ) -> impl Render<Html, Kind = AssetComponent> + Send + Sync + 'static {
+//!     [Stylesheet { location: Location::internal("styles/main.css") }]
+//! }
 //!
 //! fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static
 //! {
 //!     Page {
 //!         title: String::from("Simple Pedia"),
-//!         assets: [Stylesheet {
-//!             location: Location::internal("styles/main.css"),
-//!         }],
+//!         assets: default_assets(),
 //!         body: harray![
 //!             Paragraph(
 //!                 "This is the initial page of the simple pedia. You can \
@@ -81,9 +84,7 @@
 //! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Foo"),
-//!         assets: [Stylesheet {
-//!             location: Location::internal("styles/main.css"),
-//!         }],
+//!         assets: default_assets(),
 //!         body: harray![Paragraph("Foo is a metavariable."),],
 //!         children: harray![],
 //!     }
@@ -93,9 +94,7 @@
 //! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Bar"),
-//!         assets: [Stylesheet {
-//!             location: Location::internal("styles/main.css"),
-//!         }],
+//!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![
 //!             "Bar is a metavariable. ",
 //!             Link { location: Location::internal("bar/baz"), target: "Baz" },
@@ -109,9 +108,7 @@
 //! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
 //!         title: String::from("Baz"),
-//!         assets: [Stylesheet {
-//!             location: Location::internal("styles/main.css"),
-//!         }],
+//!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![
 //!             "Baz is a metavariable, similar to ",
 //!             Link { location: Location::internal("bar"), target: "Bar" },
@@ -150,21 +147,40 @@
 //! # if false {
 //!     let site = simple_pedia_site();
 //!
-//!     let result = site.build(
-//!         &mut Html,
-//!         &mut PathBuf::from("paideia/examples/build"),
-//!         &mut PathBuf::from("paideia/examples/assets"),
-//!     );
-//!
-//!     if let Err(error) = result {
-//!         eprintln!("{}", error);
-//!         process::exit(1);
-//!     }
-//! }
+//!     static_site_main(&site, &mut Html, "example/build", "example/assets");
 //! # }
+//! }
 //! ```
+
+use component::page::PageComponent;
+use std::{path::PathBuf, process};
 
 pub mod render;
 pub mod component;
 pub mod location;
 pub mod site;
+
+use render::{Format, Render};
+use site::Site;
+
+/// Main function of a static site targetting one format. A convenience over
+/// [`site::Site::build`].
+pub fn static_site_main<P, W, O, R>(
+    site: &Site<P>,
+    format: &mut W,
+    output_dir: O,
+    resource_dir: R,
+) where
+    P: Render<W, Kind = PageComponent>,
+    W: Format + ?Sized,
+    O: Into<PathBuf>,
+    R: Into<PathBuf>,
+{
+    if let Err(error) =
+        site.build(format, &mut output_dir.into(), &mut resource_dir.into())
+    {
+        eprintln!("Failed to build static encyclopedia.\n");
+        eprintln!("{}", error);
+        process::exit(1);
+    }
+}

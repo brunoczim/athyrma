@@ -26,8 +26,7 @@ impl ComponentKind for PageComponent {}
 /// The page: the outermost component in an article/page.
 pub struct Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
@@ -46,18 +45,17 @@ where
 
 impl<A, B, L> fmt::Debug for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_struct("Page");
-        debug_fmtr.field("title", &self.title).field("body", &self.body);
-        for (i, element) in self.assets.iter().enumerate() {
-            debug_fmtr.field(&format!("asset[{}]", i), &element);
-        }
+        debug_fmtr
+            .field("title", &self.title)
+            .field("assets", &self.assets)
+            .field("body", &self.body);
         for (i, element) in self.children.iter().enumerate() {
             debug_fmtr.field(&format!("children[{}]", i), &element);
         }
@@ -67,8 +65,7 @@ where
 
 impl<A, B, L> Clone for Page<A, B, L>
 where
-    A: IntoIterRef + Clone,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent> + Clone,
     B: Component<Kind = BlockComponent> + Clone,
     L: IntoIterRef + Clone,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
@@ -85,15 +82,14 @@ where
 
 impl<A, B, L> PartialEq for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + PartialEq,
+    A: Component<Kind = AssetComponent> + PartialEq,
     B: Component<Kind = BlockComponent> + PartialEq,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.title == other.title
-            && self.assets.iter().eq(other.assets.iter())
+            && self.assets == other.assets
             && self.body == other.body
             && self.children.iter().eq(other.children.iter())
     }
@@ -101,8 +97,7 @@ where
 
 impl<A, B, L> Eq for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + Eq,
+    A: Component<Kind = AssetComponent> + Eq,
     B: Component<Kind = BlockComponent> + Eq,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Eq,
@@ -111,8 +106,7 @@ where
 
 impl<A, B, L> PartialOrd for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + PartialOrd,
+    A: Component<Kind = AssetComponent> + PartialOrd,
     B: Component<Kind = BlockComponent> + PartialOrd,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialOrd,
@@ -121,7 +115,7 @@ where
         let ordering = self
             .title
             .partial_cmp(&other.title)?
-            .then(self.assets.iter().partial_cmp(other.assets.iter())?)
+            .then(self.assets.partial_cmp(&other.assets)?)
             .then(self.body.partial_cmp(&other.body)?)
             .then(self.children.iter().partial_cmp(other.children.iter())?);
         Some(ordering)
@@ -130,8 +124,7 @@ where
 
 impl<A, B, L> Ord for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + Ord,
+    A: Component<Kind = AssetComponent> + Ord,
     B: Component<Kind = BlockComponent> + Ord,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Ord,
@@ -139,7 +132,7 @@ where
     fn cmp(&self, other: &Self) -> Ordering {
         self.title
             .cmp(&other.title)
-            .then_with(|| self.assets.iter().cmp(other.assets.iter()))
+            .then_with(|| self.assets.cmp(&other.assets))
             .then_with(|| self.body.cmp(&other.body))
             .then_with(|| self.children.iter().cmp(other.children.iter()))
     }
@@ -147,8 +140,7 @@ where
 
 impl<A, B, L> Hash for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent> + Hash,
+    A: Component<Kind = AssetComponent> + Hash,
     B: Component<Kind = BlockComponent> + Hash,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
@@ -158,10 +150,7 @@ where
         H: Hasher,
     {
         self.title.hash(state);
-        for (i, asset) in self.assets.iter().enumerate() {
-            i.hash(state);
-            asset.hash(state);
-        }
+        self.assets.hash(state);
         self.body.hash(state);
         for (i, child) in self.children.iter().enumerate() {
             i.hash(state);
@@ -171,8 +160,7 @@ where
 }
 impl<A, B, L> Default for Page<A, B, L>
 where
-    A: IntoIterRef + Default,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent> + Default,
     B: Component<Kind = BlockComponent> + Default,
     L: IntoIterRef + Default,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
@@ -189,8 +177,7 @@ where
 
 impl<A, B, L> Component for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
@@ -200,8 +187,7 @@ where
 
 impl<A, B, L> Render<Html> for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Render<Html, Kind = AssetComponent>,
+    A: Render<Html, Kind = AssetComponent>,
     B: Render<Html, Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Render<Html, Kind = SectionComponent>,
@@ -216,9 +202,7 @@ where
              name=\"viewport\" content=\"width=device-width, \
              initial-scale=1.0\">",
         )?;
-        for asset in self.assets.iter() {
-            asset.render(renderer, ctx.with_kind(&AssetComponent))?;
-        }
+        self.assets.render(renderer, ctx.with_kind(&AssetComponent))?;
         renderer.write_str("<title>")?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str(
@@ -243,8 +227,7 @@ where
 
 impl<A, B, L> Render<Markdown> for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Render<Markdown, Kind = SectionComponent>,
@@ -267,8 +250,7 @@ where
 
 impl<A, B, L> Render<Text> for Page<A, B, L>
 where
-    A: IntoIterRef,
-    <A as IntoIterRef>::Item: Component<Kind = AssetComponent>,
+    A: Component<Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
     L: IntoIterRef,
     <L as IntoIterRef>::Item: Render<Text, Kind = SectionComponent>,

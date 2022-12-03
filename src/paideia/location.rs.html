@@ -532,6 +532,10 @@
 <span id="532">532</span>
 <span id="533">533</span>
 <span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module provides location, paths, Urls.
 
 </span><span class="kw">use crate</span>::{
@@ -800,10 +804,14 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone)]
+<span class="doccomment">/// Error yielded when an internal location was attempted to be constructed from
+/// an invalid string.
+</span><span class="attribute">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>InvalidInternalLoc {
-    Id(InvalidId),
-    Fragment(InvalidFragment),
+    <span class="doccomment">/// The ID part is invalid.
+    </span>Id(InvalidId),
+    <span class="doccomment">/// The fragment part is invalid.
+    </span>Fragment(InvalidFragment),
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidInternalLoc {
@@ -870,7 +878,7 @@
         })
     }
 
-    <span class="kw">pub fn </span>render_as_url&lt;W&gt;(
+    <span class="kw">fn </span>render_as_url&lt;W&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;W&gt;,
         ctx: Context&lt;&lt;<span class="self">Self </span><span class="kw">as </span>Component&gt;::Kind&gt;,

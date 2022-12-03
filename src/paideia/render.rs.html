@@ -533,6 +533,17 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module exports items related to rendering components.
 
 </span><span class="kw">use </span>std::{
@@ -676,11 +687,22 @@
     }
 }
 
-<span class="kw">pub trait </span>Render&lt;W&gt;: Component
+<span class="doccomment">/// General rendering trait. A component implements this trait when it can
+/// renders using the given format `W`.
+</span><span class="kw">pub trait </span>Render&lt;W&gt;: Component
 <span class="kw">where
     </span>W: Format + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn </span>render(
+    <span class="doccomment">/// Renders the given component using two things:
+    /// - A renderer backed by a render format;
+    /// - A rendering context, providing things such page location or section
+    ///   level.
+    ///
+    /// [`Renderer`] implements [`std::fmt::Write`], so arbitrary strings can be
+    /// written to it, HOWEVER, it should be reserved only for writing syntax to
+    /// the renderer, strings as plain data should be written using their
+    /// [`Render::render`] method.
+    </span><span class="kw">fn </span>render(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;W&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,

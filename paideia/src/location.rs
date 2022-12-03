@@ -266,9 +266,13 @@ impl Render<Text> for InternalPath {
     }
 }
 
+/// Error yielded when an internal location was attempted to be constructed from
+/// an invalid string.
 #[derive(Debug, Clone)]
 pub enum InvalidInternalLoc {
+    /// The ID part is invalid.
     Id(InvalidId),
+    /// The fragment part is invalid.
     Fragment(InvalidFragment),
 }
 
@@ -336,7 +340,7 @@ impl InternalLoc {
         })
     }
 
-    pub fn render_as_url<W>(
+    fn render_as_url<W>(
         &self,
         renderer: &mut Renderer<W>,
         ctx: Context<<Self as Component>::Kind>,

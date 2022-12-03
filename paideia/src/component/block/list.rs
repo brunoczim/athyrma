@@ -1,3 +1,5 @@
+//! This module exports list related components.
+
 use super::BlockComponent;
 use crate::{
     component::Component,

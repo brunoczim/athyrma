@@ -141,10 +141,21 @@ where
     }
 }
 
+/// General rendering trait. A component implements this trait when it can
+/// renders using the given format `W`.
 pub trait Render<W>: Component
 where
     W: Format + ?Sized,
 {
+    /// Renders the given component using two things:
+    /// - A renderer backed by a render format;
+    /// - A rendering context, providing things such page location or section
+    ///   level.
+    ///
+    /// [`Renderer`] implements [`std::fmt::Write`], so arbitrary strings can be
+    /// written to it, HOWEVER, it should be reserved only for writing syntax to
+    /// the renderer, strings as plain data should be written using their
+    /// [`Render::render`] method.
     fn render(
         &self,
         renderer: &mut Renderer<W>,

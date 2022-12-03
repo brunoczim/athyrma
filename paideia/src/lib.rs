@@ -1,8 +1,47 @@
 #![warn(missing_docs)]
 
 //! This tool allows you to generate static sites in encyclopedia-like format,
-//! using Rust code. With this tool, you'll deal with "components" of web pages.
-//! No JavaScript dependency required for the build output.
+//! using Rust code. The tool can be resumed in a few items:
+//! - Components;
+//! - Component kinds;
+//! - Rendering formats;
+//! - Sites.
+//!
+//! Components implement the [`Component`](component::Component) trait and have
+//! a [`ComponentKind`](component::ComponentKind) associated with it that serves
+//! for the purpose of typing components. Paideia's builtin component kinds are:
+//! - [`InlineComponent`](component::inline::InlineComponent) - components
+//!   inlined in text;
+//! - [`BlockComponent`](component::block::BlockComponent) - components with
+//!   blocks of their own;
+//! - [`table::CellComponent`](component::block::table::CellComponent) - cells
+//!   of a table;
+//! - [`table::RowComponent`](component::block::table::RowComponent) - rows of a
+//!   table;
+//! - [`SectionComponent`](component::section::SectionComponent) - sections of
+//!   an article/page;
+//! - [`AssetComponent`](component::asset::AssetComponent) - asset of an
+//!   article/page;
+//! - [`PageComponent`](component::page::PageComponent) - the whole
+//!   artcile/page.
+//!
+//! Rendering formats are a proxy to Rust's `fmt` which allows specific
+//! formatting e.g. in a specific context, such as in a nested list. More
+//! important than that is that they also are used to define what kind of output
+//! the rendering will produce. Builtin rendering formats are:
+//! - [HTML](render::Html);
+//! - [Markdown](render::Markdown);
+//! - [Plaintext](render::Text).
+//!
+//! Components can implement a trait named [`Render<W>`](render::Render) where
+//! `W` is a rendering format. For instance, if a component wants to render
+//! HTML, it must implement `Render<Html>`.
+//!
+//! Finally, a [`Site`](site::Site) is a collection of pages structured in terms
+//! of in-memory directories. The build process consists of generating pages
+//! into actual directories, as well copying resources. Look at the function
+//! [`static_site_main`]. No JavaScript dependency required for the build
+//! output.
 //!
 //! # Example
 //!

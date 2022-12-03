@@ -218,7 +218,21 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Coproduct: an arbitrary enum, or if will, an arbitrary-length coproduct.
+
+</span><span class="kw">use </span>std::{
     cmp::Ordering,
     error::Error,
     fmt,
@@ -229,14 +243,18 @@
     task::{Context, Poll},
 };
 
-<span class="kw">pub trait </span>Coproduct {
-    <span class="kw">type </span>Meta: <span class="question-mark">?</span>Sized;
+<span class="doccomment">/// Types coproducts.
+</span><span class="kw">pub trait </span>Coproduct {
+    <span class="doccomment">/// The meta-type of this coproduct.
+    </span><span class="kw">type </span>Meta: <span class="question-mark">?</span>Sized;
 }
 
 <span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">enum </span>Void {}
 
-<span class="kw">pub struct </span>Conil&lt;M&gt;(Void, PhantomData&lt;M&gt;)
+<span class="doccomment">/// Nil is the empty list. Conil is the dual of the empty list: an empty
+/// co-product, impossible to construct.
+</span><span class="kw">pub struct </span>Conil&lt;M&gt;(Void, PhantomData&lt;M&gt;)
 <span class="kw">where
     </span>M: <span class="question-mark">?</span>Sized;
 
@@ -244,7 +262,9 @@
 <span class="kw">where
     </span>M: <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">pub const fn </span>coerce&lt;A&gt;(<span class="self">self</span>) -&gt; A {
+    <span class="doccomment">/// Coerces this coproduct into any type since it is impossible to be
+    /// constructed.
+    </span><span class="kw">pub const fn </span>coerce&lt;A&gt;(<span class="self">self</span>) -&gt; A {
         <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{}
     }
 }
@@ -357,10 +377,14 @@
     }
 }
 
-<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+<span class="doccomment">/// Cons is a node in a list. Cocons is the dual of the cons. Cons is both head
+/// and tail, cocons is either a head or a tail.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub enum </span>Cocons&lt;H, T&gt; {
-    Head(H),
-    Tail(T),
+    <span class="doccomment">/// Head of the coproduct (i.e. first element in the type-list).
+    </span>Head(H),
+    <span class="doccomment">/// Tail of the coproduct (i.e. not the first element in the type-list).
+    </span>Tail(T),
 }
 
 <span class="kw">impl</span>&lt;H, T&gt; Coproduct <span class="kw">for </span>Cocons&lt;H, T&gt;

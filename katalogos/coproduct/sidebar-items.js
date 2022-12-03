@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Cocons",""]],"struct":[["Conil",""]],"trait":[["Coproduct",""]]};
+window.SIDEBAR_ITEMS = {"enum":[["Cocons","Cons is a node in a list. Cocons is the dual of the cons. Cons is both head and tail, cocons is either a head or a tail."]],"struct":[["Conil","Nil is the empty list. Conil is the dual of the empty list: an empty co-product, impossible to construct."]],"trait":[["Coproduct","Types coproducts."]]};

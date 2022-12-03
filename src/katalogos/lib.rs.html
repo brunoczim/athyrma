@@ -276,18 +276,44 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="kw">pub mod </span>coproduct;
-<span class="kw">pub mod </span>function;
-<span class="kw">pub mod </span>combinator;
-<span class="kw">pub mod </span>by_ref;
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+</pre><pre class="rust"><code><span class="attribute">#![warn(missing_docs)]
 
-<span class="kw">pub trait </span>IntoIterRef {
-    <span class="kw">type </span>Item;
-    <span class="kw">type </span>IntoIter&lt;<span class="lifetime">&#39;item</span>&gt;: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span><span class="self">Self</span>::Item&gt;
+</span><span class="doccomment">//! Katalogos is a library for heterogenous lists and arbitrary enums, but only
+//! regarding to construction of such lists. If you need to retrive data from a
+//! list, this crate is not recommended.
+
+</span><span class="kw">pub mod </span>coproduct;
+
+<span class="doccomment">/// A trait to make trait bounds more ergnomic relating to iteration by
+/// reference.
+</span><span class="kw">pub trait </span>IntoIterRef {
+    <span class="doccomment">/// Item of the iterator.
+    </span><span class="kw">type </span>Item;
+    <span class="doccomment">/// Type of the iterator.
+    </span><span class="kw">type </span>Iter&lt;<span class="lifetime">&#39;item</span>&gt;: Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span><span class="self">Self</span>::Item&gt;
     <span class="kw">where
         </span><span class="self">Self</span>: <span class="lifetime">&#39;item</span>;
 
-    <span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;item</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter&lt;<span class="lifetime">&#39;item</span>&gt;;
+    <span class="doccomment">/// Converts the reference into an iterator.
+    </span><span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;item</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Iter&lt;<span class="lifetime">&#39;item</span>&gt;;
 }
 
 <span class="kw">impl</span>&lt;T, I&gt; IntoIterRef <span class="kw">for </span>T
@@ -295,15 +321,17 @@
     for</span>&lt;<span class="lifetime">&#39;this</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;this </span>T: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;this </span>I&gt;,
 {
     <span class="kw">type </span>Item = I;
-    <span class="kw">type </span>IntoIter&lt;<span class="lifetime">&#39;item</span>&gt; = &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span>T <span class="kw">as </span>IntoIterator&gt;::IntoIter <span class="kw">where </span>T: <span class="lifetime">&#39;item</span>;
+    <span class="kw">type </span>Iter&lt;<span class="lifetime">&#39;item</span>&gt; = &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span>T <span class="kw">as </span>IntoIterator&gt;::IntoIter <span class="kw">where </span>T: <span class="lifetime">&#39;item</span>;
 
-    <span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;item</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter&lt;<span class="lifetime">&#39;item</span>&gt; {
+    <span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;item</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Iter&lt;<span class="lifetime">&#39;item</span>&gt; {
         <span class="self">self</span>.into_iter()
     }
 }
 
-
-<span class="attribute">#[macro_export]
+<span class="doccomment">/// Constructs an &quot;heterogenous iterator&quot;, i.e. constructed with different types
+/// for different items, but iterates as if it were a type, preserving static
+/// dispatch.
+</span><span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>hiter {
     [(): <span class="macro-nonterminal">$m</span>:ty] =&gt; {
         ::std::iter::empty&lt;<span class="macro-nonterminal">$crate::coproduct::Conil</span>&lt;<span class="macro-nonterminal">$m</span>&gt;&gt;()
@@ -334,7 +362,10 @@
     };
 }
 
-<span class="attribute">#[macro_export]
+<span class="doccomment">/// Constructs an &quot;heterogenous vector&quot;, i.e. constructed with different types
+/// for different elements, but ends up with a single same type for the whole
+/// vector, while preserving static dispatch.
+</span><span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>hvec {
     [($(<span class="macro-nonterminal">$elems</span>:expr),<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>:ty] =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::hiter!</span>[($(<span class="macro-nonterminal">$elems</span>),<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>].collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
@@ -351,7 +382,10 @@
     };
 }
 
-<span class="attribute">#[macro_export]
+<span class="doccomment">/// Constructs an &quot;heterogenous array&quot;, i.e. constructed with different types
+/// for different elements, but ends up with a single same type for the whole
+/// array, while preserving static dispatch.
+</span><span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>harray {
     [($(<span class="macro-nonterminal">$elems</span>:expr),<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>:ty] =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::harray!</span>[
@@ -451,7 +485,8 @@
     };
 }
 
-<span class="attribute">#[macro_export]
+<span class="doccomment">/// Expands to the type of an heterogenous array.
+</span><span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>HArray {
     [($(<span class="macro-nonterminal">$tys</span>:ty),<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>:ty] =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::HArray!</span>[
@@ -522,7 +557,8 @@
     };
 }
 
-<span class="attribute">#[macro_export]
+<span class="doccomment">/// Defines a corpoduct type, i.e. an arbitrary enum.
+</span><span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>Coproduct {
     [(): <span class="macro-nonterminal">$m</span>:ty] =&gt; { <span class="macro-nonterminal">$crate::coproduct::Conil</span>&lt;<span class="macro-nonterminal">$m</span>&gt; };
     [(<span class="macro-nonterminal">$elem</span>:ty $(, <span class="macro-nonterminal">$elems</span>:ty)<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>:ty] =&gt; {

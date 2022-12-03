@@ -32,7 +32,8 @@ format. For instance, if a component wants to render HTML, it must implement
 
 Finally, a `Site` is a collection of pages structured in terms of in-memory
 directories. The build process consists of generating pages into actual
-directories, as well copying asssets. Look at the function `static_site_main`.
+directories, as well copying resources. Look at the function `static_site_main`.
+No JavaScript dependency required for the build output.
 
 Note: paideia uses a crate `katalogos` for heterogenous lists, also from
 athyrma.

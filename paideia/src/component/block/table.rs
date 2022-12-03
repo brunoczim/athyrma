@@ -46,12 +46,16 @@ impl Default for CellAttrs {
     }
 }
 
+/// A table cell, that can be a header, and can span over multiple columns or
+/// rows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Cell<T>
 where
     T: Component<Kind = BlockComponent>,
 {
+    /// Child component displayed in the cell.
     pub child: T,
+    /// Cell attributes, such as span and declaring it as header or not.
     pub attrs: CellAttrs,
 }
 

@@ -4,10 +4,12 @@
 /// reference.
 pub trait IntoIterRef {
     /// Item of the iterator.
-    type Item;
+    type Item<'item>
+    where
+        Self: 'item;
 
     /// Type of the iterator.
-    type Iter<'item>: Iterator<Item = &'item Self::Item>
+    type Iter<'item>: Iterator<Item = Self::Item<'item>>
     where
         Self: 'item;
 
@@ -19,17 +21,17 @@ pub trait IntoIterRef {
     fn concat(self) -> Concat<Self>
     where
         Self: Sized,
-        Self::Item: IntoIterRef,
+        for<'item> Self::Item<'item>: IntoIterRef,
     {
         Concat(self)
     }
 }
 
-impl<T, I> IntoIterRef for T
+impl<T> IntoIterRef for T
 where
-    for<'this> &'this T: IntoIterator<Item = &'this I>,
+    for<'this> &'this T: IntoIterator,
 {
-    type Item = I;
+    type Item<'item> = <&'item T as IntoIterator>::Item where T: 'item;
     type Iter<'item> = <&'item T as IntoIterator>::IntoIter where T: 'item;
 
     fn iter<'item>(&'item self) -> Self::Iter<'item> {
@@ -42,14 +44,14 @@ where
 pub struct Concat<L>(pub L)
 where
     L: IntoIterRef,
-    L::Item: IntoIterRef;
+    for<'this> L::Item<'this>: IntoIterRef;
 
 impl<'this, L> IntoIterator for &'this Concat<L>
 where
     L: IntoIterRef,
-    L::Item: IntoIterRef,
+    for<'r> L::Item<'r>: IntoIterRef,
 {
-    type Item = &'this <L::Item as IntoIterRef>::Item;
+    type Item = <L::Item<'this> as IntoIterRef>::Item<'this>;
     type IntoIter = ConcatIntoIter<'this, L>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -62,18 +64,18 @@ where
 pub struct ConcatIntoIter<'this, L>
 where
     L: IntoIterRef + 'this,
-    L::Item: IntoIterRef,
+    L::Item<'this>: IntoIterRef,
 {
     outer: L::Iter<'this>,
-    inner: Option<<L::Item as IntoIterRef>::Iter<'this>>,
+    inner: Option<<L::Item<'this> as IntoIterRef>::Iter<'this>>,
 }
 
 impl<'this, L> Iterator for ConcatIntoIter<'this, L>
 where
     L: IntoIterRef + 'this,
-    L::Item: IntoIterRef,
+    L::Item<'this>: IntoIterRef,
 {
-    type Item = &'this <L::Item as IntoIterRef>::Item;
+    type Item = <L::Item<'this> as IntoIterRef>::Item<'this>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -92,10 +94,6 @@ mod test {
 
     #[test]
     fn should_concat_correctly() {
-        let elements = harray![harray![4, 5], hvec![7, 8, 9]]
-            .concat()
-            .iter()
-            .map(ToString::to_string)
-            .collect::<Vec<_>>();
+        let elements = harray![harray![4, 5], hvec![7, 8, 9]].concat();
     }
 }

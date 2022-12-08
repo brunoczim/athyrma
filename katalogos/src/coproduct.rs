@@ -6,7 +6,6 @@ use std::{
     fmt,
     future::Future,
     hash::{Hash, Hasher},
-    iter::{empty, once, Empty, Map, Once},
     marker::PhantomData,
     pin::Pin,
     task::{Context, Poll},
@@ -55,6 +54,18 @@ where
 
     fn into_iter(self) -> Self::IntoIter {
         Iter(self)
+    }
+}
+
+impl<'this, M> IntoIterator for &'this Conil<M>
+where
+    M: ?Sized,
+{
+    type Item = Conil<M>;
+    type IntoIter = Iter<Conil<M>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Iter(self.coerce())
     }
 }
 
@@ -182,7 +193,38 @@ where
     T: IntoIterator,
 {
     type Item = Cocons<H::Item, T::Item>;
-    type IntoIter = Iter;
+    type IntoIter = Iter<Cocons<H::IntoIter, T::IntoIter>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        match self {
+            Self::Head(head) => Iter(Cocons::Head(head.into_iter())),
+            Self::Tail(tail) => Iter(Cocons::Tail(tail.into_iter())),
+        }
+    }
+}
+
+impl<'this, H, T> IntoIterator for &'this Cocons<H, T>
+where
+    &'this H: IntoIterator,
+    &'this T: IntoIterator,
+{
+    type Item = Cocons<
+        <&'this H as IntoIterator>::Item,
+        <&'this T as IntoIterator>::Item,
+    >;
+    type IntoIter = Iter<
+        Cocons<
+            <&'this H as IntoIterator>::IntoIter,
+            <&'this T as IntoIterator>::IntoIter,
+        >,
+    >;
+
+    fn into_iter(self) -> Self::IntoIter {
+        match self {
+            Cocons::Head(head) => Iter(Cocons::Head(head.into_iter())),
+            Cocons::Tail(tail) => Iter(Cocons::Tail(tail.into_iter())),
+        }
+    }
 }
 
 impl<H, T> fmt::Display for Cocons<H, T>

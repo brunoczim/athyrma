@@ -6,6 +6,7 @@ use std::{
     fmt,
     future::Future,
     hash::{Hash, Hasher},
+    iter::{empty, once, Empty, Map, Once},
     marker::PhantomData,
     pin::Pin,
     task::{Context, Poll},
@@ -17,6 +18,7 @@ pub trait Coproduct {
     type Meta: ?Sized;
 }
 
+/// A thing that may never exist.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum Void {}
 
@@ -42,6 +44,18 @@ where
     M: ?Sized,
 {
     type Meta = M;
+}
+
+impl<M> IntoIterator for Conil<M>
+where
+    M: ?Sized,
+{
+    type Item = Conil<M>;
+    type IntoIter = Iter<Conil<M>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Iter(self)
+    }
 }
 
 impl<M> fmt::Debug for Conil<M>
@@ -162,6 +176,15 @@ where
     type Meta = T::Meta;
 }
 
+impl<H, T> IntoIterator for Cocons<H, T>
+where
+    H: IntoIterator,
+    T: IntoIterator,
+{
+    type Item = Cocons<H::Item, T::Item>;
+    type IntoIter = Iter;
+}
+
 impl<H, T> fmt::Display for Cocons<H, T>
 where
     H: fmt::Display,
@@ -227,6 +250,36 @@ where
                     Pin::new_unchecked(tail).poll(cx).map(Cocons::Tail)
                 },
             }
+        }
+    }
+}
+
+/// Iterator that iterates through the nodes of a coproduct when they are
+/// iterators.
+pub struct Iter<C>(C);
+
+impl<M> Iterator for Iter<Conil<M>>
+where
+    M: ?Sized,
+{
+    type Item = Conil<M>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.coerce()
+    }
+}
+
+impl<H, T> Iterator for Iter<Cocons<H, T>>
+where
+    H: Iterator,
+    T: Iterator,
+{
+    type Item = Cocons<H::Item, T::Item>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match &mut self.0 {
+            Cocons::Head(head) => head.next().map(Cocons::Head),
+            Cocons::Tail(tail) => tail.next().map(Cocons::Tail),
         }
     }
 }

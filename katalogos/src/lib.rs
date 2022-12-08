@@ -5,32 +5,7 @@
 //! list, this crate is not recommended.
 
 pub mod coproduct;
-
-/// A trait to make trait bounds more ergnomic relating to iteration by
-/// reference.
-pub trait IntoIterRef {
-    /// Item of the iterator.
-    type Item;
-    /// Type of the iterator.
-    type Iter<'item>: Iterator<Item = &'item Self::Item>
-    where
-        Self: 'item;
-
-    /// Converts the reference into an iterator.
-    fn iter<'item>(&'item self) -> Self::Iter<'item>;
-}
-
-impl<T, I> IntoIterRef for T
-where
-    for<'this> &'this T: IntoIterator<Item = &'this I>,
-{
-    type Item = I;
-    type Iter<'item> = <&'item T as IntoIterator>::IntoIter where T: 'item;
-
-    fn iter<'item>(&'item self) -> Self::Iter<'item> {
-        self.into_iter()
-    }
-}
+pub mod iter;
 
 /// Constructs an "heterogenous iterator", i.e. constructed with different types
 /// for different items, but iterates as if it were a type, preserving static
@@ -38,7 +13,7 @@ where
 #[macro_export]
 macro_rules! hiter {
     [(): $m:ty] => {
-        ::std::iter::empty<$crate::coproduct::Conil<$m>>()
+        ::std::iter::empty::<$crate::coproduct::Conil<$m>>()
     };
     [($elem:expr $(, $elems:expr)*): $m:ty] => {
         ::std::iter::once($crate::coproduct::Cocons::Head($elem))

@@ -9,7 +9,7 @@ use super::{
     InlineComponent,
 };
 use crate::render::{Context, Html, Markdown, Render, Renderer, Text};
-use katalogos::IntoIterRef;
+use katalogos::iter::IntoIterRef;
 use std::{
     cmp::Ordering,
     fmt::{self, Write},

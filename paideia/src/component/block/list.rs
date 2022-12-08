@@ -5,7 +5,7 @@ use crate::{
     component::Component,
     render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
 };
-use katalogos::IntoIterRef;
+use katalogos::iter::IntoIterRef;
 use std::{
     cmp::Ordering,
     fmt::{self, Write},

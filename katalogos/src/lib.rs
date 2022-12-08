@@ -44,7 +44,7 @@ macro_rules! hiter {
         ::std::iter::once($crate::coproduct::Cocons::Head($elem))
             .chain(
                 $crate::hiter![($($elems),*): $m]
-                .map($ccrate::coproduct::Cocons::Tail)
+                .map($crate::coproduct::Cocons::Tail)
             )
     };
     [($($elems:expr,)*): $m:ty] => {
@@ -52,13 +52,13 @@ macro_rules! hiter {
     };
 
     [] => {
-        ::std::iter::empty<$crate::coproduct::Conil>()
+        ::std::iter::empty::<$crate::coproduct::Conil<_>>()
     };
     [$elem:expr $(, $elems:expr)*] => {
         ::std::iter::once($crate::coproduct::Cocons::Head($elem))
             .chain(
                 $crate::hiter![$($elems),*]
-                .map($ccrate::coproduct::Cocons::Tail)
+                .map($crate::coproduct::Cocons::Tail)
             )
     };
     [$($elems:expr,)*] => {

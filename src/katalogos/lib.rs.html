@@ -340,7 +340,7 @@
         ::std::iter::once(<span class="macro-nonterminal">$crate::coproduct::Cocons::Head</span>(<span class="macro-nonterminal">$elem</span>))
             .chain(
                 <span class="macro-nonterminal">$</span><span class="macro">crate::hiter!</span>[($(<span class="macro-nonterminal">$elems</span>),<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>]
-                .map(<span class="macro-nonterminal">$ccrate::coproduct::Cocons::Tail</span>)
+                .map(<span class="macro-nonterminal">$crate::coproduct::Cocons::Tail</span>)
             )
     };
     [($(<span class="macro-nonterminal">$elems</span>:expr,)<span class="kw-2">*</span>): <span class="macro-nonterminal">$m</span>:ty] =&gt; {
@@ -348,13 +348,13 @@
     };
 
     [] =&gt; {
-        ::std::iter::empty&lt;<span class="macro-nonterminal">$crate::coproduct::Conil</span>&gt;()
+        ::std::iter::empty::&lt;<span class="macro-nonterminal">$crate::coproduct::Conil</span>&lt;<span class="kw">_</span>&gt;&gt;()
     };
     [<span class="macro-nonterminal">$elem</span>:expr $(, <span class="macro-nonterminal">$elems</span>:expr)<span class="kw-2">*</span>] =&gt; {
         ::std::iter::once(<span class="macro-nonterminal">$crate::coproduct::Cocons::Head</span>(<span class="macro-nonterminal">$elem</span>))
             .chain(
                 <span class="macro-nonterminal">$</span><span class="macro">crate::hiter!</span>[$(<span class="macro-nonterminal">$elems</span>),<span class="kw-2">*</span>]
-                .map(<span class="macro-nonterminal">$ccrate::coproduct::Cocons::Tail</span>)
+                .map(<span class="macro-nonterminal">$crate::coproduct::Cocons::Tail</span>)
             )
     };
     [$(<span class="macro-nonterminal">$elems</span>:expr,)<span class="kw-2">*</span>] =&gt; {

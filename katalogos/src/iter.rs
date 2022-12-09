@@ -4,12 +4,10 @@
 /// reference.
 pub trait IntoIterRef {
     /// Item of the iterator.
-    type Item<'item>
-    where
-        Self: 'item;
+    type Item;
 
     /// Type of the iterator.
-    type Iter<'item>: Iterator<Item = Self::Item<'item>>
+    type Iter<'item>: Iterator<Item = &'item Self::Item>
     where
         Self: 'item;
 
@@ -21,17 +19,18 @@ pub trait IntoIterRef {
     fn concat(self) -> Concat<Self>
     where
         Self: Sized,
-        for<'item> Self::Item<'item>: IntoIterRef,
+        Self::Item: IntoIterRef,
     {
         Concat(self)
     }
 }
 
-impl<T> IntoIterRef for T
+impl<T, I> IntoIterRef for T
 where
-    for<'this> &'this T: IntoIterator,
+    for<'this> &'this T: IntoIterator<Item = &'this I>,
+    I: ?Sized,
 {
-    type Item<'item> = <&'item T as IntoIterator>::Item where T: 'item;
+    type Item = I;
     type Iter<'item> = <&'item T as IntoIterator>::IntoIter where T: 'item;
 
     fn iter<'item>(&'item self) -> Self::Iter<'item> {
@@ -39,19 +38,26 @@ where
     }
 }
 
+pub trait IntoIterRefNested {
+    type Item: IntoIterRef;
+    type IntoIter: Iterator<Item = Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter;
+}
+
 /// Concatenates the elements of the given iterable, assuming they're iterable
 /// as well, flattening the outer list.
 pub struct Concat<L>(pub L)
 where
     L: IntoIterRef,
-    for<'this> L::Item<'this>: IntoIterRef;
+    L::Item: IntoIterRef;
 
 impl<'this, L> IntoIterator for &'this Concat<L>
 where
     L: IntoIterRef,
-    for<'r> L::Item<'r>: IntoIterRef,
+    L::Item: IntoIterRef,
 {
-    type Item = <L::Item<'this> as IntoIterRef>::Item<'this>;
+    type Item = &'this <L::Item as IntoIterRef>::Item;
     type IntoIter = ConcatIntoIter<'this, L>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -64,18 +70,18 @@ where
 pub struct ConcatIntoIter<'this, L>
 where
     L: IntoIterRef + 'this,
-    L::Item<'this>: IntoIterRef,
+    L::Item: IntoIterRef,
 {
     outer: L::Iter<'this>,
-    inner: Option<<L::Item<'this> as IntoIterRef>::Iter<'this>>,
+    inner: Option<<L::Item as IntoIterRef>::Iter<'this>>,
 }
 
 impl<'this, L> Iterator for ConcatIntoIter<'this, L>
 where
     L: IntoIterRef + 'this,
-    L::Item<'this>: IntoIterRef,
+    L::Item: IntoIterRef,
 {
-    type Item = <L::Item<'this> as IntoIterRef>::Item<'this>;
+    type Item = &'this <L::Item as IntoIterRef>::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {

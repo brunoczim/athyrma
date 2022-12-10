@@ -66,6 +66,14 @@ macro_rules! hvec {
 /// array, while preserving static dispatch.
 #[macro_export]
 macro_rules! harray {
+    [] => {
+        [] as [$crate::coproduct::Conil<_>; 0]
+    };
+
+    [(): $m:ty] => {
+        [] as [$crate::coproduct::Conil<$m>; 0]
+    };
+
     [($($elems:expr),*): $m:ty] => {
         $crate::harray![
             @done_in = []

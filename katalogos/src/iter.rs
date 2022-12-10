@@ -98,6 +98,7 @@ mod test {
     use super::IntoIterRef;
     use crate::{harray, hvec};
 
+    /*
     #[test]
     fn should_concat_correctly() {
         let elements =
@@ -109,4 +110,5 @@ mod test {
 
         assert_eq!(elements, &["1", "2", "3", "5", "7", "12", "8", "9"]);
     }
+    */
 }

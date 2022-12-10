@@ -29,7 +29,8 @@ where
     A: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     /// Title of the page/article.
     pub title: String,
@@ -48,7 +49,8 @@ where
     A: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_struct("Page");
@@ -68,7 +70,8 @@ where
     A: Component<Kind = AssetComponent> + Clone,
     B: Component<Kind = BlockComponent> + Clone,
     L: IntoIterRef + Clone,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     fn clone(&self) -> Self {
         Self {
@@ -85,7 +88,8 @@ where
     A: Component<Kind = AssetComponent> + PartialEq,
     B: Component<Kind = BlockComponent> + PartialEq,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialEq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.title == other.title
@@ -100,7 +104,8 @@ where
     A: Component<Kind = AssetComponent> + Eq,
     B: Component<Kind = BlockComponent> + Eq,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Eq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Eq,
 {
 }
 
@@ -109,7 +114,8 @@ where
     A: Component<Kind = AssetComponent> + PartialOrd,
     B: Component<Kind = BlockComponent> + PartialOrd,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialOrd,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let ordering = self
@@ -127,7 +133,8 @@ where
     A: Component<Kind = AssetComponent> + Ord,
     B: Component<Kind = BlockComponent> + Ord,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Ord,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.title
@@ -143,7 +150,8 @@ where
     A: Component<Kind = AssetComponent> + Hash,
     B: Component<Kind = BlockComponent> + Hash,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -163,7 +171,8 @@ where
     A: Component<Kind = AssetComponent> + Default,
     B: Component<Kind = BlockComponent> + Default,
     L: IntoIterRef + Default,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     fn default() -> Self {
         Self {
@@ -180,7 +189,8 @@ where
     A: Component<Kind = AssetComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     type Kind = PageComponent;
 }
@@ -190,7 +200,8 @@ where
     A: Render<Html, Kind = AssetComponent>,
     B: Render<Html, Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Html, Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = SectionComponent>,
 {
     fn render(
         &self,
@@ -230,7 +241,8 @@ where
     A: Component<Kind = AssetComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Markdown, Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = SectionComponent>,
 {
     fn render(
         &self,
@@ -253,7 +265,8 @@ where
     A: Component<Kind = AssetComponent>,
     B: Render<Text, Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Text, Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = SectionComponent>,
 {
     fn render(
         &self,

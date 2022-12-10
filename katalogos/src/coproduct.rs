@@ -23,7 +23,7 @@ enum Void {}
 
 /// Nil is the empty list. Conil is the dual of the empty list: an empty
 /// co-product, impossible to construct.
-pub struct Conil<M>(Void, PhantomData<M>)
+pub struct Conil<M = ()>(Void, PhantomData<M>)
 where
     M: ?Sized;
 

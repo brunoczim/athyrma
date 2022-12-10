@@ -100,10 +100,13 @@ mod test {
 
     #[test]
     fn should_concat_correctly() {
-        let elements = harray![harray![4, 5], hvec![7, 8, 9]]
-            .concat()
-            .iter()
-            .map(|elem| elem.to_string())
-            .collect::<Vec<_>>();
+        let elements =
+            harray![harray![1, 2, 3], harray![5, 7], hvec![12, 8, 9]]
+                .concat()
+                .iter()
+                .map(|elem| elem.to_string())
+                .collect::<Vec<_>>();
+
+        assert_eq!(elements, &["1", "2", "3", "5", "7", "12", "8", "9"]);
     }
 }

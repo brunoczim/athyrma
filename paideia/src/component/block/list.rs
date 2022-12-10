@@ -17,12 +17,14 @@ use std::{
 pub struct UnorderedList<L>(pub L)
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>;
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>;
 
 impl<L> fmt::Debug for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_tuple("UnorderedList");
@@ -36,7 +38,8 @@ where
 impl<L> Clone for UnorderedList<L>
 where
     L: IntoIterRef + Clone,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -46,14 +49,16 @@ where
 impl<L> Copy for UnorderedList<L>
 where
     L: IntoIterRef + Copy,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
 }
 
 impl<L> PartialEq for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialEq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.0.iter().eq(other.0.iter())
@@ -63,14 +68,16 @@ where
 impl<L> Eq for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Eq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + Eq,
 {
 }
 
 impl<L> PartialOrd for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialOrd,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.iter().partial_cmp(other.0.iter())
@@ -80,7 +87,8 @@ where
 impl<L> Ord for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Ord,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.iter().cmp(other.0.iter())
@@ -90,7 +98,8 @@ where
 impl<L> Hash for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -106,7 +115,8 @@ where
 impl<L> Default for UnorderedList<L>
 where
     L: IntoIterRef + Default,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     fn default() -> Self {
         Self(L::default())
@@ -116,7 +126,8 @@ where
 impl<L> Component for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     type Kind = BlockComponent;
 }
@@ -124,7 +135,8 @@ where
 impl<L> Render<Html> for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Html, Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -145,7 +157,8 @@ where
 impl<L> Render<Markdown> for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Markdown, Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -166,7 +179,8 @@ where
 impl<L> Render<Text> for UnorderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Text, Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -190,12 +204,14 @@ where
 pub struct OrderedList<L>(pub L)
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>;
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>;
 
 impl<L> fmt::Debug for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_tuple("OrderedList");
@@ -209,7 +225,8 @@ where
 impl<L> Clone for OrderedList<L>
 where
     L: IntoIterRef + Clone,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -219,14 +236,16 @@ where
 impl<L> Copy for OrderedList<L>
 where
     L: IntoIterRef + Copy,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
 }
 
 impl<L> PartialEq for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialEq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.0.iter().eq(other.0.iter())
@@ -236,14 +255,16 @@ where
 impl<L> Eq for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Eq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + Eq,
 {
 }
 
 impl<L> PartialOrd for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + PartialOrd,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.iter().partial_cmp(other.0.iter())
@@ -253,7 +274,8 @@ where
 impl<L> Ord for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Ord,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.iter().cmp(other.0.iter())
@@ -263,7 +285,8 @@ where
 impl<L> Hash for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -279,7 +302,8 @@ where
 impl<L> Default for OrderedList<L>
 where
     L: IntoIterRef + Default,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     fn default() -> Self {
         Self(L::default())
@@ -289,7 +313,8 @@ where
 impl<L> Component for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = BlockComponent>,
 {
     type Kind = BlockComponent;
 }
@@ -297,7 +322,8 @@ where
 impl<L> Render<Html> for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Html, Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -318,7 +344,8 @@ where
 impl<L> Render<Markdown> for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Markdown, Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = BlockComponent>,
 {
     fn render(
         &self,
@@ -339,7 +366,8 @@ where
 impl<L> Render<Text> for OrderedList<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Text, Kind = BlockComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = BlockComponent>,
 {
     fn render(
         &self,

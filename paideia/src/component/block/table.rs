@@ -146,12 +146,12 @@ where
 pub struct Row<C>(pub C)
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent>;
+    for<'item> <C as IntoIterRef>::Item<'item>: Component<Kind = CellComponent>;
 
 impl<C> fmt::Debug for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>: Component<Kind = CellComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_tuple("Row");
@@ -165,7 +165,7 @@ where
 impl<C> Clone for Row<C>
 where
     C: IntoIterRef + Clone,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>: Component<Kind = CellComponent>,
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -175,14 +175,15 @@ where
 impl<C> Copy for Row<C>
 where
     C: IntoIterRef + Copy,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>: Component<Kind = CellComponent>,
 {
 }
 
 impl<C> PartialEq for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent> + PartialEq,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Component<Kind = CellComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.0.iter().eq(other.0.iter())
@@ -192,14 +193,16 @@ where
 impl<C> Eq for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent> + Eq,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Component<Kind = CellComponent> + Eq,
 {
 }
 
 impl<C> PartialOrd for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent> + PartialOrd,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Component<Kind = CellComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.iter().partial_cmp(other.0.iter())
@@ -209,7 +212,8 @@ where
 impl<C> Ord for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent> + Ord,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Component<Kind = CellComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.iter().cmp(other.0.iter())
@@ -219,7 +223,8 @@ where
 impl<C> Hash for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent> + Hash,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Component<Kind = CellComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -235,7 +240,7 @@ where
 impl<C> Default for Row<C>
 where
     C: IntoIterRef + Default,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>: Component<Kind = CellComponent>,
 {
     fn default() -> Self {
         Self(C::default())
@@ -245,7 +250,7 @@ where
 impl<C> Component for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Component<Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>: Component<Kind = CellComponent>,
 {
     type Kind = RowComponent;
 }
@@ -253,7 +258,8 @@ where
 impl<C> Render<Html> for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Render<Html, Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = CellComponent>,
 {
     fn render(
         &self,
@@ -272,7 +278,8 @@ where
 impl<C> Render<Markdown> for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Render<Markdown, Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = CellComponent>,
 {
     fn render(
         &self,
@@ -291,7 +298,8 @@ where
 impl<C> Render<Text> for Row<C>
 where
     C: IntoIterRef,
-    <C as IntoIterRef>::Item: Render<Text, Kind = CellComponent>,
+    for<'item> <C as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = CellComponent>,
 {
     fn render(
         &self,
@@ -311,12 +319,12 @@ where
 pub struct Table<L>(pub L)
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>;
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>;
 
 impl<L> fmt::Debug for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_tuple("Table");
@@ -330,7 +338,7 @@ where
 impl<L> Clone for Table<L>
 where
     L: IntoIterRef + Clone,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -340,14 +348,15 @@ where
 impl<L> Copy for Table<L>
 where
     L: IntoIterRef + Copy,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
 }
 
 impl<L> PartialEq for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + PartialEq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.0.iter().eq(other.0.iter())
@@ -357,14 +366,16 @@ where
 impl<L> Eq for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Eq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + Eq,
 {
 }
 
 impl<L> PartialOrd for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + PartialOrd,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.iter().partial_cmp(other.0.iter())
@@ -374,7 +385,8 @@ where
 impl<L> Ord for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Ord,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.iter().cmp(other.0.iter())
@@ -384,7 +396,8 @@ where
 impl<L> Hash for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -400,7 +413,7 @@ where
 impl<L> Default for Table<L>
 where
     L: IntoIterRef + Default,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     fn default() -> Self {
         Self(L::default())
@@ -410,7 +423,7 @@ where
 impl<L> Component for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     type Kind = BlockComponent;
 }
@@ -418,7 +431,8 @@ where
 impl<L> Render<Html> for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Html, Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = RowComponent>,
 {
     fn render(
         &self,
@@ -437,7 +451,8 @@ where
 impl<L> Render<Markdown> for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Markdown, Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = RowComponent>,
 {
     fn render(
         &self,
@@ -456,7 +471,8 @@ where
 impl<L> Render<Text> for Table<L>
 where
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Text, Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = RowComponent>,
 {
     fn render(
         &self,
@@ -477,7 +493,7 @@ pub struct CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     /// The caption of this table.
     caption: C,
@@ -489,7 +505,7 @@ impl<C, L> fmt::Debug for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmtr.debug_struct("CaptionedTable")
@@ -503,7 +519,7 @@ impl<C, L> Clone for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + Clone,
     L: IntoIterRef + Clone,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     fn clone(&self) -> Self {
         Self { caption: self.caption.clone(), table: self.table.clone() }
@@ -514,7 +530,7 @@ impl<C, L> Copy for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + Copy,
     L: IntoIterRef + Copy,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
 }
 
@@ -522,7 +538,8 @@ impl<C, L> PartialEq for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + PartialEq,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + PartialEq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.caption == other.caption && self.table == other.table
@@ -533,7 +550,8 @@ impl<C, L> Eq for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + Eq,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Eq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + Eq,
 {
 }
 
@@ -541,7 +559,8 @@ impl<C, L> PartialOrd for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + PartialOrd,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + PartialOrd,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(
@@ -556,7 +575,8 @@ impl<C, L> Ord for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + Ord,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Ord,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.caption
@@ -569,7 +589,8 @@ impl<C, L> Hash for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + Hash,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = RowComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -584,7 +605,7 @@ impl<C, L> Default for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent> + Default,
     L: IntoIterRef + Default,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     fn default() -> Self {
         Self { caption: C::default(), table: Table::default() }
@@ -595,7 +616,7 @@ impl<C, L> Component for CaptionedTable<C, L>
 where
     C: Component<Kind = InlineComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>: Component<Kind = RowComponent>,
 {
     type Kind = BlockComponent;
 }
@@ -604,7 +625,8 @@ impl<C, L> Render<Html> for CaptionedTable<C, L>
 where
     C: Render<Html, Kind = InlineComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Html, Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = RowComponent>,
 {
     fn render(
         &self,
@@ -626,7 +648,8 @@ impl<C, L> Render<Markdown> for CaptionedTable<C, L>
 where
     C: Render<Markdown, Kind = InlineComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Markdown, Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = RowComponent>,
 {
     fn render(
         &self,
@@ -648,7 +671,8 @@ impl<C, L> Render<Text> for CaptionedTable<C, L>
 where
     C: Render<Text, Kind = InlineComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Text, Kind = RowComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = RowComponent>,
 {
     fn render(
         &self,

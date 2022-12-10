@@ -25,7 +25,8 @@ where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     /// Title of the section.
     pub title: T,
@@ -43,7 +44,8 @@ where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         let mut debug_fmtr = fmtr.debug_struct("Section");
@@ -63,7 +65,8 @@ where
     T: Component<Kind = InlineComponent> + Clone,
     B: Component<Kind = BlockComponent> + Clone,
     L: IntoIterRef + Clone,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent>,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent>,
 {
     fn clone(&self) -> Self {
         Self {
@@ -80,7 +83,8 @@ where
     T: Component<Kind = InlineComponent> + PartialEq,
     B: Component<Kind = BlockComponent> + PartialEq,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialEq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.title == other.title
@@ -94,7 +98,8 @@ where
     T: Component<Kind = InlineComponent> + Eq,
     B: Component<Kind = BlockComponent> + Eq,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Eq,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Eq,
 {
 }
 
@@ -103,7 +108,8 @@ where
     T: Component<Kind = InlineComponent> + PartialOrd,
     B: Component<Kind = BlockComponent> + PartialOrd,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + PartialOrd,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + PartialOrd,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let ordering = self
@@ -120,7 +126,8 @@ where
     T: Component<Kind = InlineComponent> + Ord,
     B: Component<Kind = BlockComponent> + Ord,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Ord,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.title
@@ -135,7 +142,8 @@ where
     T: Component<Kind = InlineComponent> + Hash,
     B: Component<Kind = BlockComponent> + Hash,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Hash,
 {
     fn hash<H>(&self, state: &mut H)
     where
@@ -155,7 +163,8 @@ where
     T: Component<Kind = InlineComponent> + Default,
     B: Component<Kind = BlockComponent> + Default,
     L: IntoIterRef + Default,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Hash,
 {
     fn default() -> Self {
         Self {
@@ -172,7 +181,8 @@ where
     T: Component<Kind = InlineComponent>,
     B: Component<Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Component<Kind = SectionComponent> + Hash,
 {
     type Kind = SectionComponent;
 }
@@ -182,7 +192,8 @@ where
     T: Render<Html, Kind = InlineComponent>,
     B: Render<Html, Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Html, Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Html, Kind = SectionComponent> + Hash,
 {
     fn render(
         &self,
@@ -244,7 +255,8 @@ where
     T: Render<Markdown, Kind = InlineComponent>,
     B: Render<Markdown, Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Markdown, Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Markdown, Kind = SectionComponent> + Hash,
 {
     fn render(
         &self,
@@ -293,7 +305,8 @@ where
     T: Render<Text, Kind = InlineComponent>,
     B: Render<Text, Kind = BlockComponent>,
     L: IntoIterRef,
-    <L as IntoIterRef>::Item: Render<Text, Kind = SectionComponent> + Hash,
+    for<'item> <L as IntoIterRef>::Item<'item>:
+        Render<Text, Kind = SectionComponent> + Hash,
 {
     fn render(
         &self,

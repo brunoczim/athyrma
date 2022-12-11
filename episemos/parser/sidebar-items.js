@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["SyntaxTree",""]],"fn":[["parse",""]],"struct":[["SyntaxTreeBranch",""],["SyntaxTreeLeaf",""]]};

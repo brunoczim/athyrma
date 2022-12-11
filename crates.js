@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["athyrma","diakritikos","form_urlencoded","glossa","hashbrown","idna","indexmap","katalogos","paideia","percent_encoding","phonetikos","phonologia","tinyvec","tinyvec_macros","unicode_bidi","unicode_normalization","url"];
+window.ALL_CRATES = ["athyrma","diakritikos","episemos","form_urlencoded","glossa","hashbrown","idna","indexmap","katalogos","paideia","percent_encoding","phonetikos","phonologia","tinyvec","tinyvec_macros","unicode_bidi","unicode_normalization","url"];

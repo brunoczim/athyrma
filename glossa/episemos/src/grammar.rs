@@ -22,6 +22,68 @@ impl<T, N> Symbol<T, N> {
     pub fn is_non_terminal(&self) -> bool {
         matches!(self, Self::NonTerm(_))
     }
+
+    pub fn as_ref(&self) -> Symbol<&T, &N> {
+        match self {
+            Self::Terminal(term) => Symbol::Terminal(term),
+            Self::NonTerm(nonterm) => Symbol::NonTerm(nonterm),
+        }
+    }
+
+    pub fn as_mut(&mut self) -> Symbol<&mut T, &mut N> {
+        match self {
+            Self::Terminal(term) => Symbol::Terminal(term),
+            Self::NonTerm(nonterm) => Symbol::NonTerm(nonterm),
+        }
+    }
+}
+
+impl<'term, 'nonterm, T, N> Symbol<&'term T, &'nonterm N> {
+    pub fn cloned(&self) -> Symbol<T, N>
+    where
+        T: Clone,
+        N: Clone,
+    {
+        match *self {
+            Self::Terminal(term) => Symbol::Terminal(term.clone()),
+            Self::NonTerm(nonterm) => Symbol::NonTerm(nonterm.clone()),
+        }
+    }
+
+    pub fn copied(&self) -> Symbol<T, N>
+    where
+        T: Copy,
+        N: Copy,
+    {
+        match *self {
+            Self::Terminal(term) => Symbol::Terminal(*term),
+            Self::NonTerm(nonterm) => Symbol::NonTerm(*nonterm),
+        }
+    }
+}
+
+impl<'term, 'nonterm, T, N> Symbol<&'term mut T, &'nonterm mut N> {
+    pub fn cloned(&self) -> Symbol<T, N>
+    where
+        T: Clone,
+        N: Clone,
+    {
+        match self {
+            Self::Terminal(term) => Symbol::Terminal((*term).clone()),
+            Self::NonTerm(nonterm) => Symbol::NonTerm((*nonterm).clone()),
+        }
+    }
+
+    pub fn copied(&self) -> Symbol<T, N>
+    where
+        T: Copy,
+        N: Copy,
+    {
+        match self {
+            Self::Terminal(term) => Symbol::Terminal(**term),
+            Self::NonTerm(nonterm) => Symbol::NonTerm(**nonterm),
+        }
+    }
 }
 
 impl<T, N> Default for Symbol<T, N>

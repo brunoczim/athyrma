@@ -2,8 +2,8 @@ use std::collections::BTreeSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Grammar<T, N> {
-    pub terminals: BTreeSet<T>,
-    pub non_terminals: BTreeSet<N>,
+    pub terminals: Vec<T>,
+    pub non_terminals: Vec<N>,
     pub starting_non_term: N,
     pub productions: Vec<Production<T, N>>,
 }
@@ -188,5 +188,106 @@ where
             count += 1;
         }
         count
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod test {
+    use super::{Grammar, Production, Symbol};
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub enum LambdaCalcTerm {
+        Ident,
+        Lambda,
+        Dot,
+        OpenParen,
+        CloseParen,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub enum LambdaCalcNonTerm {
+        Start,
+        Var,
+        App,
+        Lambda,
+        Expr,
+    }
+
+    pub fn lambda_calc_grammar() -> Grammar<LambdaCalcTerm, LambdaCalcNonTerm> {
+        Grammar {
+            terminals: vec![
+                LambdaCalcTerm::Ident,
+                LambdaCalcTerm::Lambda,
+                LambdaCalcTerm::Dot,
+                LambdaCalcTerm::OpenParen,
+                LambdaCalcTerm::CloseParen,
+            ],
+            non_terminals: vec![
+                LambdaCalcNonTerm::Start,
+                LambdaCalcNonTerm::Var,
+                LambdaCalcNonTerm::App,
+                LambdaCalcNonTerm::Lambda,
+                LambdaCalcNonTerm::Expr,
+            ],
+            starting_non_term: LambdaCalcNonTerm::Start,
+            productions: vec![
+                Production {
+                    input: LambdaCalcNonTerm::Var,
+                    output: vec![Symbol::Terminal(LambdaCalcTerm::Ident)],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::Lambda,
+                    output: vec![
+                        Symbol::Terminal(LambdaCalcTerm::Lambda),
+                        Symbol::Terminal(LambdaCalcTerm::Ident),
+                        Symbol::Terminal(LambdaCalcTerm::Dot),
+                        Symbol::NonTerm(LambdaCalcNonTerm::Expr),
+                    ],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::App,
+                    output: vec![
+                        Symbol::NonTerm(LambdaCalcNonTerm::Var),
+                        Symbol::NonTerm(LambdaCalcNonTerm::Expr),
+                    ],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::App,
+                    output: vec![
+                        Symbol::NonTerm(LambdaCalcNonTerm::App),
+                        Symbol::NonTerm(LambdaCalcNonTerm::Expr),
+                    ],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::App,
+                    output: vec![
+                        Symbol::Terminal(LambdaCalcTerm::OpenParen),
+                        Symbol::NonTerm(LambdaCalcNonTerm::Expr),
+                        Symbol::Terminal(LambdaCalcTerm::CloseParen),
+                        Symbol::NonTerm(LambdaCalcNonTerm::Expr),
+                    ],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::Expr,
+                    output: vec![Symbol::NonTerm(LambdaCalcNonTerm::Var)],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::Expr,
+                    output: vec![Symbol::NonTerm(LambdaCalcNonTerm::Lambda)],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::Expr,
+                    output: vec![Symbol::NonTerm(LambdaCalcNonTerm::App)],
+                },
+                Production {
+                    input: LambdaCalcNonTerm::Expr,
+                    output: vec![
+                        Symbol::Terminal(LambdaCalcTerm::OpenParen),
+                        Symbol::NonTerm(LambdaCalcNonTerm::Expr),
+                        Symbol::Terminal(LambdaCalcTerm::CloseParen),
+                    ],
+                },
+            ],
+        }
     }
 }

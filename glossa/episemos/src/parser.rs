@@ -309,3 +309,14 @@ where
     parser.derive();
     parser.solutions()
 }
+
+#[cfg(test)]
+mod test {
+    use super::parse;
+    use crate::grammar::test::{lambda_calc_grammar, LambdaCalcTerm};
+
+    #[test]
+    fn lambda_calc() {
+        parse(&lambda_calc_grammar(), &[LambdaCalcTerm::OpenParen]);
+    }
+}

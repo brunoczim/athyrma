@@ -1,5 +1,8 @@
 use crate::grammar::{Grammar, Symbol};
-use std::collections::{btree_set, BTreeSet};
+use std::{
+    collections::{btree_set, BTreeSet},
+    fmt,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SyntaxTree<T, N> {
@@ -140,33 +143,20 @@ struct Candidate<T, N> {
     syntax_tree: SyntaxTree<T, N>,
 }
 
-impl<T, N> Candidate<T, N> {
-    pub fn from_syntax_tree(
-        start: usize,
-        syntax_tree: SyntaxTree<T, N>,
-    ) -> Self {
-        Self { start, length: syntax_tree.count_leaves(), syntax_tree }
-    }
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+struct Attempt<T, N> {
+    start: usize,
+    length: usize,
+    children: Vec<SyntaxTree<T, N>>,
+}
 
+impl<T, N> Candidate<T, N> {
     pub fn from_leaf(start: usize, symbol: T) -> Self {
         Self {
             start,
             length: 1,
             syntax_tree: SyntaxTree::Leaf(SyntaxTreeLeaf { symbol }),
         }
-    }
-
-    pub fn from_branch<I>(start: usize, label: N, children: I) -> Self
-    where
-        I: IntoIterator<Item = Self>,
-    {
-        let mut branch = SyntaxTreeBranch { label, children: Vec::new() };
-        let mut length = 0;
-        for candidate in children {
-            length += candidate.length;
-            branch.children.push(candidate.syntax_tree);
-        }
-        Self { start, length, syntax_tree: SyntaxTree::Branch(branch) }
     }
 }
 
@@ -188,6 +178,8 @@ struct Parser<'grammar, T, N> {
 
 impl<'grammar, T, N> Parser<'grammar, T, N>
 where
+    T: fmt::Debug,
+    N: fmt::Debug,
     T: Ord,
     N: Ord,
 {
@@ -221,42 +213,53 @@ where
         while self.iterate() {}
     }
 
+    fn attempt_symbol(
+        attempts: &mut BTreeSet<Attempt<&'grammar T, &'grammar N>>,
+        candidate: &Candidate<&'grammar T, &'grammar N>,
+    ) {
+        let mut additional_attempts = BTreeSet::new();
+        for attempt in &*attempts {
+            if attempt.start + attempt.length == candidate.start {
+                let mut attempt = attempt.clone();
+                attempt.length += candidate.length;
+                attempt.children.push(candidate.syntax_tree.clone());
+                additional_attempts.insert(attempt);
+            }
+        }
+        for attempt in additional_attempts {
+            attempts.insert(attempt);
+        }
+        attempts.insert(Attempt {
+            start: candidate.start,
+            length: candidate.length,
+            children: vec![candidate.syntax_tree.clone()],
+        });
+    }
+
     fn iterate(&mut self) -> bool {
+        let mut attempts = BTreeSet::new();
+        for candidate in &self.candidates {
+            Self::attempt_symbol(&mut attempts, candidate);
+        }
+
         let mut found = false;
-
-        let grammar = self.grammar;
-        for production in &grammar.productions {
-            let mut candidates = self.candidates.clone();
-            for start in 0 .. self.input_length {
-                candidates.retain(|candidate| candidate.start >= start);
-                let mut children = Vec::<Candidate<&T, &N>>::new();
-
-                loop {
-                    let matches =
-                        production.output.iter().map(Symbol::as_ref).eq(
-                            children.iter().map(|child| {
-                                child.syntax_tree.top_symbol().copied()
+        for production in &self.grammar.productions {
+            for attempt in &attempts {
+                if attempt
+                    .children
+                    .iter()
+                    .map(|tree| tree.top_symbol().copied())
+                    .eq(production.output.iter().map(|symbol| symbol.as_ref()))
+                {
+                    found = found
+                        || self.candidates.insert(Candidate {
+                            start: attempt.start,
+                            length: attempt.length,
+                            syntax_tree: SyntaxTree::Branch(SyntaxTreeBranch {
+                                label: &production.input,
+                                children: attempt.children.clone(),
                             }),
-                        );
-
-                    if matches
-                        && self.candidates.insert(Candidate::from_branch(
-                            start,
-                            &production.input,
-                            children.iter().cloned(),
-                        ))
-                    {
-                        found = true;
-                        break;
-                    }
-
-                    // TODO replace for .first() when stable
-                    match candidates.iter().next() {
-                        Some(child) => {
-                            children.push(child.clone());
-                        },
-                        None => break,
-                    }
+                        });
                 }
             }
         }
@@ -297,6 +300,7 @@ where
     }
 }
 
+/// HORRIBLE, at best Omega(n^3)
 pub fn parse<'grammar, T, N>(
     grammar: &'grammar Grammar<T, N>,
     input: &[T],
@@ -304,6 +308,8 @@ pub fn parse<'grammar, T, N>(
 where
     T: Ord,
     N: Ord,
+    T: fmt::Debug,
+    N: fmt::Debug,
 {
     let mut parser = Parser::new(grammar, input);
     parser.derive();
@@ -313,10 +319,132 @@ where
 #[cfg(test)]
 mod test {
     use super::parse;
-    use crate::grammar::test::{lambda_calc_grammar, LambdaCalcTerm};
+    use crate::{
+        grammar::test::{
+            lambda_calc_grammar,
+            LambdaCalcNonTerm,
+            LambdaCalcTerm,
+        },
+        parser::{SyntaxTree, SyntaxTreeBranch, SyntaxTreeLeaf},
+    };
 
     #[test]
-    fn lambda_calc() {
-        parse(&lambda_calc_grammar(), &[LambdaCalcTerm::OpenParen]);
+    fn simple_lambda_calc() {
+        use LambdaCalcNonTerm::*;
+        use LambdaCalcTerm::*;
+        use SyntaxTree::*;
+
+        let grammar = lambda_calc_grammar();
+        let solution_iter = parse(&grammar, &[OpenParen, Ident, CloseParen]);
+        let solutions =
+            solution_iter.map(|solution| solution.cloned()).collect::<Vec<_>>();
+        assert_eq!(solutions, &[Branch(SyntaxTreeBranch {
+            label: Start,
+            children: vec![Branch(SyntaxTreeBranch {
+                label: Expr,
+                children: vec![
+                    Leaf(SyntaxTreeLeaf { symbol: OpenParen }),
+                    Branch(SyntaxTreeBranch {
+                        label: Expr,
+                        children: vec![Branch(SyntaxTreeBranch {
+                            label: Var,
+                            children: vec![Leaf(SyntaxTreeLeaf {
+                                symbol: Ident,
+                            })],
+                        })],
+                    }),
+                    Leaf(SyntaxTreeLeaf { symbol: CloseParen }),
+                ]
+            })],
+        })]);
+    }
+
+    #[test]
+    fn lambda_lambda_calc() {
+        use LambdaCalcNonTerm::*;
+        use LambdaCalcTerm::*;
+        use SyntaxTree::*;
+
+        let grammar = lambda_calc_grammar();
+        let solution_iter = parse(&grammar, &[
+            OpenParen,
+            LambdaCalcTerm::Lambda,
+            Ident,
+            Dot,
+            Ident,
+            Ident,
+            CloseParen,
+            Ident,
+        ]);
+        let solutions =
+            solution_iter.map(|solution| solution.cloned()).collect::<Vec<_>>();
+
+        assert_eq!(solutions, &[Branch(SyntaxTreeBranch {
+            label: Start,
+            children: vec![Branch(SyntaxTreeBranch {
+                label: Expr,
+                children: vec![Branch(SyntaxTreeBranch {
+                    label: App,
+                    children: vec![
+                        Leaf(SyntaxTreeLeaf { symbol: OpenParen }),
+                        Branch(SyntaxTreeBranch {
+                            label: Expr,
+                            children: vec![Branch(SyntaxTreeBranch {
+                                label: LambdaCalcNonTerm::Lambda,
+                                children: vec![
+                                    Leaf(SyntaxTreeLeaf {
+                                        symbol: LambdaCalcTerm::Lambda,
+                                    }),
+                                    Leaf(SyntaxTreeLeaf { symbol: Ident }),
+                                    Leaf(SyntaxTreeLeaf { symbol: Dot }),
+                                    Branch(SyntaxTreeBranch {
+                                        label: Expr,
+                                        children: vec![Branch(
+                                            SyntaxTreeBranch {
+                                                label: App,
+                                                children: vec![
+                                                    Branch(SyntaxTreeBranch {
+                                                        label: Var,
+                                                        children: vec![Leaf(
+                                                            SyntaxTreeLeaf {
+                                                                symbol: Ident,
+                                                            }
+                                                        )],
+                                                    }),
+                                                    Branch(SyntaxTreeBranch {
+                                                        label: Expr,
+                                                        children: vec![Branch(
+                                                            SyntaxTreeBranch {
+                                                                label: Var,
+                                                                children:
+                                                                    vec![Leaf(
+                                                            SyntaxTreeLeaf {
+                                                                symbol: Ident,
+                                                            }
+                                                        )],
+                                                            }
+                                                        )],
+                                                    }),
+                                                ]
+                                            }
+                                        )],
+                                    }),
+                                ],
+                            })],
+                        }),
+                        Leaf(SyntaxTreeLeaf { symbol: CloseParen }),
+                        Branch(SyntaxTreeBranch {
+                            label: Expr,
+                            children: vec![Branch(SyntaxTreeBranch {
+                                label: Var,
+                                children: vec![Leaf(SyntaxTreeLeaf {
+                                    symbol: Ident,
+                                })],
+                            })],
+                        }),
+                    ],
+                }),]
+            })],
+        })]);
     }
 }

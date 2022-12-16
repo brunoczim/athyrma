@@ -1,9 +1,7 @@
-use std::collections::BTreeSet;
-
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Grammar<T, N> {
-    pub terminals: BTreeSet<T>,
-    pub non_terminals: BTreeSet<N>,
+    pub terminals: Vec<T>,
+    pub non_terminals: Vec<N>,
     pub starting_non_term: N,
     pub productions: Vec<Production<T, N>>,
 }
@@ -188,5 +186,96 @@ where
             count += 1;
         }
         count
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod test {
+    use super::{Grammar, Production, Symbol};
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub enum LambdaCalcTerm {
+        Ident,
+        Lambda,
+        Dot,
+        OpenParen,
+        CloseParen,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub enum LambdaCalcNonTerm {
+        Start,
+        Var,
+        App,
+        Lambda,
+        Expr,
+    }
+
+    pub fn lambda_calc_grammar() -> Grammar<LambdaCalcTerm, LambdaCalcNonTerm> {
+        use LambdaCalcNonTerm::*;
+        use LambdaCalcTerm::*;
+        use Symbol::*;
+
+        Grammar {
+            terminals: vec![
+                Ident,
+                LambdaCalcTerm::Lambda,
+                Dot,
+                OpenParen,
+                CloseParen,
+            ],
+            non_terminals: vec![
+                Start,
+                Var,
+                App,
+                LambdaCalcNonTerm::Lambda,
+                Expr,
+            ],
+            starting_non_term: Start,
+            productions: vec![
+                Production { input: Start, output: vec![NonTerm(Expr)] },
+                Production { input: Var, output: vec![Terminal(Ident)] },
+                Production {
+                    input: LambdaCalcNonTerm::Lambda,
+                    output: vec![
+                        Terminal(LambdaCalcTerm::Lambda),
+                        Terminal(Ident),
+                        Terminal(Dot),
+                        NonTerm(Expr),
+                    ],
+                },
+                Production {
+                    input: App,
+                    output: vec![NonTerm(Var), NonTerm(Expr)],
+                },
+                Production {
+                    input: App,
+                    output: vec![NonTerm(App), NonTerm(Expr)],
+                },
+                Production {
+                    input: App,
+                    output: vec![
+                        Terminal(OpenParen),
+                        NonTerm(Expr),
+                        Terminal(CloseParen),
+                        NonTerm(Expr),
+                    ],
+                },
+                Production { input: Expr, output: vec![NonTerm(Var)] },
+                Production {
+                    input: Expr,
+                    output: vec![NonTerm(LambdaCalcNonTerm::Lambda)],
+                },
+                Production { input: Expr, output: vec![NonTerm(App)] },
+                Production {
+                    input: Expr,
+                    output: vec![
+                        Terminal(OpenParen),
+                        NonTerm(Expr),
+                        Terminal(CloseParen),
+                    ],
+                },
+            ],
+        }
     }
 }

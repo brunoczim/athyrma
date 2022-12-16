@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `glossa/episemos/src/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../episemos/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../episemos/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../episemos/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `glossa/episemos/src/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../episemos/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -309,8 +309,150 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::grammar::{Grammar, Symbol};
-<span class="kw">use </span>std::collections::{btree_set, BTreeSet};
+<span class="kw">use </span>std::{
+    collections::{btree_set, BTreeSet},
+    fmt,
+};
 
 <span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub enum </span>SyntaxTree&lt;T, N&gt; {
@@ -451,33 +593,20 @@
     syntax_tree: SyntaxTree&lt;T, N&gt;,
 }
 
-<span class="kw">impl</span>&lt;T, N&gt; Candidate&lt;T, N&gt; {
-    <span class="kw">pub fn </span>from_syntax_tree(
-        start: usize,
-        syntax_tree: SyntaxTree&lt;T, N&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ start, length: syntax_tree.count_leaves(), syntax_tree }
-    }
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">struct </span>Attempt&lt;T, N&gt; {
+    start: usize,
+    length: usize,
+    children: Vec&lt;SyntaxTree&lt;T, N&gt;&gt;,
+}
 
+<span class="kw">impl</span>&lt;T, N&gt; Candidate&lt;T, N&gt; {
     <span class="kw">pub fn </span>from_leaf(start: usize, symbol: T) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             start,
             length: <span class="number">1</span>,
             syntax_tree: SyntaxTree::Leaf(SyntaxTreeLeaf { symbol }),
         }
-    }
-
-    <span class="kw">pub fn </span>from_branch&lt;I&gt;(start: usize, label: N, children: I) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>I: IntoIterator&lt;Item = <span class="self">Self</span>&gt;,
-    {
-        <span class="kw">let </span><span class="kw-2">mut </span>branch = SyntaxTreeBranch { label, children: Vec::new() };
-        <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0</span>;
-        <span class="kw">for </span>candidate <span class="kw">in </span>children {
-            length += candidate.length;
-            branch.children.push(candidate.syntax_tree);
-        }
-        <span class="self">Self </span>{ start, length, syntax_tree: SyntaxTree::Branch(branch) }
     }
 }
 
@@ -499,7 +628,9 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;grammar</span>, T, N&gt; Parser&lt;<span class="lifetime">&#39;grammar</span>, T, N&gt;
 <span class="kw">where
-    </span>T: Ord,
+    </span>T: fmt::Debug,
+    N: fmt::Debug,
+    T: Ord,
     N: Ord,
 {
     <span class="kw">fn </span>new(grammar: <span class="kw-2">&amp;</span><span class="lifetime">&#39;grammar </span>Grammar&lt;T, N&gt;, input: <span class="kw-2">&amp;</span>[T]) -&gt; <span class="self">Self </span>{
@@ -532,42 +663,53 @@
         <span class="kw">while </span><span class="self">self</span>.iterate() {}
     }
 
+    <span class="kw">fn </span>attempt_symbol(
+        attempts: <span class="kw-2">&amp;mut </span>BTreeSet&lt;Attempt&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;grammar </span>T, <span class="kw-2">&amp;</span><span class="lifetime">&#39;grammar </span>N&gt;&gt;,
+        candidate: <span class="kw-2">&amp;</span>Candidate&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;grammar </span>T, <span class="kw-2">&amp;</span><span class="lifetime">&#39;grammar </span>N&gt;,
+    ) {
+        <span class="kw">let </span><span class="kw-2">mut </span>additional_attempts = BTreeSet::new();
+        <span class="kw">for </span>attempt <span class="kw">in </span><span class="kw-2">&amp;*</span>attempts {
+            <span class="kw">if </span>attempt.start + attempt.length == candidate.start {
+                <span class="kw">let </span><span class="kw-2">mut </span>attempt = attempt.clone();
+                attempt.length += candidate.length;
+                attempt.children.push(candidate.syntax_tree.clone());
+                additional_attempts.insert(attempt);
+            }
+        }
+        <span class="kw">for </span>attempt <span class="kw">in </span>additional_attempts {
+            attempts.insert(attempt);
+        }
+        attempts.insert(Attempt {
+            start: candidate.start,
+            length: candidate.length,
+            children: <span class="macro">vec!</span>[candidate.syntax_tree.clone()],
+        });
+    }
+
     <span class="kw">fn </span>iterate(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>attempts = BTreeSet::new();
+        <span class="kw">for </span>candidate <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.candidates {
+            <span class="self">Self</span>::attempt_symbol(<span class="kw-2">&amp;mut </span>attempts, candidate);
+        }
+
         <span class="kw">let </span><span class="kw-2">mut </span>found = <span class="bool-val">false</span>;
-
-        <span class="kw">let </span>grammar = <span class="self">self</span>.grammar;
-        <span class="kw">for </span>production <span class="kw">in </span><span class="kw-2">&amp;</span>grammar.productions {
-            <span class="kw">let </span><span class="kw-2">mut </span>candidates = <span class="self">self</span>.candidates.clone();
-            <span class="kw">for </span>start <span class="kw">in </span><span class="number">0 </span>.. <span class="self">self</span>.input_length {
-                candidates.retain(|candidate| candidate.start &gt;= start);
-                <span class="kw">let </span><span class="kw-2">mut </span>children = Vec::&lt;Candidate&lt;<span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>N&gt;&gt;::new();
-
-                <span class="kw">loop </span>{
-                    <span class="kw">let </span>matches =
-                        production.output.iter().map(Symbol::as_ref).eq(
-                            children.iter().map(|child| {
-                                child.syntax_tree.top_symbol().copied()
+        <span class="kw">for </span>production <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.grammar.productions {
+            <span class="kw">for </span>attempt <span class="kw">in </span><span class="kw-2">&amp;</span>attempts {
+                <span class="kw">if </span>attempt
+                    .children
+                    .iter()
+                    .map(|tree| tree.top_symbol().copied())
+                    .eq(production.output.iter().map(|symbol| symbol.as_ref()))
+                {
+                    found = found
+                        || <span class="self">self</span>.candidates.insert(Candidate {
+                            start: attempt.start,
+                            length: attempt.length,
+                            syntax_tree: SyntaxTree::Branch(SyntaxTreeBranch {
+                                label: <span class="kw-2">&amp;</span>production.input,
+                                children: attempt.children.clone(),
                             }),
-                        );
-
-                    <span class="kw">if </span>matches
-                        &amp;&amp; <span class="self">self</span>.candidates.insert(Candidate::from_branch(
-                            start,
-                            <span class="kw-2">&amp;</span>production.input,
-                            children.iter().cloned(),
-                        ))
-                    {
-                        found = <span class="bool-val">true</span>;
-                        <span class="kw">break</span>;
-                    }
-
-                    <span class="comment">// TODO replace for .first() when stable
-                    </span><span class="kw">match </span>candidates.iter().next() {
-                        <span class="prelude-val">Some</span>(child) =&gt; {
-                            children.push(child.clone());
-                        },
-                        <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
-                    }
+                        });
                 }
             }
         }
@@ -608,17 +750,153 @@
     }
 }
 
-<span class="kw">pub fn </span>parse&lt;<span class="lifetime">&#39;grammar</span>, T, N&gt;(
+<span class="doccomment">/// HORRIBLE, at best Omega(n^3)
+</span><span class="kw">pub fn </span>parse&lt;<span class="lifetime">&#39;grammar</span>, T, N&gt;(
     grammar: <span class="kw-2">&amp;</span><span class="lifetime">&#39;grammar </span>Grammar&lt;T, N&gt;,
     input: <span class="kw-2">&amp;</span>[T],
 ) -&gt; Solutions&lt;<span class="lifetime">&#39;grammar</span>, T, N&gt;
 <span class="kw">where
     </span>T: Ord,
     N: Ord,
+    T: fmt::Debug,
+    N: fmt::Debug,
 {
     <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new(grammar, input);
     parser.derive();
     parser.solutions()
 }
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::parse;
+    <span class="kw">use crate</span>::{
+        grammar::test::{
+            lambda_calc_grammar,
+            LambdaCalcNonTerm,
+            LambdaCalcTerm,
+        },
+        parser::{SyntaxTree, SyntaxTreeBranch, SyntaxTreeLeaf},
+    };
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>simple_lambda_calc() {
+        <span class="kw">use </span>LambdaCalcNonTerm::<span class="kw-2">*</span>;
+        <span class="kw">use </span>LambdaCalcTerm::<span class="kw-2">*</span>;
+        <span class="kw">use </span>SyntaxTree::<span class="kw-2">*</span>;
+
+        <span class="kw">let </span>grammar = lambda_calc_grammar();
+        <span class="kw">let </span>solution_iter = parse(<span class="kw-2">&amp;</span>grammar, <span class="kw-2">&amp;</span>[OpenParen, Ident, CloseParen]);
+        <span class="kw">let </span>solutions =
+            solution_iter.map(|solution| solution.cloned()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="macro">assert_eq!</span>(solutions, <span class="kw-2">&amp;</span>[Branch(SyntaxTreeBranch {
+            label: Start,
+            children: <span class="macro">vec!</span>[Branch(SyntaxTreeBranch {
+                label: Expr,
+                children: <span class="macro">vec!</span>[
+                    Leaf(SyntaxTreeLeaf { symbol: OpenParen }),
+                    Branch(SyntaxTreeBranch {
+                        label: Expr,
+                        children: <span class="macro">vec!</span>[Branch(SyntaxTreeBranch {
+                            label: Var,
+                            children: <span class="macro">vec!</span>[Leaf(SyntaxTreeLeaf {
+                                symbol: Ident,
+                            })],
+                        })],
+                    }),
+                    Leaf(SyntaxTreeLeaf { symbol: CloseParen }),
+                ]
+            })],
+        })]);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>lambda_lambda_calc() {
+        <span class="kw">use </span>LambdaCalcNonTerm::<span class="kw-2">*</span>;
+        <span class="kw">use </span>LambdaCalcTerm::<span class="kw-2">*</span>;
+        <span class="kw">use </span>SyntaxTree::<span class="kw-2">*</span>;
+
+        <span class="kw">let </span>grammar = lambda_calc_grammar();
+        <span class="kw">let </span>solution_iter = parse(<span class="kw-2">&amp;</span>grammar, <span class="kw-2">&amp;</span>[
+            OpenParen,
+            LambdaCalcTerm::Lambda,
+            Ident,
+            Dot,
+            Ident,
+            Ident,
+            CloseParen,
+            Ident,
+        ]);
+        <span class="kw">let </span>solutions =
+            solution_iter.map(|solution| solution.cloned()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+        <span class="macro">assert_eq!</span>(solutions, <span class="kw-2">&amp;</span>[Branch(SyntaxTreeBranch {
+            label: Start,
+            children: <span class="macro">vec!</span>[Branch(SyntaxTreeBranch {
+                label: Expr,
+                children: <span class="macro">vec!</span>[Branch(SyntaxTreeBranch {
+                    label: App,
+                    children: <span class="macro">vec!</span>[
+                        Leaf(SyntaxTreeLeaf { symbol: OpenParen }),
+                        Branch(SyntaxTreeBranch {
+                            label: Expr,
+                            children: <span class="macro">vec!</span>[Branch(SyntaxTreeBranch {
+                                label: LambdaCalcNonTerm::Lambda,
+                                children: <span class="macro">vec!</span>[
+                                    Leaf(SyntaxTreeLeaf {
+                                        symbol: LambdaCalcTerm::Lambda,
+                                    }),
+                                    Leaf(SyntaxTreeLeaf { symbol: Ident }),
+                                    Leaf(SyntaxTreeLeaf { symbol: Dot }),
+                                    Branch(SyntaxTreeBranch {
+                                        label: Expr,
+                                        children: <span class="macro">vec!</span>[Branch(
+                                            SyntaxTreeBranch {
+                                                label: App,
+                                                children: <span class="macro">vec!</span>[
+                                                    Branch(SyntaxTreeBranch {
+                                                        label: Var,
+                                                        children: <span class="macro">vec!</span>[Leaf(
+                                                            SyntaxTreeLeaf {
+                                                                symbol: Ident,
+                                                            }
+                                                        )],
+                                                    }),
+                                                    Branch(SyntaxTreeBranch {
+                                                        label: Expr,
+                                                        children: <span class="macro">vec!</span>[Branch(
+                                                            SyntaxTreeBranch {
+                                                                label: Var,
+                                                                children:
+                                                                    <span class="macro">vec!</span>[Leaf(
+                                                            SyntaxTreeLeaf {
+                                                                symbol: Ident,
+                                                            }
+                                                        )],
+                                                            }
+                                                        )],
+                                                    }),
+                                                ]
+                                            }
+                                        )],
+                                    }),
+                                ],
+                            })],
+                        }),
+                        Leaf(SyntaxTreeLeaf { symbol: CloseParen }),
+                        Branch(SyntaxTreeBranch {
+                            label: Expr,
+                            children: <span class="macro">vec!</span>[Branch(SyntaxTreeBranch {
+                                label: Var,
+                                children: <span class="macro">vec!</span>[Leaf(SyntaxTreeLeaf {
+                                    symbol: Ident,
+                                })],
+                            })],
+                        }),
+                    ],
+                }),]
+            })],
+        })]);
+    }
+}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="episemos" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="episemos" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>

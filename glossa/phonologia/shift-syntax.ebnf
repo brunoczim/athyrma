@@ -1,0 +1,7 @@
+program = [ rule ] ;
+
+rule = pattern, ">", pattern, "where", cond ;
+
+non-term = ? ... ? ;
+
+term = ? ... ? ;

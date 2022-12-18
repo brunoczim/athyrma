@@ -81,6 +81,13 @@ pub enum Token {
     Equal,
     Comma,
     Semicolon,
+    Pipe,
+    OpenParen,
+    CloseParen,
+    OpenSquare,
+    CloseSquare,
+    OpenCurly,
+    CloseCurly,
 }
 
 impl Token {
@@ -92,6 +99,13 @@ impl Token {
             Self::Equal => TokenKind::Equal,
             Self::Comma => TokenKind::Comma,
             Self::Semicolon => TokenKind::Semicolon,
+            Self::Pipe => TokenKind::Pipe,
+            Self::OpenParen => TokenKind::OpenParen,
+            Self::CloseParen => TokenKind::CloseParen,
+            Self::OpenSquare => TokenKind::OpenSquare,
+            Self::CloseSquare => TokenKind::CloseSquare,
+            Self::OpenCurly => TokenKind::OpenCurly,
+            Self::CloseCurly => TokenKind::CloseCurly,
         }
     }
 }
@@ -110,12 +124,26 @@ pub enum TokenKind {
     Equal,
     Comma,
     Semicolon,
+    Pipe,
+    OpenParen,
+    CloseParen,
+    OpenSquare,
+    CloseSquare,
+    OpenCurly,
+    CloseCurly,
 }
 
 impl PartialEq<Token> for TokenKind {
     fn eq(&self, other: &Token) -> bool {
         *self == other.kind()
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum LexError {
+    Unrecognized(Symbol<char>),
+    UnfinishedQuote(Symbol<char>),
+    UnfinishedSpecial(Symbol<char>),
 }
 
 #[derive(Debug, Clone)]
@@ -130,7 +158,7 @@ impl<I> Iterator for Lexer<I>
 where
     I: Iterator<Item = Symbol<char>>,
 {
-    type Item = Symbol<Token>;
+    type Item = Result<Symbol<Token>, LexError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let current = loop {
@@ -140,12 +168,115 @@ where
             }
         };
 
-        match current {
-            ',' => {},
-            ';' => {},
-            '=' => {},
-            '"' | '\'' => {},
-            _ if current.data.is_alphabetic() => {},
-        }
+        Some(match current.data {
+            ',' => Ok(Symbol { data: Token::Comma, span: current.span }),
+            ';' => Ok(Symbol { data: Token::Semicolon, span: current.span }),
+            '=' => Ok(Symbol { data: Token::Equal, span: current.span }),
+            '|' => Ok(Symbol { data: Token::Pipe, span: current.span }),
+            '(' => Ok(Symbol { data: Token::OpenParen, span: current.span }),
+            ')' => Ok(Symbol { data: Token::CloseParen, span: current.span }),
+            '[' => Ok(Symbol { data: Token::OpenSquare, span: current.span }),
+            ']' => Ok(Symbol { data: Token::CloseSquare, span: current.span }),
+            '{' => Ok(Symbol { data: Token::OpenCurly, span: current.span }),
+            '}' => Ok(Symbol { data: Token::CloseCurly, span: current.span }),
+            '"' | '\'' => {
+                let mut terminal = String::new();
+                let mut escape = false;
+                loop {
+                    match self.input_stream.next() {
+                        Some(character) => {
+                            if escape {
+                                escape = false;
+                                terminal.push(match character.data {
+                                    'n' => '\n',
+                                    't' => '\t',
+                                    'r' => '\r',
+                                    _ => character.data,
+                                })
+                            } else if character.data == current.data {
+                                break Ok(Symbol {
+                                    data: Token::Terminal(Arc::from(terminal)),
+                                    span: current.span,
+                                });
+                            } else if character.data == '\\' {
+                                escape = true;
+                            } else {
+                                terminal.push(character.data);
+                            }
+                        },
+                        None => break Err(LexError::UnfinishedQuote(current)),
+                    }
+                }
+            },
+            '?' => {
+                let mut special = String::new();
+                let mut escape = false;
+                loop {
+                    match self.input_stream.next() {
+                        Some(character) => {
+                            if escape {
+                                escape = false;
+                                special.push(match character.data {
+                                    'n' => '\n',
+                                    't' => '\t',
+                                    'r' => '\r',
+                                    _ => character.data,
+                                })
+                            } else if character.data == current.data {
+                                break Ok(Symbol {
+                                    data: Token::Special(Arc::from(special)),
+                                    span: current.span,
+                                });
+                            } else if character.data == '\\' {
+                                escape = true;
+                            } else {
+                                special.push(character.data);
+                            }
+                        },
+                        None => {
+                            break Err(LexError::UnfinishedSpecial(current))
+                        },
+                    }
+                }
+            },
+            _ if current.data.is_alphabetic() || current.data == '$' => {
+                let mut ident = String::new();
+                let mut whitespace = false;
+                loop {
+                    match self.input_stream.peek() {
+                        Some(symbol) => {
+                            if symbol.data.is_whitespace() {
+                                whitespace = true;
+                                self.input_stream.next();
+                            } else {
+                                let should_continue =
+                                    matches!(symbol.data, '_' | '-' | '$')
+                                        || symbol.data.is_alphanumeric();
+                                if should_continue {
+                                    if whitespace {
+                                        whitespace = false;
+                                        ident.push(' ');
+                                    }
+                                    ident.push(symbol.data);
+                                    self.input_stream.next();
+                                } else {
+                                    break;
+                                }
+                            }
+                        },
+                        None => break,
+                    }
+                }
+                let length = u128::try_from(ident.chars().count())
+                    .expect("token length is too big");
+                Ok(Symbol {
+                    data: Token::NonTerm(Arc::from(ident)),
+                    span: current
+                        .span
+                        .map(|span| Span { location: span.location, length }),
+                })
+            },
+            _ => Err(LexError::Unrecognized(current)),
+        })
     }
 }

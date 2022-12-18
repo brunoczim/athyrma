@@ -12,6 +12,7 @@ var sourcesIndex = JSON.parse('{\
 "percent_encoding":["",[],["lib.rs"]],\
 "phonetikos":["",[],["consonant.rs","diacritic.rs","lib.rs","vowel.rs"]],\
 "phonologia":["",[],["lib.rs"]],\
+"suntaxis":["",[],["lexer.rs","lib.rs","source.rs","token.rs"]],\
 "tinyvec":["",[["array",[],["generated_impl.rs"]]],["array.rs","arrayvec.rs","arrayvec_drain.rs","lib.rs","slicevec.rs","tinyvec.rs"]],\
 "tinyvec_macros":["",[],["lib.rs"]],\
 "unicode_bidi":["",[["char_data",[],["mod.rs","tables.rs"]]],["data_source.rs","deprecated.rs","explicit.rs","format_chars.rs","implicit.rs","level.rs","lib.rs","prepare.rs"]],\

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Location",""],["Source",""],["Span",""],["Symbol",""]]};

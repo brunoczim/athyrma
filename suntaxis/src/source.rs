@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Location {
     pub line: u128,
@@ -10,6 +12,12 @@ impl Default for Location {
     }
 }
 
+impl fmt::Display for Location {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "line {}, column {}", self.line, self.column)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Span {
     pub location: Location,
@@ -19,6 +27,32 @@ pub struct Span {
 impl Default for Span {
     fn default() -> Self {
         Self::from(Location::default())
+    }
+}
+
+impl fmt::Display for Span {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            fmtr,
+            "line {}, column {}-{}",
+            self.line(),
+            self.column_start(),
+            self.column_end(),
+        )
+    }
+}
+
+impl Span {
+    pub fn line(self) -> u128 {
+        self.location.line
+    }
+
+    pub fn column_start(self) -> u128 {
+        self.location.column
+    }
+
+    pub fn column_end(self) -> u128 {
+        self.location.column + self.length
     }
 }
 

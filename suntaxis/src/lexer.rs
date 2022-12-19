@@ -2,6 +2,7 @@ use crate::{
     source::{Span, Symbol},
     token::Token,
 };
+use core::fmt;
 use std::{iter, sync::Arc};
 
 #[derive(Debug, Clone, Copy)]
@@ -10,6 +11,56 @@ pub enum LexError {
     UnfinishedQuote(Symbol<char>),
     UnfinishedSpecial(Symbol<char>),
     UnclosedComment(Symbol<char>),
+}
+
+impl fmt::Display for LexError {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Unrecognized(symbol) => {
+                write!(fmtr, "unrecognized character {:?}", symbol.data)?;
+                if let Some(span) = symbol.span {
+                    write!(fmtr, ", {}", span)?;
+                }
+                Ok(())
+            },
+
+            Self::UnfinishedQuote(symbol) => {
+                write!(
+                    fmtr,
+                    "unfinished quoting wtih starting character {:?}",
+                    symbol.data
+                )?;
+                if let Some(span) = symbol.span {
+                    write!(fmtr, ", {}", span)?;
+                }
+                Ok(())
+            },
+
+            Self::UnfinishedSpecial(symbol) => {
+                write!(
+                    fmtr,
+                    "unfinished special symbol wtih starting character {:?}",
+                    symbol.data
+                )?;
+                if let Some(span) = symbol.span {
+                    write!(fmtr, ", {}", span)?;
+                }
+                Ok(())
+            },
+
+            Self::UnclosedComment(symbol) => {
+                write!(
+                    fmtr,
+                    "unfinished comment wtih starting character {:?}",
+                    symbol.data
+                )?;
+                if let Some(span) = symbol.span {
+                    write!(fmtr, ", {}", span)?;
+                }
+                Ok(())
+            },
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -283,10 +283,79 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     source::{Span, Symbol},
     token::Token,
 };
+<span class="kw">use </span>core::fmt;
 <span class="kw">use </span>std::{iter, sync::Arc};
 
 <span class="attribute">#[derive(Debug, Clone, Copy)]
@@ -295,6 +364,56 @@
     UnfinishedQuote(Symbol&lt;char&gt;),
     UnfinishedSpecial(Symbol&lt;char&gt;),
     UnclosedComment(Symbol&lt;char&gt;),
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>LexError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Unrecognized(symbol) =&gt; {
+                <span class="macro">write!</span>(fmtr, <span class="string">&quot;unrecognized character {:?}&quot;</span>, symbol.data)<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = symbol.span {
+                    <span class="macro">write!</span>(fmtr, <span class="string">&quot;, {}&quot;</span>, span)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Ok</span>(())
+            },
+
+            <span class="self">Self</span>::UnfinishedQuote(symbol) =&gt; {
+                <span class="macro">write!</span>(
+                    fmtr,
+                    <span class="string">&quot;unfinished quoting wtih starting character {:?}&quot;</span>,
+                    symbol.data
+                )<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = symbol.span {
+                    <span class="macro">write!</span>(fmtr, <span class="string">&quot;, {}&quot;</span>, span)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Ok</span>(())
+            },
+
+            <span class="self">Self</span>::UnfinishedSpecial(symbol) =&gt; {
+                <span class="macro">write!</span>(
+                    fmtr,
+                    <span class="string">&quot;unfinished special symbol wtih starting character {:?}&quot;</span>,
+                    symbol.data
+                )<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = symbol.span {
+                    <span class="macro">write!</span>(fmtr, <span class="string">&quot;, {}&quot;</span>, span)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Ok</span>(())
+            },
+
+            <span class="self">Self</span>::UnclosedComment(symbol) =&gt; {
+                <span class="macro">write!</span>(
+                    fmtr,
+                    <span class="string">&quot;unfinished comment wtih starting character {:?}&quot;</span>,
+                    symbol.data
+                )<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = symbol.span {
+                    <span class="macro">write!</span>(fmtr, <span class="string">&quot;, {}&quot;</span>, span)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Ok</span>(())
+            },
+        }
+    }
 }
 
 <span class="attribute">#[derive(Debug, Clone)]
@@ -423,9 +542,10 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         first: Symbol&lt;char&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Symbol&lt;Token&gt;, LexError&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>span = first.span;
         <span class="kw">let </span><span class="kw-2">mut </span>ident = String::new();
         <span class="kw">let </span><span class="kw-2">mut </span>whitespace = <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>span_end = <span class="prelude-val">None</span>;
+
         <span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self</span>.source.peek() {
                 <span class="prelude-val">Some</span>(symbol) =&gt; {
@@ -442,7 +562,8 @@
                                 ident.push(<span class="string">&#39; &#39;</span>);
                             }
                             ident.push(symbol.data);
-                            <span class="self">self</span>.next_spanned(span.as_mut());
+                            span_end = span_end.max(symbol.span.map(Span::end));
+                            <span class="self">self</span>.source.next();
                         } <span class="kw">else </span>{
                             <span class="kw">break</span>;
                         }
@@ -451,7 +572,15 @@
                 <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
             }
         }
-        <span class="prelude-val">Ok</span>(Symbol { data: Token::NonTerm(Arc::from(ident)), span })
+
+        <span class="prelude-val">Ok</span>(Symbol {
+            data: Token::NonTerm(Arc::from(ident)),
+            span: first
+                .span
+                .map(Span::start)
+                .zip(span_end)
+                .map(|(start, end)| Span::new_inclusive(start, end)),
+        })
     }
 
     <span class="kw">fn </span>lex_comment(
@@ -461,12 +590,13 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Symbol&lt;Token&gt;, LexError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>stack_count = <span class="number">1u128</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>content = String::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>span = first.span;
-
         <span class="kw">let </span><span class="kw-2">mut </span>prev = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>span_end = <span class="prelude-val">None</span>;
+
         <span class="kw">loop </span>{
-            <span class="kw">match </span><span class="self">self</span>.next_spanned(span.as_mut()) {
+            <span class="kw">match </span><span class="self">self</span>.source.next() {
                 <span class="prelude-val">Some</span>(symbol) =&gt; {
+                    span_end = span_end.max(symbol.span.map(Span::end));
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(prev_char) = prev {
                         content.push(prev_char);
                     }
@@ -475,7 +605,13 @@
                         <span class="kw">if </span>stack_count == <span class="number">0 </span>{
                             <span class="kw">break </span><span class="prelude-val">Ok</span>(Symbol {
                                 data: Token::Comment(Arc::from(content)),
-                                span,
+                                span: first
+                                    .span
+                                    .map(Span::start)
+                                    .zip(span_end)
+                                    .map(|(start, end)| {
+                                        Span::new_inclusive(start, end)
+                                    }),
                             });
                         }
                     }
@@ -500,11 +636,13 @@
         E: FnOnce(Symbol&lt;char&gt;) -&gt; LexError,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>quoted = String::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>span = quote.span;
+        <span class="kw">let </span><span class="kw-2">mut </span>span_end = <span class="prelude-val">None</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>escape = <span class="bool-val">false</span>;
+
         <span class="kw">loop </span>{
-            <span class="kw">match </span><span class="self">self</span>.next_spanned(span.as_mut()) {
+            <span class="kw">match </span><span class="self">self</span>.source.next() {
                 <span class="prelude-val">Some</span>(symbol) =&gt; {
+                    span_end = span_end.max(symbol.span.map(Span::end));
                     <span class="kw">if </span>escape {
                         escape = <span class="bool-val">false</span>;
                         quoted.push(<span class="kw">match </span>symbol.data {
@@ -514,7 +652,16 @@
                             <span class="kw">_ </span>=&gt; symbol.data,
                         });
                     } <span class="kw">else if </span>symbol.data == quote.data {
-                        <span class="kw">break </span><span class="prelude-val">Ok</span>(Symbol { data: make_token(quoted), span });
+                        <span class="kw">break </span><span class="prelude-val">Ok</span>(Symbol {
+                            data: make_token(quoted),
+                            span: quote
+                                .span
+                                .map(Span::start)
+                                .zip(span_end)
+                                .map(|(start, end)| {
+                                    Span::new_inclusive(start, end)
+                                }),
+                        });
                     } <span class="kw">else if </span>symbol.data == <span class="string">&#39;\\&#39; </span>{
                         escape = <span class="bool-val">true</span>;
                     } <span class="kw">else </span>{
@@ -524,17 +671,6 @@
                 <span class="prelude-val">None </span>=&gt; <span class="kw">break </span><span class="prelude-val">Err</span>(make_error(quote)),
             }
         }
-    }
-
-    <span class="kw">fn </span>next_spanned(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        maybe_span: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Span&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;Symbol&lt;char&gt;&gt; {
-        <span class="kw">let </span>symbol = <span class="self">self</span>.source.next();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = maybe_span.filter(|<span class="kw">_</span>| symbol.is_some()) {
-            span.length += <span class="number">1</span>;
-        }
-        symbol
     }
 }
 

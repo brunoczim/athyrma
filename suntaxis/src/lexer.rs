@@ -138,9 +138,10 @@ where
         &mut self,
         first: Symbol<char>,
     ) -> Result<Symbol<Token>, LexError> {
-        let mut span = first.span;
         let mut ident = String::new();
         let mut whitespace = false;
+        let mut span_end = None;
+
         loop {
             match self.source.peek() {
                 Some(symbol) => {
@@ -157,7 +158,8 @@ where
                                 ident.push(' ');
                             }
                             ident.push(symbol.data);
-                            self.next_spanned(span.as_mut());
+                            span_end = span_end.max(symbol.span.map(Span::end));
+                            self.source.next();
                         } else {
                             break;
                         }
@@ -166,7 +168,15 @@ where
                 None => break,
             }
         }
-        Ok(Symbol { data: Token::NonTerm(Arc::from(ident)), span })
+
+        Ok(Symbol {
+            data: Token::NonTerm(Arc::from(ident)),
+            span: first
+                .span
+                .map(Span::start)
+                .zip(span_end)
+                .map(|(start, end)| Span::new_inclusive(start, end)),
+        })
     }
 
     fn lex_comment(
@@ -176,12 +186,13 @@ where
     ) -> Result<Symbol<Token>, LexError> {
         let mut stack_count = 1u128;
         let mut content = String::new();
-        let mut span = first.span;
-
         let mut prev = None;
+        let mut span_end = None;
+
         loop {
-            match self.next_spanned(span.as_mut()) {
+            match self.source.next() {
                 Some(symbol) => {
+                    span_end = span_end.max(symbol.span.map(Span::end));
                     if let Some(prev_char) = prev {
                         content.push(prev_char);
                     }
@@ -190,7 +201,13 @@ where
                         if stack_count == 0 {
                             break Ok(Symbol {
                                 data: Token::Comment(Arc::from(content)),
-                                span,
+                                span: first
+                                    .span
+                                    .map(Span::start)
+                                    .zip(span_end)
+                                    .map(|(start, end)| {
+                                        Span::new_inclusive(start, end)
+                                    }),
                             });
                         }
                     }
@@ -215,11 +232,13 @@ where
         E: FnOnce(Symbol<char>) -> LexError,
     {
         let mut quoted = String::new();
-        let mut span = quote.span;
+        let mut span_end = None;
         let mut escape = false;
+
         loop {
-            match self.next_spanned(span.as_mut()) {
+            match self.source.next() {
                 Some(symbol) => {
+                    span_end = span_end.max(symbol.span.map(Span::end));
                     if escape {
                         escape = false;
                         quoted.push(match symbol.data {
@@ -229,7 +248,16 @@ where
                             _ => symbol.data,
                         });
                     } else if symbol.data == quote.data {
-                        break Ok(Symbol { data: make_token(quoted), span });
+                        break Ok(Symbol {
+                            data: make_token(quoted),
+                            span: quote
+                                .span
+                                .map(Span::start)
+                                .zip(span_end)
+                                .map(|(start, end)| {
+                                    Span::new_inclusive(start, end)
+                                }),
+                        });
                     } else if symbol.data == '\\' {
                         escape = true;
                     } else {
@@ -239,17 +267,6 @@ where
                 None => break Err(make_error(quote)),
             }
         }
-    }
-
-    fn next_spanned(
-        &mut self,
-        maybe_span: Option<&mut Span>,
-    ) -> Option<Symbol<char>> {
-        let symbol = self.source.next();
-        if let Some(span) = maybe_span.filter(|_| symbol.is_some()) {
-            span.length += 1;
-        }
-        symbol
     }
 }
 

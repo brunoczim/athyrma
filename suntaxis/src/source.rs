@@ -20,8 +20,8 @@ impl fmt::Display for Location {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Span {
-    pub location: Location,
-    pub length: u128,
+    start: Location,
+    end: Location,
 }
 
 impl Default for Span {
@@ -32,33 +32,63 @@ impl Default for Span {
 
 impl fmt::Display for Span {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            fmtr,
-            "line {}, column {}-{}",
-            self.line(),
-            self.column_start(),
-            self.column_end(),
-        )
+        if self.start() == self.inclusive_end() {
+            write!(fmtr, "{}", self.start())
+        } else {
+            write!(fmtr, "{} - {}", self.start(), self.inclusive_end())
+        }
     }
 }
 
 impl Span {
-    pub fn line(self) -> u128 {
-        self.location.line
+    pub fn new_inclusive(start: Location, end: Location) -> Self {
+        Self::try_new_inclusive(start, end)
+            .expect("end must not come before start")
     }
 
-    pub fn column_start(self) -> u128 {
-        self.location.column
+    pub fn new(start: Location, end: Location) -> Self {
+        Self::try_new(start, end).expect("end must not come before start")
     }
 
-    pub fn column_end(self) -> u128 {
-        self.location.column + self.length
+    pub fn try_new(start: Location, end: Location) -> Result<Self, SpanError> {
+        if end >= start {
+            Ok(Self { start, end })
+        } else {
+            Err(SpanError { given_start: start, given_end: end })
+        }
+    }
+
+    pub fn try_new_inclusive(
+        start: Location,
+        end: Location,
+    ) -> Result<Self, SpanError> {
+        let converted_end = Location { line: end.line, column: end.column + 1 };
+        if converted_end >= start {
+            Ok(Self::new(start, converted_end))
+        } else {
+            Err(SpanError { given_start: start, given_end: end })
+        }
+    }
+
+    pub fn start(self) -> Location {
+        self.start
+    }
+
+    pub fn end(self) -> Location {
+        self.end
+    }
+
+    pub fn inclusive_end(self) -> Location {
+        Location { line: self.end.line, column: self.end.column - 1 }
     }
 }
 
 impl From<Location> for Span {
     fn from(location: Location) -> Self {
-        Self { location, length: 1 }
+        Self::new(location, Location {
+            line: location.line,
+            column: location.column + 1,
+        })
     }
 }
 
@@ -102,5 +132,21 @@ where
             self.location.column += 1;
         }
         Some(Symbol { data: character, span: Some(span) })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SpanError {
+    pub given_start: Location,
+    pub given_end: Location,
+}
+
+impl fmt::Display for SpanError {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            fmtr,
+            "Span's end {} must not come before span's start {}",
+            self.given_end, self.given_start
+        )
     }
 }

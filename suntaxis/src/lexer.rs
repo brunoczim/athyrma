@@ -122,6 +122,7 @@ where
     ) -> Result<Symbol<Token>, LexError> {
         match self.source.peek().copied() {
             Some(second) if second.data == '*' => {
+                self.source.next();
                 self.lex_comment(first, second)
             },
             _ => Ok(Symbol { data: Token::OpenParen, span: first.span }),
@@ -189,7 +190,7 @@ where
         &mut self,
         first: Symbol<char>,
     ) -> Result<Symbol<Token>, LexError> {
-        let mut ident = String::new();
+        let mut ident = String::from(first.data);
         let mut whitespace = false;
         let mut span_end = None;
 
@@ -244,9 +245,6 @@ where
             match self.source.next() {
                 Some(symbol) => {
                     span_end = span_end.max(symbol.span.map(Span::end));
-                    if let Some(prev_char) = prev {
-                        content.push(prev_char);
-                    }
                     if prev == Some('*') && symbol.data == ')' {
                         stack_count -= 1;
                         if stack_count == 0 {
@@ -264,6 +262,9 @@ where
                     }
                     if prev == Some('(') && symbol.data == '*' {
                         stack_count += 1;
+                    }
+                    if let Some(prev_char) = prev {
+                        content.push(prev_char);
                     }
                     prev = Some(symbol.data);
                 },
@@ -349,5 +350,40 @@ where
         };
 
         Some(result)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Lexer;
+    use crate::{source::Source, token::Token};
+    use std::sync::Arc;
+
+    #[test]
+    fn every_token() {
+        let input = "hello \t there = \"double\" | 'single', (* comment *) () \
+                     [] {} ?special? ;";
+        let tokens = Lexer::from_source(Source::new(input.chars()))
+            .map(|result| result.map(|symbol| symbol.data))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(tokens, &[
+            Token::NonTerm(Arc::from("hello there")),
+            Token::Equal,
+            Token::Terminal(Arc::from("double")),
+            Token::Pipe,
+            Token::Terminal(Arc::from("single")),
+            Token::Comma,
+            Token::Comment(Arc::from(" comment ")),
+            Token::OpenParen,
+            Token::CloseParen,
+            Token::OpenSquare,
+            Token::CloseSquare,
+            Token::OpenCurly,
+            Token::CloseCurly,
+            Token::Special(Arc::from("special")),
+            Token::Semicolon,
+        ]);
     }
 }

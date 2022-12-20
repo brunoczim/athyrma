@@ -150,3 +150,65 @@ impl fmt::Display for SpanError {
         )
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::source::{Location, Source, Span, Symbol};
+
+    #[test]
+    fn with_newlines() {
+        let input = "abc\nde\n";
+        let symbols = Source::new(input.chars()).collect::<Vec<_>>();
+        assert_eq!(symbols, &[
+            Symbol {
+                data: 'a',
+                span: Some(Span {
+                    start: Location { line: 1, column: 1 },
+                    end: Location { line: 1, column: 2 },
+                })
+            },
+            Symbol {
+                data: 'b',
+                span: Some(Span {
+                    start: Location { line: 1, column: 2 },
+                    end: Location { line: 1, column: 3 },
+                })
+            },
+            Symbol {
+                data: 'c',
+                span: Some(Span {
+                    start: Location { line: 1, column: 3 },
+                    end: Location { line: 1, column: 4 },
+                })
+            },
+            Symbol {
+                data: '\n',
+                span: Some(Span {
+                    start: Location { line: 1, column: 4 },
+                    end: Location { line: 1, column: 5 },
+                })
+            },
+            Symbol {
+                data: 'd',
+                span: Some(Span {
+                    start: Location { line: 2, column: 1 },
+                    end: Location { line: 2, column: 2 },
+                })
+            },
+            Symbol {
+                data: 'e',
+                span: Some(Span {
+                    start: Location { line: 2, column: 2 },
+                    end: Location { line: 2, column: 3 },
+                })
+            },
+            Symbol {
+                data: '\n',
+                span: Some(Span {
+                    start: Location { line: 2, column: 3 },
+                    end: Location { line: 2, column: 4 },
+                })
+            },
+        ]);
+    }
+}

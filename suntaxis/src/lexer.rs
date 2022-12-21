@@ -11,6 +11,7 @@ pub enum LexError {
     UnfinishedQuote(Symbol<char>),
     UnfinishedSpecial(Symbol<char>),
     UnclosedComment(Symbol<char>),
+    NumberTooBig(Span),
 }
 
 impl fmt::Display for LexError {
@@ -54,6 +55,14 @@ impl fmt::Display for LexError {
                     "unfinished comment wtih starting character {:?}",
                     symbol.data
                 )?;
+                if let Some(span) = symbol.span {
+                    write!(fmtr, ", {}", span)?;
+                }
+                Ok(())
+            },
+
+            Self::NumberTooBig(span) => {
+                write!(fmtr, "number too big")?;
                 if let Some(span) = symbol.span {
                     write!(fmtr, ", {}", span)?;
                 }
@@ -114,6 +123,20 @@ where
         first: Symbol<char>,
     ) -> Result<Symbol<Token>, LexError> {
         Ok(Symbol { data: Token::Pipe, span: first.span })
+    }
+
+    fn lex_times(
+        &mut self,
+        first: Symbol<char>,
+    ) -> Result<Symbol<Token>, LexError> {
+        Ok(Symbol { data: Token::Times, span: first.span })
+    }
+
+    fn lex_except(
+        &mut self,
+        first: Symbol<char>,
+    ) -> Result<Symbol<Token>, LexError> {
+        Ok(Symbol { data: Token::Except, span: first.span })
     }
 
     fn lex_open_paren(
@@ -201,9 +224,8 @@ where
                         whitespace = true;
                         self.source.next();
                     } else {
-                        let should_continue =
-                            matches!(symbol.data, '_' | '-' | '$')
-                                || symbol.data.is_alphanumeric();
+                        let should_continue = matches!(symbol.data, '_' | '$')
+                            || symbol.data.is_alphanumeric();
                         if should_continue {
                             if whitespace {
                                 whitespace = false;
@@ -229,6 +251,30 @@ where
                 .zip(span_end)
                 .map(|(start, end)| Span::new_inclusive(start, end)),
         })
+    }
+
+    fn lex_number(
+        &mut self,
+        first: Symbol<char>,
+    ) -> Result<Symbol<Token>, LexError> {
+        let mut number = u128::from(first.data.to_digit(10).unwrap());
+        let mut exponent = 1;
+
+        loop {
+            match self.source.peek().copied() {
+                Some(symbol) => match symbol.data.to_digit(10) {
+                    Some(digit) => {
+                        number += 10u128.pow(exponent) * u128::from(digit);
+                        exponent += 1;
+                        self.source.next();
+                    },
+                    None => break,
+                },
+                None => break,
+            }
+        }
+
+        Ok(Symbol { data: Token::Number(number), span: first.span })
     }
 
     fn lex_comment(
@@ -336,6 +382,8 @@ where
             ';' => self.lex_semicolon(first),
             '=' => self.lex_equal(first),
             '|' => self.lex_pipe(first),
+            '*' => self.lex_times(first),
+            '-' => self.lex_except(first),
             '(' => self.lex_open_paren(first),
             ')' => self.lex_close_paren(first),
             '[' => self.lex_open_square(first),
@@ -345,7 +393,9 @@ where
             '"' | '\'' => self.lex_terminal(first),
             '?' => self.lex_special(first),
             '$' => self.lex_non_term(first),
+            '_' => self.lex_non_term(first),
             _ if first.data.is_alphabetic() => self.lex_non_term(first),
+            _ if first.data.is_digit(10) => self.lex_number(first),
             _ => Err(LexError::Unrecognized(first)),
         };
 
@@ -384,6 +434,53 @@ mod test {
             Token::CloseCurly,
             Token::Special(Arc::from("special")),
             Token::Semicolon,
+        ]);
+    }
+
+    #[test]
+    fn non_terminals() {
+        let input = "hello \t there, I am here , bye";
+        let tokens = Lexer::from_source(Source::new(input.chars()))
+            .map(|result| result.map(|symbol| symbol.data))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(tokens, &[
+            Token::NonTerm(Arc::from("hello there")),
+            Token::Comma,
+            Token::NonTerm(Arc::from("I am here")),
+            Token::Comma,
+            Token::NonTerm(Arc::from("bye")),
+        ]);
+    }
+
+    #[test]
+    fn terminals() {
+        let input = "\"hello \t there\", 'I am \\'\\\"\\\\ here\n'";
+        let tokens = Lexer::from_source(Source::new(input.chars()))
+            .map(|result| result.map(|symbol| symbol.data))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(tokens, &[
+            Token::Terminal(Arc::from("hello \t there")),
+            Token::Comma,
+            Token::Terminal(Arc::from("I am '\"\\ here\n")),
+        ]);
+    }
+
+    #[test]
+    fn specials() {
+        let input = "?hello \t there?, ?I am \\'\\\"\\\\\\? here\n?";
+        let tokens = Lexer::from_source(Source::new(input.chars()))
+            .map(|result| result.map(|symbol| symbol.data))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(tokens, &[
+            Token::Special(Arc::from("hello \t there")),
+            Token::Comma,
+            Token::Special(Arc::from("I am '\"\\? here\n")),
         ]);
     }
 }

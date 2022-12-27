@@ -7,7 +7,7 @@ members = [
     "./glossa",
     "./glossa/phonetikos",
     "./glossa/phonologia",
-    "./glossa/episemos",
+    "./glossa/metaphrastees",
 ]
 
 [package]

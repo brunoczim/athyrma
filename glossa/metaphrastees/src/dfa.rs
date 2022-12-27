@@ -22,7 +22,7 @@ where
 {
     pub initial_state: State,
     pub final_states: HashSet<State>,
-    pub table: HashMap<(State, T), State>,
+    pub transitions: HashMap<State, HashMap<T, State>>,
 }
 
 impl<T> Automaton<T>
@@ -32,9 +32,12 @@ where
     pub fn maximum_state(&self) -> State {
         let max_final_state = self.final_states.iter().copied().max();
         let max_table_state = self
-            .table
+            .transitions
             .iter()
-            .map(|((state_in, _), &state_out)| (*state_in).max(state_out))
+            .map(|(&state_in, states_out)| {
+                let max_state_out = states_out.values().copied().max();
+                state_in.max(max_state_out.unwrap_or(State::MIN))
+            })
             .max();
         self.initial_state
             .max(max_final_state.unwrap_or(State::MIN))
@@ -45,9 +48,10 @@ where
         Execution { automaton: self, current_state: Ok(self.initial_state) }
     }
 
-    pub fn test<I>(&self, input: I) -> bool
+    pub fn test<'item, I>(&self, input: I) -> bool
     where
-        I: IntoIterator<Item = T>,
+        I: IntoIterator<Item = &'item T>,
+        T: 'item,
     {
         let mut execution = self.start();
         for symbol in input {
@@ -88,12 +92,13 @@ where
         self.current_state
     }
 
-    pub fn next(&mut self, symbol: T) {
+    pub fn next(&mut self, symbol: &T) {
         if let Ok(current_state) = self.current_state {
             self.current_state = self
                 .automaton
-                .table
-                .get(&(current_state, symbol))
+                .transitions
+                .get(&current_state)
+                .and_then(|transitions| transitions.get(symbol))
                 .copied()
                 .ok_or(UnrecognizedInput);
         }

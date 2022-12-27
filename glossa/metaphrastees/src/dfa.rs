@@ -1,12 +1,12 @@
-use core::fmt;
 use std::{
     collections::{HashMap, HashSet},
+    fmt,
     hash::Hash,
 };
 
 pub type State = u128;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UnrecognizedInput;
 
 impl fmt::Display for UnrecognizedInput {
@@ -29,6 +29,18 @@ impl<T> Automaton<T>
 where
     T: Hash + Eq,
 {
+    pub fn maximum_state(&self) -> State {
+        let max_final_state = self.final_states.iter().copied().max();
+        let max_table_state = self
+            .table
+            .iter()
+            .map(|((state_in, _), &state_out)| (*state_in).max(state_out))
+            .max();
+        self.initial_state
+            .max(max_final_state.unwrap_or(State::MIN))
+            .max(max_table_state.unwrap_or(State::MIN))
+    }
+
     pub fn start(&self) -> Execution<T> {
         Execution { automaton: self, current_state: Ok(self.initial_state) }
     }

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["SyntaxTree",""]],"fn":[["parse","HORRIBLE, at best Omega(n^3)"]],"struct":[["Solutions",""],["SyntaxTreeBranch",""],["SyntaxTreeLeaf",""]]};

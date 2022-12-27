@@ -1,13 +1,13 @@
 var sourcesIndex = JSON.parse('{\
 "athyrma":["",[],["lib.rs"]],\
 "diakritikos":["",[],["lib.rs","pos.rs","slot.rs"]],\
-"episemos":["",[],["grammar.rs","lib.rs","parser.rs"]],\
 "form_urlencoded":["",[],["lib.rs"]],\
 "glossa":["",[],["lib.rs"]],\
 "hashbrown":["",[["external_trait_impls",[],["mod.rs"]],["raw",[],["alloc.rs","bitmask.rs","mod.rs","sse2.rs"]]],["lib.rs","macros.rs","map.rs","scopeguard.rs","set.rs"]],\
 "idna":["",[],["lib.rs","punycode.rs","uts46.rs"]],\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs"]]],["arbitrary.rs","equivalent.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
 "katalogos":["",[],["coproduct.rs","lib.rs"]],\
+"metaphrastees":["",[],["dfa.rs","lib.rs"]],\
 "paideia":["",[["component",[["block",[],["list.rs","media.rs","table.rs","text.rs"]],["inline",[],["media.rs","text.rs"]]],["asset.rs","block.rs","inline.rs","page.rs","section.rs"]],["render",[],["common_text.rs","html.rs","markdown.rs","text.rs"]]],["component.rs","lib.rs","location.rs","render.rs","site.rs"]],\
 "percent_encoding":["",[],["lib.rs"]],\
 "phonetikos":["",[],["consonant.rs","diacritic.rs","lib.rs","vowel.rs"]],\

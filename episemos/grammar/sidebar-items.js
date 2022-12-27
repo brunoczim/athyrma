@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["Symbol",""]],"struct":[["Grammar",""],["Production",""],["Replacement",""]]};

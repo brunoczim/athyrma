@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["dfa",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["dfa",""],["nfa",""]]};

@@ -99,6 +99,11 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     collections::{HashMap, HashSet},
     fmt,
@@ -123,7 +128,7 @@
 {
     <span class="kw">pub </span>initial_state: State,
     <span class="kw">pub </span>final_states: HashSet&lt;State&gt;,
-    <span class="kw">pub </span>table: HashMap&lt;(State, T), State&gt;,
+    <span class="kw">pub </span>transitions: HashMap&lt;State, HashMap&lt;T, State&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;T&gt; Automaton&lt;T&gt;
@@ -133,9 +138,12 @@
     <span class="kw">pub fn </span>maximum_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
         <span class="kw">let </span>max_final_state = <span class="self">self</span>.final_states.iter().copied().max();
         <span class="kw">let </span>max_table_state = <span class="self">self
-            </span>.table
+            </span>.transitions
             .iter()
-            .map(|((state_in, <span class="kw">_</span>), <span class="kw-2">&amp;</span>state_out)| (<span class="kw-2">*</span>state_in).max(state_out))
+            .map(|(<span class="kw-2">&amp;</span>state_in, states_out)| {
+                <span class="kw">let </span>max_state_out = states_out.values().copied().max();
+                state_in.max(max_state_out.unwrap_or(State::MIN))
+            })
             .max();
         <span class="self">self</span>.initial_state
             .max(max_final_state.unwrap_or(State::MIN))
@@ -146,9 +154,10 @@
         Execution { automaton: <span class="self">self</span>, current_state: <span class="prelude-val">Ok</span>(<span class="self">self</span>.initial_state) }
     }
 
-    <span class="kw">pub fn </span>test&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, input: I) -&gt; bool
+    <span class="kw">pub fn </span>test&lt;<span class="lifetime">&#39;item</span>, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, input: I) -&gt; bool
     <span class="kw">where
-        </span>I: IntoIterator&lt;Item = T&gt;,
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span>T&gt;,
+        T: <span class="lifetime">&#39;item</span>,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>execution = <span class="self">self</span>.start();
         <span class="kw">for </span>symbol <span class="kw">in </span>input {
@@ -189,12 +198,13 @@
         <span class="self">self</span>.current_state
     }
 
-    <span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, symbol: T) {
+    <span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, symbol: <span class="kw-2">&amp;</span>T) {
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(current_state) = <span class="self">self</span>.current_state {
             <span class="self">self</span>.current_state = <span class="self">self
                 </span>.automaton
-                .table
-                .get(<span class="kw-2">&amp;</span>(current_state, symbol))
+                .transitions
+                .get(<span class="kw-2">&amp;</span>current_state)
+                .and_then(|transitions| transitions.get(symbol))
                 .copied()
                 .ok_or(UnrecognizedInput);
         }

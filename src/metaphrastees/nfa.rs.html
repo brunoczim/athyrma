@@ -85,6 +85,10 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dfa;
 <span class="kw">use </span>std::{
     collections::{HashMap, HashSet},
@@ -100,7 +104,7 @@
 {
     <span class="kw">pub </span>initial_state: State,
     <span class="kw">pub </span>final_states: HashSet&lt;State&gt;,
-    <span class="kw">pub </span>table: HashMap&lt;(State, T), HashSet&lt;State&gt;&gt;,
+    <span class="kw">pub </span>transitions: HashMap&lt;State, HashMap&lt;T, HashSet&lt;State&gt;&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;T&gt; Automaton&lt;T&gt;
@@ -110,10 +114,11 @@
     <span class="kw">pub fn </span>maximum_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
         <span class="kw">let </span>max_final_state = <span class="self">self</span>.final_states.iter().copied().max();
         <span class="kw">let </span>max_table_state = <span class="self">self
-            </span>.table
+            </span>.transitions
             .iter()
-            .map(|((state_in, <span class="kw">_</span>), states_out)| {
-                <span class="kw">let </span>max_state_out = states_out.iter().copied().max();
+            .map(|(state_in, states_out)| {
+                <span class="kw">let </span>max_state_out =
+                    states_out.values().flatten().copied().max();
                 (<span class="kw-2">*</span>state_in).max(max_state_out.unwrap_or(State::MIN))
             })
             .max();
@@ -129,9 +134,10 @@
         }
     }
 
-    <span class="kw">pub fn </span>test&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, input: I) -&gt; bool
+    <span class="kw">pub fn </span>test&lt;<span class="lifetime">&#39;item</span>, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, input: I) -&gt; bool
     <span class="kw">where
-        </span>I: IntoIterator&lt;Item = T&gt;,
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;item </span>T&gt;,
+        T: <span class="lifetime">&#39;item</span>,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>execution = <span class="self">self</span>.start();
         <span class="kw">for </span>symbol <span class="kw">in </span>input {
@@ -158,17 +164,19 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.current_states
     }
 
-    <span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>symbol: T) {
+    <span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, symbol: <span class="kw-2">&amp;</span>T) {
         <span class="kw">let </span>current_states = <span class="self">self</span>.current_states.drain().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
         <span class="kw">for </span>current_state <span class="kw">in </span>current_states {
-            <span class="kw">let </span>key = (current_state, symbol);
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(next_states) = <span class="self">self</span>.automaton.table.get(<span class="kw-2">&amp;</span>key) {
-                <span class="kw">for </span><span class="kw-2">&amp;</span>next_state <span class="kw">in </span>next_states {
-                    <span class="self">self</span>.current_states.insert(next_state);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(next_states) =
+                <span class="self">self</span>.automaton.transitions.get(<span class="kw-2">&amp;</span>current_state)
+            {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(next_for_symbol) = next_states.get(symbol) {
+                    <span class="kw">for </span><span class="kw-2">&amp;</span>next_state <span class="kw">in </span>next_for_symbol {
+                        <span class="self">self</span>.current_states.insert(next_state);
+                    }
                 }
             }
-            symbol = key.<span class="number">1</span>;
         }
     }
 }

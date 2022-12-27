@@ -13,7 +13,7 @@ where
 {
     pub initial_state: State,
     pub final_states: HashSet<State>,
-    pub table: HashMap<(State, T), HashSet<State>>,
+    pub table: HashMap<State, HashMap<T, HashSet<State>>>,
 }
 
 impl<T> Automaton<T>
@@ -25,8 +25,9 @@ where
         let max_table_state = self
             .table
             .iter()
-            .map(|((state_in, _), states_out)| {
-                let max_state_out = states_out.iter().copied().max();
+            .map(|(state_in, states_out)| {
+                let max_state_out =
+                    states_out.values().flatten().copied().max();
                 (*state_in).max(max_state_out.unwrap_or(State::MIN))
             })
             .max();

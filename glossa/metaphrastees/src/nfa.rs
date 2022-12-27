@@ -13,7 +13,7 @@ where
 {
     pub initial_state: State,
     pub final_states: HashSet<State>,
-    pub table: HashMap<(State, T), HashSet<State>>,
+    pub transitions: HashMap<State, HashMap<T, HashSet<State>>>,
 }
 
 impl<T> Automaton<T>
@@ -23,10 +23,11 @@ where
     pub fn maximum_state(&self) -> State {
         let max_final_state = self.final_states.iter().copied().max();
         let max_table_state = self
-            .table
+            .transitions
             .iter()
-            .map(|((state_in, _), states_out)| {
-                let max_state_out = states_out.iter().copied().max();
+            .map(|(state_in, states_out)| {
+                let max_state_out =
+                    states_out.values().flatten().copied().max();
                 (*state_in).max(max_state_out.unwrap_or(State::MIN))
             })
             .max();
@@ -42,9 +43,10 @@ where
         }
     }
 
-    pub fn test<I>(&self, input: I) -> bool
+    pub fn test<'item, I>(&self, input: I) -> bool
     where
-        I: IntoIterator<Item = T>,
+        I: IntoIterator<Item = &'item T>,
+        T: 'item,
     {
         let mut execution = self.start();
         for symbol in input {
@@ -71,17 +73,19 @@ where
         &self.current_states
     }
 
-    pub fn next(&mut self, mut symbol: T) {
+    pub fn next(&mut self, symbol: &T) {
         let current_states = self.current_states.drain().collect::<Vec<_>>();
 
         for current_state in current_states {
-            let key = (current_state, symbol);
-            if let Some(next_states) = self.automaton.table.get(&key) {
-                for &next_state in next_states {
-                    self.current_states.insert(next_state);
+            if let Some(next_states) =
+                self.automaton.transitions.get(&current_state)
+            {
+                if let Some(next_for_symbol) = next_states.get(symbol) {
+                    for &next_state in next_for_symbol {
+                        self.current_states.insert(next_state);
+                    }
                 }
             }
-            symbol = key.1;
         }
     }
 }

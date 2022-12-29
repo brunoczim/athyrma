@@ -104,3 +104,62 @@ where
         }
     }
 }
+
+#[cfg(test)]
+pub(crate) mod test {
+    use super::Automaton;
+    use std::collections::{HashMap, HashSet};
+
+    #[derive(
+        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash,
+    )]
+    pub struct Succ;
+
+    pub fn unary_odd_automaton() -> Automaton<Succ> {
+        Automaton {
+            initial_state: 0,
+            final_states: HashSet::from([1]),
+            transitions: HashMap::from([
+                (0, HashMap::from([(Succ, 1)])),
+                (1, HashMap::from([(Succ, 0)])),
+            ]),
+        }
+    }
+
+    pub fn big_endian_binary_odd_automaton() -> Automaton<bool> {
+        Automaton {
+            initial_state: 0,
+            final_states: HashSet::from([2]),
+            transitions: HashMap::from([
+                (0, HashMap::from([(false, 1), (true, 2)])),
+                (1, HashMap::from([(false, 1), (true, 2)])),
+                (2, HashMap::from([(false, 1), (true, 2)])),
+            ]),
+        }
+    }
+
+    #[test]
+    fn unary_odd() {
+        let automaton = unary_odd_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(automaton.test(&[Succ]));
+        assert!(!automaton.test(&[Succ, Succ]));
+        assert!(automaton.test(&[Succ, Succ, Succ]));
+    }
+
+    #[test]
+    fn binary_odd() {
+        let automaton = big_endian_binary_odd_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(automaton.test(&[true]));
+        assert!(!automaton.test(&[false, false]));
+        assert!(automaton.test(&[false, true]));
+        assert!(!automaton.test(&[true, false]));
+        assert!(automaton.test(&[true, true]));
+        assert!(!automaton.test(&[false, true, false]));
+        assert!(automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(automaton.test(&[false, true, false, true]));
+    }
+}

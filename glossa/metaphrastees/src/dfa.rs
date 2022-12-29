@@ -18,7 +18,7 @@ impl fmt::Display for UnrecognizedInput {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Automaton<T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     pub initial_state: State,
     pub final_states: HashSet<State>,
@@ -27,7 +27,7 @@ where
 
 impl<T> Automaton<T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     pub fn maximum_state(&self) -> State {
         let max_final_state = self.final_states.iter().copied().max();
@@ -67,7 +67,7 @@ where
 #[derive(Debug, PartialEq, Eq)]
 pub struct Execution<'automaton, T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     automaton: &'automaton Automaton<T>,
     current_state: Result<State, UnrecognizedInput>,
@@ -75,18 +75,18 @@ where
 
 impl<'automaton, T> Clone for Execution<'automaton, T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<'automaton, T> Copy for Execution<'automaton, T> where T: Hash + Eq {}
+impl<'automaton, T> Copy for Execution<'automaton, T> where T: Hash + Ord {}
 
 impl<'automaton, T> Execution<'automaton, T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     pub fn current_state(&self) -> Result<State, UnrecognizedInput> {
         self.current_state

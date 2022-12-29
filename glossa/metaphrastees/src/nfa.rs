@@ -1,6 +1,5 @@
-use crate::dfa;
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeSet, HashMap, HashSet},
     hash::Hash,
 };
 
@@ -9,16 +8,16 @@ pub type State = u128;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Automaton<T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     pub initial_state: State,
     pub final_states: HashSet<State>,
-    pub transitions: HashMap<State, HashMap<T, HashSet<State>>>,
+    pub transitions: HashMap<State, HashMap<T, BTreeSet<State>>>,
 }
 
 impl<T> Automaton<T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     pub fn maximum_state(&self) -> State {
         let max_final_state = self.final_states.iter().copied().max();
@@ -59,7 +58,7 @@ where
 #[derive(Debug, PartialEq, Eq)]
 pub struct Execution<'automaton, T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     automaton: &'automaton Automaton<T>,
     current_states: HashSet<State>,
@@ -67,7 +66,7 @@ where
 
 impl<'automaton, T> Execution<'automaton, T>
 where
-    T: Hash + Eq,
+    T: Hash + Ord,
 {
     pub fn current_states(&self) -> &HashSet<State> {
         &self.current_states

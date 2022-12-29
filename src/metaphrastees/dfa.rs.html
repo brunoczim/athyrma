@@ -124,7 +124,7 @@
 <span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Automaton&lt;T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">pub </span>initial_state: State,
     <span class="kw">pub </span>final_states: HashSet&lt;State&gt;,
@@ -133,7 +133,7 @@
 
 <span class="kw">impl</span>&lt;T&gt; Automaton&lt;T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">pub fn </span>maximum_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
         <span class="kw">let </span>max_final_state = <span class="self">self</span>.final_states.iter().copied().max();
@@ -173,7 +173,7 @@
 <span class="attribute">#[derive(Debug, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     automaton: <span class="kw-2">&amp;</span><span class="lifetime">&#39;automaton </span>Automaton&lt;T&gt;,
     current_state: <span class="prelude-ty">Result</span>&lt;State, UnrecognizedInput&gt;,
@@ -181,18 +181,18 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;automaton</span>, T&gt; Clone <span class="kw">for </span>Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw-2">*</span><span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;automaton</span>, T&gt; Copy <span class="kw">for </span>Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt; <span class="kw">where </span>T: Hash + Eq {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;automaton</span>, T&gt; Copy <span class="kw">for </span>Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt; <span class="kw">where </span>T: Hash + Ord {}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;automaton</span>, T&gt; Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">pub fn </span>current_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;State, UnrecognizedInput&gt; {
         <span class="self">self</span>.current_state

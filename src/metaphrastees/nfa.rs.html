@@ -88,10 +88,8 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-<span id="91">91</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::dfa;
-<span class="kw">use </span>std::{
-    collections::{HashMap, HashSet},
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    collections::{BTreeSet, HashMap, HashSet},
     hash::Hash,
 };
 
@@ -100,16 +98,16 @@
 <span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Automaton&lt;T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">pub </span>initial_state: State,
     <span class="kw">pub </span>final_states: HashSet&lt;State&gt;,
-    <span class="kw">pub </span>transitions: HashMap&lt;State, HashMap&lt;T, HashSet&lt;State&gt;&gt;&gt;,
+    <span class="kw">pub </span>transitions: HashMap&lt;State, HashMap&lt;T, BTreeSet&lt;State&gt;&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;T&gt; Automaton&lt;T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">pub fn </span>maximum_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
         <span class="kw">let </span>max_final_state = <span class="self">self</span>.final_states.iter().copied().max();
@@ -150,7 +148,7 @@
 <span class="attribute">#[derive(Debug, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     automaton: <span class="kw-2">&amp;</span><span class="lifetime">&#39;automaton </span>Automaton&lt;T&gt;,
     current_states: HashSet&lt;State&gt;,
@@ -158,7 +156,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;automaton</span>, T&gt; Execution&lt;<span class="lifetime">&#39;automaton</span>, T&gt;
 <span class="kw">where
-    </span>T: Hash + Eq,
+    </span>T: Hash + Ord,
 {
     <span class="kw">pub fn </span>current_states(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashSet&lt;State&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.current_states

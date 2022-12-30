@@ -51,7 +51,10 @@ where
         for symbol in input {
             execution.next(symbol);
         }
-        !execution.current_states().is_empty()
+        execution
+            .current_states()
+            .iter()
+            .any(|state| self.final_states.contains(state))
     }
 }
 
@@ -86,5 +89,41 @@ where
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod test {
+    use super::Automaton;
+    use std::collections::{BTreeSet, HashMap, HashSet};
+
+    pub fn big_endian_binary_odd_automaton() -> Automaton<bool> {
+        Automaton {
+            initial_state: 0,
+            final_states: HashSet::from([1]),
+            transitions: HashMap::from([(
+                0,
+                HashMap::from([
+                    (false, BTreeSet::from([0])),
+                    (true, BTreeSet::from([0, 1])),
+                ]),
+            )]),
+        }
+    }
+
+    #[test]
+    fn binary_odd() {
+        let automaton = big_endian_binary_odd_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(automaton.test(&[true]));
+        assert!(!automaton.test(&[false, false]));
+        assert!(automaton.test(&[false, true]));
+        assert!(!automaton.test(&[true, false]));
+        assert!(automaton.test(&[true, true]));
+        assert!(!automaton.test(&[false, true, false]));
+        assert!(automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(automaton.test(&[false, true, false, true]));
     }
 }

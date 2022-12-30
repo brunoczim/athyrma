@@ -111,6 +111,32 @@ pub(crate) mod test {
         }
     }
 
+    pub fn palindrome_4bit_automaton() -> Automaton<bool> {
+        Automaton {
+            initial_state: 0,
+            final_states: HashSet::from([4, 10]),
+            transitions: HashMap::from([
+                (
+                    0,
+                    HashMap::from([
+                        (false, BTreeSet::from([1, 5])),
+                        (true, BTreeSet::from([7, 11])),
+                    ]),
+                ),
+                (1, HashMap::from([(false, BTreeSet::from([2]))])),
+                (2, HashMap::from([(false, BTreeSet::from([3]))])),
+                (3, HashMap::from([(false, BTreeSet::from([4]))])),
+                (5, HashMap::from([(true, BTreeSet::from([6]))])),
+                (6, HashMap::from([(true, BTreeSet::from([3]))])),
+                (7, HashMap::from([(false, BTreeSet::from([8]))])),
+                (8, HashMap::from([(false, BTreeSet::from([9]))])),
+                (9, HashMap::from([(true, BTreeSet::from([10]))])),
+                (11, HashMap::from([(true, BTreeSet::from([12]))])),
+                (12, HashMap::from([(true, BTreeSet::from([9]))])),
+            ]),
+        }
+    }
+
     #[test]
     fn binary_odd() {
         let automaton = big_endian_binary_odd_automaton();
@@ -125,5 +151,22 @@ pub(crate) mod test {
         assert!(automaton.test(&[false, false, true]));
         assert!(!automaton.test(&[true, true, true, false]));
         assert!(automaton.test(&[false, true, false, true]));
+    }
+
+    #[test]
+    fn palindrome_4bit() {
+        let automaton = palindrome_4bit_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(!automaton.test(&[false, true]));
+        assert!(!automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(!automaton.test(&[false, false, true, true]));
+        assert!(!automaton.test(&[false, false, true, false]));
+        assert!(!automaton.test(&[true, false, true, false]));
+        assert!(automaton.test(&[false, true, true, false]));
+        assert!(automaton.test(&[false, false, false, false]));
+        assert!(automaton.test(&[true, true, true, true]));
+        assert!(automaton.test(&[true, false, false, true]));
     }
 }

@@ -3,7 +3,8 @@ use std::{
     hash::Hash,
 };
 
-pub type State = u128;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct State(pub u128);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Automaton<T>
@@ -19,22 +20,6 @@ impl<T> Automaton<T>
 where
     T: Hash + Ord,
 {
-    pub fn maximum_state(&self) -> State {
-        let max_final_state = self.final_states.iter().copied().max();
-        let max_table_state = self
-            .transitions
-            .iter()
-            .map(|(state_in, states_out)| {
-                let max_state_out =
-                    states_out.values().flatten().copied().max();
-                (*state_in).max(max_state_out.unwrap_or(State::MIN))
-            })
-            .max();
-        self.initial_state
-            .max(max_final_state.unwrap_or(State::MIN))
-            .max(max_table_state.unwrap_or(State::MIN))
-    }
-
     pub fn start(&self) -> Execution<T> {
         Execution {
             automaton: self,
@@ -94,18 +79,18 @@ where
 
 #[cfg(test)]
 pub(crate) mod test {
-    use super::Automaton;
+    use super::{Automaton, State};
     use std::collections::{BTreeSet, HashMap, HashSet};
 
     pub fn big_endian_binary_odd_automaton() -> Automaton<bool> {
         Automaton {
-            initial_state: 0,
-            final_states: HashSet::from([1]),
+            initial_state: State(0),
+            final_states: HashSet::from([State(1)]),
             transitions: HashMap::from([(
-                0,
+                State(0),
                 HashMap::from([
-                    (false, BTreeSet::from([0])),
-                    (true, BTreeSet::from([0, 1])),
+                    (false, BTreeSet::from([State(0)])),
+                    (true, BTreeSet::from([State(0), State(1)])),
                 ]),
             )]),
         }
@@ -113,26 +98,50 @@ pub(crate) mod test {
 
     pub fn palindrome_4bit_automaton() -> Automaton<bool> {
         Automaton {
-            initial_state: 0,
-            final_states: HashSet::from([4, 10]),
+            initial_state: State(0),
+            final_states: HashSet::from([State(4), State(10)]),
             transitions: HashMap::from([
                 (
-                    0,
+                    State(0),
                     HashMap::from([
-                        (false, BTreeSet::from([1, 5])),
-                        (true, BTreeSet::from([7, 11])),
+                        (false, BTreeSet::from([State(1), State(5)])),
+                        (true, BTreeSet::from([State(7), State(11)])),
                     ]),
                 ),
-                (1, HashMap::from([(false, BTreeSet::from([2]))])),
-                (2, HashMap::from([(false, BTreeSet::from([3]))])),
-                (3, HashMap::from([(false, BTreeSet::from([4]))])),
-                (5, HashMap::from([(true, BTreeSet::from([6]))])),
-                (6, HashMap::from([(true, BTreeSet::from([3]))])),
-                (7, HashMap::from([(false, BTreeSet::from([8]))])),
-                (8, HashMap::from([(false, BTreeSet::from([9]))])),
-                (9, HashMap::from([(true, BTreeSet::from([10]))])),
-                (11, HashMap::from([(true, BTreeSet::from([12]))])),
-                (12, HashMap::from([(true, BTreeSet::from([9]))])),
+                (
+                    State(1),
+                    HashMap::from([(false, BTreeSet::from([State(2)]))]),
+                ),
+                (
+                    State(2),
+                    HashMap::from([(false, BTreeSet::from([State(3)]))]),
+                ),
+                (
+                    State(3),
+                    HashMap::from([(false, BTreeSet::from([State(4)]))]),
+                ),
+                (State(5), HashMap::from([(true, BTreeSet::from([State(6)]))])),
+                (State(6), HashMap::from([(true, BTreeSet::from([State(3)]))])),
+                (
+                    State(7),
+                    HashMap::from([(false, BTreeSet::from([State(8)]))]),
+                ),
+                (
+                    State(8),
+                    HashMap::from([(false, BTreeSet::from([State(9)]))]),
+                ),
+                (
+                    State(9),
+                    HashMap::from([(true, BTreeSet::from([State(10)]))]),
+                ),
+                (
+                    State(11),
+                    HashMap::from([(true, BTreeSet::from([State(12)]))]),
+                ),
+                (
+                    State(12),
+                    HashMap::from([(true, BTreeSet::from([State(9)]))]),
+                ),
             ]),
         }
     }

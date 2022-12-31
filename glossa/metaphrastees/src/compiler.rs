@@ -121,7 +121,9 @@ where
                 }
             }
 
-            let dfa_states = self.nfa_to_dfa_set.get(&current_state).unwrap();
+            let dfa_states = self.nfa_to_dfa_set.get(&current_state).expect(
+                "handle nfa transitions must be called before dfa transitions",
+            );
             for dfa_state in dfa_states {
                 dfa_transitions.entry(*dfa_state).or_default().extend(
                     dfa_next_states.iter().map(|(key, value)| {

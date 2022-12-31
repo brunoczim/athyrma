@@ -88,12 +88,104 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     collections::{BTreeSet, HashMap, HashSet},
     hash::Hash,
 };
 
-<span class="kw">pub type </span>State = u128;
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>State(<span class="kw">pub </span>u128);
 
 <span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Automaton&lt;T&gt;
@@ -109,22 +201,6 @@
 <span class="kw">where
     </span>T: Hash + Ord,
 {
-    <span class="kw">pub fn </span>maximum_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
-        <span class="kw">let </span>max_final_state = <span class="self">self</span>.final_states.iter().copied().max();
-        <span class="kw">let </span>max_table_state = <span class="self">self
-            </span>.transitions
-            .iter()
-            .map(|(state_in, states_out)| {
-                <span class="kw">let </span>max_state_out =
-                    states_out.values().flatten().copied().max();
-                (<span class="kw-2">*</span>state_in).max(max_state_out.unwrap_or(State::MIN))
-            })
-            .max();
-        <span class="self">self</span>.initial_state
-            .max(max_final_state.unwrap_or(State::MIN))
-            .max(max_table_state.unwrap_or(State::MIN))
-    }
-
     <span class="kw">pub fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Execution&lt;T&gt; {
         Execution {
             automaton: <span class="self">self</span>,
@@ -141,7 +217,10 @@
         <span class="kw">for </span>symbol <span class="kw">in </span>input {
             execution.next(symbol);
         }
-        !execution.current_states().is_empty()
+        execution
+            .current_states()
+            .iter()
+            .any(|state| <span class="self">self</span>.final_states.contains(state))
     }
 }
 
@@ -176,6 +255,109 @@
                 }
             }
         }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{Automaton, State};
+    <span class="kw">use </span>std::collections::{BTreeSet, HashMap, HashSet};
+
+    <span class="kw">pub fn </span>big_endian_binary_odd_automaton() -&gt; Automaton&lt;bool&gt; {
+        Automaton {
+            initial_state: State(<span class="number">0</span>),
+            final_states: HashSet::from([State(<span class="number">1</span>)]),
+            transitions: HashMap::from([(
+                State(<span class="number">0</span>),
+                HashMap::from([
+                    (<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">0</span>)])),
+                    (<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">0</span>), State(<span class="number">1</span>)])),
+                ]),
+            )]),
+        }
+    }
+
+    <span class="kw">pub fn </span>palindrome_4bit_automaton() -&gt; Automaton&lt;bool&gt; {
+        Automaton {
+            initial_state: State(<span class="number">0</span>),
+            final_states: HashSet::from([State(<span class="number">4</span>), State(<span class="number">10</span>)]),
+            transitions: HashMap::from([
+                (
+                    State(<span class="number">0</span>),
+                    HashMap::from([
+                        (<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">1</span>), State(<span class="number">5</span>)])),
+                        (<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">7</span>), State(<span class="number">11</span>)])),
+                    ]),
+                ),
+                (
+                    State(<span class="number">1</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">2</span>)]))]),
+                ),
+                (
+                    State(<span class="number">2</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">3</span>)]))]),
+                ),
+                (
+                    State(<span class="number">3</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">4</span>)]))]),
+                ),
+                (State(<span class="number">5</span>), HashMap::from([(<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">6</span>)]))])),
+                (State(<span class="number">6</span>), HashMap::from([(<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">3</span>)]))])),
+                (
+                    State(<span class="number">7</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">8</span>)]))]),
+                ),
+                (
+                    State(<span class="number">8</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, BTreeSet::from([State(<span class="number">9</span>)]))]),
+                ),
+                (
+                    State(<span class="number">9</span>),
+                    HashMap::from([(<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">10</span>)]))]),
+                ),
+                (
+                    State(<span class="number">11</span>),
+                    HashMap::from([(<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">12</span>)]))]),
+                ),
+                (
+                    State(<span class="number">12</span>),
+                    HashMap::from([(<span class="bool-val">true</span>, BTreeSet::from([State(<span class="number">9</span>)]))]),
+                ),
+            ]),
+        }
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>binary_odd() {
+        <span class="kw">let </span>automaton = big_endian_binary_odd_automaton();
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>palindrome_4bit() {
+        <span class="kw">let </span>automaton = palindrome_4bit_automaton();
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]));
     }
 }
 </code></pre></div>

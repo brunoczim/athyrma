@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Automaton",""],["Execution",""],["UnrecognizedInput",""]],"type":[["State",""]]};
+window.SIDEBAR_ITEMS = {"struct":[["Automaton",""],["Execution",""],["State",""],["UnrecognizedInput",""]]};

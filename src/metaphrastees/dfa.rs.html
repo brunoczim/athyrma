@@ -104,13 +104,68 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     collections::{HashMap, HashSet},
     fmt,
     hash::Hash,
 };
 
-<span class="kw">pub type </span>State = u128;
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>State(<span class="kw">pub </span>u128);
 
 <span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 </span><span class="kw">pub struct </span>UnrecognizedInput;
@@ -135,21 +190,6 @@
 <span class="kw">where
     </span>T: Hash + Ord,
 {
-    <span class="kw">pub fn </span>maximum_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; State {
-        <span class="kw">let </span>max_final_state = <span class="self">self</span>.final_states.iter().copied().max();
-        <span class="kw">let </span>max_table_state = <span class="self">self
-            </span>.transitions
-            .iter()
-            .map(|(<span class="kw-2">&amp;</span>state_in, states_out)| {
-                <span class="kw">let </span>max_state_out = states_out.values().copied().max();
-                state_in.max(max_state_out.unwrap_or(State::MIN))
-            })
-            .max();
-        <span class="self">self</span>.initial_state
-            .max(max_final_state.unwrap_or(State::MIN))
-            .max(max_table_state.unwrap_or(State::MIN))
-    }
-
     <span class="kw">pub fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Execution&lt;T&gt; {
         Execution { automaton: <span class="self">self</span>, current_state: <span class="prelude-val">Ok</span>(<span class="self">self</span>.initial_state) }
     }
@@ -208,6 +248,74 @@
                 .copied()
                 .ok_or(UnrecognizedInput);
         }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{Automaton, State};
+    <span class="kw">use </span>std::collections::{HashMap, HashSet};
+
+    <span class="attribute">#[derive(
+        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash,
+    )]
+    </span><span class="kw">pub struct </span>Succ;
+
+    <span class="kw">pub fn </span>unary_odd_automaton() -&gt; Automaton&lt;Succ&gt; {
+        Automaton {
+            initial_state: State(<span class="number">0</span>),
+            final_states: HashSet::from([State(<span class="number">1</span>)]),
+            transitions: HashMap::from([
+                (State(<span class="number">0</span>), HashMap::from([(Succ, State(<span class="number">1</span>))])),
+                (State(<span class="number">1</span>), HashMap::from([(Succ, State(<span class="number">0</span>))])),
+            ]),
+        }
+    }
+
+    <span class="kw">pub fn </span>big_endian_binary_odd_automaton() -&gt; Automaton&lt;bool&gt; {
+        Automaton {
+            initial_state: State(<span class="number">0</span>),
+            final_states: HashSet::from([State(<span class="number">2</span>)]),
+            transitions: HashMap::from([
+                (
+                    State(<span class="number">0</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, State(<span class="number">1</span>)), (<span class="bool-val">true</span>, State(<span class="number">2</span>))]),
+                ),
+                (
+                    State(<span class="number">1</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, State(<span class="number">1</span>)), (<span class="bool-val">true</span>, State(<span class="number">2</span>))]),
+                ),
+                (
+                    State(<span class="number">2</span>),
+                    HashMap::from([(<span class="bool-val">false</span>, State(<span class="number">1</span>)), (<span class="bool-val">true</span>, State(<span class="number">2</span>))]),
+                ),
+            ]),
+        }
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>unary_odd() {
+        <span class="kw">let </span>automaton = unary_odd_automaton();
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[Succ]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[Succ, Succ]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[Succ, Succ, Succ]));
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>binary_odd() {
+        <span class="kw">let </span>automaton = big_endian_binary_odd_automaton();
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]));
+        <span class="macro">assert!</span>(!automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]));
+        <span class="macro">assert!</span>(automaton.test(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]));
     }
 }
 </code></pre></div>

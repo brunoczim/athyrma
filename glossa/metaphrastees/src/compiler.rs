@@ -1,44 +1,45 @@
 use crate::{dfa, nfa};
 use std::{
-    collections::{BTreeSet, HashMap, HashSet},
+    collections::{hash_map, BTreeSet, HashMap, HashSet},
+    fmt,
     hash::Hash,
 };
 
 pub fn nfa_to_dfa<T>(input: &nfa::Automaton<T>) -> dfa::Automaton<T>
 where
-    T: Hash + Ord + Clone,
+    T: Hash + Ord + Clone + fmt::Debug,
 {
     let mut compiler = NfaToDfa::new(input.initial_state);
-    compiler.handle_transitions(&input.transitions);
-    let final_states = compiler.final_states(&input.final_states);
-    let transitions = compiler.into_transitions();
-    dfa::Automaton { initial_state: 0, final_states, transitions }
+    compiler.process_nfa_transitions(&input.transitions);
+    let final_states = compiler.dfa_final_states(&input.final_states);
+    let transitions = compiler.dfa_transitions();
+    dfa::Automaton { initial_state: dfa::State(0), final_states, transitions }
 }
 
 #[derive(Debug)]
 struct NfaToDfa<'input, T>
 where
-    T: Hash + Ord + Clone,
+    T: Hash + Ord + Clone + fmt::Debug,
 {
     state_count: dfa::State,
     nfa_set_to_dfa: HashMap<&'input BTreeSet<nfa::State>, dfa::State>,
     nfa_to_dfa_set: HashMap<nfa::State, BTreeSet<dfa::State>>,
-    dfa_transitions: HashMap<dfa::State, HashMap<T, dfa::State>>,
+    transitions: HashMap<nfa::State, HashMap<&'input T, BTreeSet<dfa::State>>>,
 }
 
 impl<'input, T> NfaToDfa<'input, T>
 where
-    T: Hash + Ord + Clone,
+    T: Hash + Ord + Clone + fmt::Debug,
 {
     fn new(initial_nfa_state: nfa::State) -> Self {
         Self {
-            state_count: 1,
+            state_count: dfa::State(1),
             nfa_set_to_dfa: HashMap::new(),
             nfa_to_dfa_set: HashMap::from([(
                 initial_nfa_state,
-                BTreeSet::from([0]),
+                BTreeSet::from([dfa::State(0)]),
             )]),
-            dfa_transitions: HashMap::new(),
+            transitions: HashMap::new(),
         }
     }
 
@@ -46,21 +47,24 @@ where
         &mut self,
         nfa_set: &'input BTreeSet<nfa::State>,
     ) -> dfa::State {
-        let state = *self.nfa_set_to_dfa.entry(nfa_set).or_insert_with(|| {
-            let new_state = self.state_count;
-            self.state_count += 1;
-            new_state
-        });
+        let dfa_state =
+            *self.nfa_set_to_dfa.entry(nfa_set).or_insert_with(|| {
+                let new_state = self.state_count;
+                self.state_count.0 += 1;
+                new_state
+            });
 
-        self.nfa_to_dfa_set
-            .entry(state)
-            .or_default()
-            .extend(nfa_set.iter().copied());
+        for nfa_state in nfa_set {
+            self.nfa_to_dfa_set
+                .entry(*nfa_state)
+                .or_default()
+                .insert(dfa_state);
+        }
 
-        state
+        dfa_state
     }
 
-    fn handle_transitions(
+    pub(self) fn process_nfa_transitions(
         &mut self,
         transitions: &'input HashMap<
             nfa::State,
@@ -68,32 +72,34 @@ where
         >,
     ) {
         for (current_state, next_states) in transitions {
-            self.handle_transition_entry(*current_state, next_states);
+            self.process_nfa_transition_entry(*current_state, next_states);
         }
     }
 
-    fn handle_transition_entry(
+    fn process_nfa_transition_entry(
         &mut self,
         current_state: nfa::State,
         next_states: &'input HashMap<T, BTreeSet<nfa::State>>,
     ) {
-        let mut new_next_states = HashMap::new();
+        let mut mapped_next_states = HashMap::<_, BTreeSet<_>>::new();
         for (symbol, next_for_symbol) in next_states {
-            let new_state = self.nfa_set_to_dfa(next_for_symbol);
-            new_next_states.insert(symbol.clone(), new_state);
+            let dfa_state = self.nfa_set_to_dfa(next_for_symbol);
+            mapped_next_states.entry(symbol).or_default().insert(dfa_state);
         }
 
-        if let Some(dfa_states) = self.nfa_to_dfa_set.get(&current_state) {
-            for dfa_state in dfa_states {
-                self.dfa_transitions
-                    .insert(*dfa_state, new_next_states.clone());
-            }
-        }
+        match self.transitions.entry(current_state) {
+            hash_map::Entry::Occupied(mut entry) => {
+                entry.get_mut().extend(mapped_next_states);
+            },
+            hash_map::Entry::Vacant(entry) => {
+                entry.insert(mapped_next_states);
+            },
+        };
     }
 
-    fn final_states(
+    fn dfa_final_states(
         &self,
-        nfa_final_states: &HashSet<dfa::State>,
+        nfa_final_states: &HashSet<nfa::State>,
     ) -> HashSet<dfa::State> {
         let mut final_states = HashSet::new();
         for final_state in nfa_final_states {
@@ -104,7 +110,73 @@ where
         final_states
     }
 
-    fn into_transitions(self) -> HashMap<dfa::State, HashMap<T, dfa::State>> {
-        self.dfa_transitions
+    fn dfa_transitions(&self) -> HashMap<dfa::State, HashMap<T, dfa::State>> {
+        let mut dfa_transitions = HashMap::<_, HashMap<T, _>>::new();
+
+        for (current_state, next_states) in &self.transitions {
+            let mut dfa_next_states = HashMap::new();
+            for (symbol, next_for_symbol) in next_states {
+                for dfa_state in next_for_symbol {
+                    dfa_next_states.insert(symbol.clone(), dfa_state);
+                }
+            }
+
+            let dfa_states = self.nfa_to_dfa_set.get(&current_state).unwrap();
+            for dfa_state in dfa_states {
+                dfa_transitions.entry(*dfa_state).or_default().extend(
+                    dfa_next_states.iter().map(|(key, value)| {
+                        ((**key).clone(), (**value).clone())
+                    }),
+                );
+            }
+        }
+
+        dfa_transitions
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        compiler::nfa_to_dfa,
+        nfa::test::{
+            big_endian_binary_odd_automaton,
+            palindrome_4bit_automaton,
+        },
+    };
+
+    #[test]
+    fn binary_odd() {
+        let nfa_automaton = big_endian_binary_odd_automaton();
+        let dfa_automaton = nfa_to_dfa(&nfa_automaton);
+        assert!(!dfa_automaton.test(&[]));
+        assert!(!dfa_automaton.test(&[false]));
+        assert!(dfa_automaton.test(&[true]));
+        assert!(!dfa_automaton.test(&[false, false]));
+        assert!(dfa_automaton.test(&[false, true]));
+        assert!(!dfa_automaton.test(&[true, false]));
+        assert!(dfa_automaton.test(&[true, true]));
+        assert!(!dfa_automaton.test(&[false, true, false]));
+        assert!(dfa_automaton.test(&[false, false, true]));
+        assert!(!dfa_automaton.test(&[true, true, true, false]));
+        assert!(dfa_automaton.test(&[false, true, false, true]));
+    }
+
+    #[test]
+    fn palindrome_4bit() {
+        let nfa_automaton = palindrome_4bit_automaton();
+        let dfa_automaton = nfa_to_dfa(&nfa_automaton);
+        assert!(!dfa_automaton.test(&[]));
+        assert!(!dfa_automaton.test(&[false]));
+        assert!(!dfa_automaton.test(&[false, true]));
+        assert!(!dfa_automaton.test(&[false, false, true]));
+        assert!(!dfa_automaton.test(&[true, true, true, false]));
+        assert!(!dfa_automaton.test(&[false, false, true, true]));
+        assert!(!dfa_automaton.test(&[false, false, true, false]));
+        assert!(!dfa_automaton.test(&[true, false, true, false]));
+        assert!(dfa_automaton.test(&[false, true, true, false]));
+        assert!(dfa_automaton.test(&[false, false, false, false]));
+        assert!(dfa_automaton.test(&[true, true, true, true]));
+        assert!(dfa_automaton.test(&[true, false, false, true]));
     }
 }

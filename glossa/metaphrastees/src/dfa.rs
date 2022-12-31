@@ -4,7 +4,8 @@ use std::{
     hash::Hash,
 };
 
-pub type State = u128;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct State(pub u128);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UnrecognizedInput;
@@ -29,21 +30,6 @@ impl<T> Automaton<T>
 where
     T: Hash + Ord,
 {
-    pub fn maximum_state(&self) -> State {
-        let max_final_state = self.final_states.iter().copied().max();
-        let max_table_state = self
-            .transitions
-            .iter()
-            .map(|(&state_in, states_out)| {
-                let max_state_out = states_out.values().copied().max();
-                state_in.max(max_state_out.unwrap_or(State::MIN))
-            })
-            .max();
-        self.initial_state
-            .max(max_final_state.unwrap_or(State::MIN))
-            .max(max_table_state.unwrap_or(State::MIN))
-    }
-
     pub fn start(&self) -> Execution<T> {
         Execution { automaton: self, current_state: Ok(self.initial_state) }
     }
@@ -102,5 +88,73 @@ where
                 .copied()
                 .ok_or(UnrecognizedInput);
         }
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod test {
+    use super::{Automaton, State};
+    use std::collections::{HashMap, HashSet};
+
+    #[derive(
+        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash,
+    )]
+    pub struct Succ;
+
+    pub fn unary_odd_automaton() -> Automaton<Succ> {
+        Automaton {
+            initial_state: State(0),
+            final_states: HashSet::from([State(1)]),
+            transitions: HashMap::from([
+                (State(0), HashMap::from([(Succ, State(1))])),
+                (State(1), HashMap::from([(Succ, State(0))])),
+            ]),
+        }
+    }
+
+    pub fn big_endian_binary_odd_automaton() -> Automaton<bool> {
+        Automaton {
+            initial_state: State(0),
+            final_states: HashSet::from([State(2)]),
+            transitions: HashMap::from([
+                (
+                    State(0),
+                    HashMap::from([(false, State(1)), (true, State(2))]),
+                ),
+                (
+                    State(1),
+                    HashMap::from([(false, State(1)), (true, State(2))]),
+                ),
+                (
+                    State(2),
+                    HashMap::from([(false, State(1)), (true, State(2))]),
+                ),
+            ]),
+        }
+    }
+
+    #[test]
+    fn unary_odd() {
+        let automaton = unary_odd_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(automaton.test(&[Succ]));
+        assert!(!automaton.test(&[Succ, Succ]));
+        assert!(automaton.test(&[Succ, Succ, Succ]));
+    }
+
+    #[test]
+    fn binary_odd() {
+        let automaton = big_endian_binary_odd_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(automaton.test(&[true]));
+        assert!(!automaton.test(&[false, false]));
+        assert!(automaton.test(&[false, true]));
+        assert!(!automaton.test(&[true, false]));
+        assert!(automaton.test(&[true, true]));
+        assert!(!automaton.test(&[false, true, false]));
+        assert!(automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(automaton.test(&[false, true, false, true]));
     }
 }

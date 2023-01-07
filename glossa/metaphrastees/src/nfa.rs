@@ -41,6 +41,56 @@ where
             .iter()
             .any(|state| self.final_states.contains(state))
     }
+
+    pub fn merge(automatons: &[Self]) -> Self
+    where
+        T: Clone,
+    {
+        let initial_state = State(0);
+        let mut final_states = HashSet::new();
+        let mut transitions = HashMap::<_, HashMap<_, BTreeSet<_>>>::new();
+
+        let mut state_count = 1;
+        let mut state_mapping = vec![HashMap::new(); automatons.len()];
+        let mut make_state = || {
+            let new_state = State(state_count);
+            state_count += 1;
+            new_state
+        };
+
+        for (i, automaton) in automatons.iter().enumerate() {
+            state_mapping[i].insert(automaton.initial_state, initial_state);
+
+            for final_state in &automaton.final_states {
+                let new_final_state = *state_mapping[i]
+                    .entry(*final_state)
+                    .or_insert_with(&mut make_state);
+                final_states.insert(new_final_state);
+            }
+
+            for (current_state, next_states) in &automaton.transitions {
+                let new_current_state = *state_mapping[i]
+                    .entry(*current_state)
+                    .or_insert_with(&mut make_state);
+
+                let new_next_states =
+                    transitions.entry(new_current_state).or_default();
+
+                for (symbol, next_for_symbol) in next_states {
+                    let new_next_for_symbol =
+                        new_next_states.entry(symbol.clone()).or_default();
+                    for next_state in next_for_symbol {
+                        let new_next_state = *state_mapping[i]
+                            .entry(*next_state)
+                            .or_insert_with(&mut make_state);
+                        new_next_for_symbol.insert(new_next_state);
+                    }
+                }
+            }
+        }
+
+        Self { initial_state, final_states, transitions }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -146,6 +196,13 @@ pub(crate) mod test {
         }
     }
 
+    pub fn mreged_binary_odd_and_palindrome_automaton() -> Automaton<bool> {
+        Automaton::merge(&[
+            big_endian_binary_odd_automaton(),
+            palindrome_4bit_automaton(),
+        ])
+    }
+
     #[test]
     fn binary_odd() {
         let automaton = big_endian_binary_odd_automaton();
@@ -177,5 +234,33 @@ pub(crate) mod test {
         assert!(automaton.test(&[false, false, false, false]));
         assert!(automaton.test(&[true, true, true, true]));
         assert!(automaton.test(&[true, false, false, true]));
+    }
+
+    #[test]
+    fn merge() {
+        let automaton = mreged_binary_odd_and_palindrome_automaton();
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(automaton.test(&[true]));
+        assert!(!automaton.test(&[false, false]));
+        assert!(automaton.test(&[false, true]));
+        assert!(!automaton.test(&[true, false]));
+        assert!(automaton.test(&[true, true]));
+        assert!(!automaton.test(&[false, true, false]));
+        assert!(automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(automaton.test(&[false, true, false, true]));
+        assert!(!automaton.test(&[false]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(!automaton.test(&[false, false, true, false]));
+        assert!(!automaton.test(&[true, false, true, false]));
+        assert!(automaton.test(&[false, true, true, false]));
+        assert!(automaton.test(&[false, false, false, false]));
+        assert!(automaton.test(&[true, true, true, true]));
+        assert!(automaton.test(&[true, false, false, true]));
+        // This now works due to the merging
+        // assert!(!automaton.test(&[false, false, true]));
+        // assert!(!automaton.test(&[false, true]));
+        // assert!(!automaton.test(&[false, false, true, true]));
     }
 }

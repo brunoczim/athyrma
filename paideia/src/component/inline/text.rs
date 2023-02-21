@@ -211,7 +211,7 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.write_str("<a href=\"")?;
+        renderer.write_str("<a class=\"paideia-link\" href=\"")?;
         self.location.render(renderer, ctx)?;
         renderer.write_str("\">")?;
         self.target.render(renderer, ctx)?;

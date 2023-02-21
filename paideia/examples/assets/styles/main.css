@@ -1,8 +1,3 @@
-@font-face {
-    font-family: "Star Folk Alphabet";
-    src: url("../fonts/Star Folk Alphabet.ttf");
-}
-
 * {
     color: black;
     margin: 0;
@@ -34,102 +29,114 @@ html, body, #paideia-page-wrapper {
     border-left: solid 1pt #000000;
 }
 
-b.bold, b.bold * {
+.paideia-bold, .paideia-bold * {
     font-weight: bold;
 }
 
-i.italic, i.italic * {
+.paideia-italic, .paideia-italic * {
     font-style: italic;
 }
 
-ul {
+.paideia-unord-list, .paideia-ord-list {
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    margin-left: 20pt;
+    margin-right: 5pt;
+}
+
+.paideia-list-elem {
+    line-height: 1.5;
+}
+
+.paideia-unord-list {
     list-style: disc;
 }
 
-ol {
+.paideia-ord-list {
     list-style: decimal;
 }
 
-table {
+.paideia-table {
     border-collapse: collapse;
     border: 0;
     margin-bottom: 14pt;
 }
 
-td, th {
+.paideia-table-cell, .paideia-table-header {
     text-align: center;
     padding: 7pt;
     border: 1px solid black;
 }
 
-th {
+.paideia-table-header {
     font-weight: bold;
 }
 
-h1, h2 > a, h3 > a, h4 > a, h5 > a, h6 > a {
+.paideia-title-link {
     font-weight: bold;
 }
 
-h1 {
-    font-size: 200%;
-    padding-top: 20pt;
-    padding-bottom: 10pt;
-}
-
-h2 {
-    font-size: 175%;
-    padding-top: 16pt;
-    padding-bottom: 8pt;
-}
-
-h3 {
-    font-size: 140%;
-    padding-top: 14pt;
-    padding-bottom: 7pt;
-}
-
-h4 {
-    font-size: 122.5%;
-    padding-top: 12pt;
-    padding-bottom: 6pt;
-}
-
-h5 {
-    font-size: 115.5%;
-    padding-top: 10pt;
-    padding-bottom: 5pt;
-}
-
-h6 {
+.paideia-section > .paideia-title {
     font-size: 110%;
     padding-top: 8pt;
     padding-bottom: 4pt;
 }
 
-a.link, a.link * {
-    color: #003850;
+.paideia-section-3 > .paideia-title {
+    font-size: 115.5%;
+    padding-top: 10pt;
+    padding-bottom: 5pt;
 }
 
-a:hover {
+.paideia-section-2 > .paideia-title {
+    font-size: 122.5%;
+    padding-top: 12pt;
+    padding-bottom: 6pt;
+}
+
+.paideia-section-1 > .paideia-title {
+    font-size: 140%;
+    padding-top: 14pt;
+    padding-bottom: 7pt;
+}
+
+.paideia-section-0 > .paideia-title {
+    font-size: 175%;
+    padding-top: 16pt;
+    padding-bottom: 8pt;
+}
+
+#paideia-page-top > .paideia-title {
+    font-size: 200%;
+    padding-top: 20pt;
+    padding-bottom: 10pt;
+}
+
+
+.paideia-link, .paideia-link * {
+    color: #4493F7;
+}
+
+.paideia-link:hover {
     text-decoration: underline;
 }
 
-a.link:visited {
-    color: #00214B;
+.paideia-link:visited, .paideia-link:visited * {
+    color: #4C87D0;
 }
 
-p {
+.paideia-paragraph {
     text-indent: 14pt;
     text-align: justify;
     margin-bottom: 5pt;
     line-height: 1.25;
 }
 
-p:last-child {
+.paideia-paragraph:last-child {
     margin-bottom: 0;
 }
 
-img {
+.paideia-image {
     max-width: 500pt;
     max-height: 98vh;
     width: 100%;
@@ -145,15 +152,4 @@ img {
 
 .paideia-figure-legend {
     margin: 2pt;
-}
-
-ul, ol {
-    margin-top: 10pt;
-    margin-bottom: 10pt;
-    margin-left: 20pt;
-    margin-right: 5pt;
-}
-
-li {
-    line-height: 1.5;
 }

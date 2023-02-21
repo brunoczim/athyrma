@@ -131,7 +131,7 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.write_str("<ul class=\"paideia-ulist\">")?;
+        renderer.write_str("<ul class=\"paideia-unord-list\">")?;
         for element in self.0.iter() {
             renderer.write_str("<li class=\"paideia-list-elem\">")?;
             element.render(renderer, ctx)?;
@@ -304,7 +304,7 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> fmt::Result {
-        renderer.write_str("<ol class=\"paideia-olist\">")?;
+        renderer.write_str("<ol class=\"paideia-ord-list\">")?;
         for element in self.0.iter() {
             renderer.write_str("<li class=\"paideia-list-elem\">")?;
             element.render(renderer, ctx)?;

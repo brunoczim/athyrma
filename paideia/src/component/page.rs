@@ -207,7 +207,8 @@ where
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str(
             "</title></head><body><div id=\"paideia-page-top\" ><h1 \
-             class=\"paideia-title\"><a href=\"#paideia-page-root\">",
+             class=\"paideia-title\"><a class=\"paideia-title-link\" \
+             href=\"#paideia-page-root\">",
         )?;
         self.title.render(renderer, ctx.with_kind(&InlineComponent))?;
         write!(

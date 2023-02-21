@@ -212,7 +212,7 @@ where
                 path: ctx.location().clone(),
                 id: Some(id.clone()),
             });
-            renderer.write_str("<a href=\"")?;
+            renderer.write_str("<a class=\"paideia-title-link\" href=\"")?;
             location.render(renderer, ctx.with_kind(&InlineComponent))?;
             renderer.write_str("\">")?;
         }

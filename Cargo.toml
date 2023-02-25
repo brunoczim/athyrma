@@ -4,6 +4,7 @@ members = [
     "./katalogos",
     "./paideia",
     "./diakritikos",
+    "./zographia",
     "./glossa",
     "./glossa/phonetikos",
     "./glossa/phonologia",

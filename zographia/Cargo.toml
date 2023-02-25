@@ -1,0 +1,28 @@
+[package]
+name = "zographia"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wasm-bindgen = "^0.2.84"
+js-sys = "^0.3.61"
+gardiz = "^0.1.1"
+
+[dependencies.web-sys]
+version = "^0.3.61"
+features = [
+    "Window",
+    "Document",
+    "CssStyleDeclaration",
+    "Element",
+    "HtmlElement",
+    "HtmlCanvasElement",
+]
+
+[dependencies.webio]
+git = "https://github.com/brunoczim/webio"
+features = [
+    "time",
+    "macros",
+    "event",
+]

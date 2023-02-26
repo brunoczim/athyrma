@@ -1,5 +1,5 @@
 use core::fmt;
-use gardiz::coord::Vec2;
+use gardiz::{axis::Axis, coord::Vec2};
 use std::{cell::Cell, error::Error, num::ParseIntError, rc::Rc};
 use wasm_bindgen::{JsCast, UnwrapThrowExt};
 use web_sys::{HtmlCanvasElement, HtmlElement, UiEvent, Window};
@@ -8,7 +8,9 @@ use webio::{
     event::{self, EventType},
 };
 
-pub type Coord = u32;
+pub type IntCoord = u32;
+
+pub type FracCoord = f64;
 
 #[derive(Debug, Clone, Copy)]
 pub enum ResizeStrategy {
@@ -42,8 +44,10 @@ impl Canvas {
 
         parent.append_with_node_1(&element).unwrap_throw();
 
+        let default_size = Vec2 { x: 400, y: 300 };
         let inner = Rc::new(CanvasInner {
-            logical_size: Cell::new(Vec2 { x: 400, y: 300 }),
+            logical_size: Cell::new(default_size),
+            display_size: Cell::new(default_size),
             parent,
             element,
             window: window.clone(),
@@ -64,19 +68,19 @@ impl Canvas {
         Self { inner, events }
     }
 
-    pub fn logical_size(&self) -> Vec2<Coord> {
+    pub fn logical_size(&self) -> Vec2<IntCoord> {
         self.inner.logical_size()
     }
 
-    pub fn set_logical_size(&self, size: Vec2<Coord>) {
+    pub fn set_logical_size(&self, size: Vec2<IntCoord>) {
         self.inner.set_logical_size(size);
     }
 
-    pub fn display_size(&self) -> Vec2<Coord> {
+    pub fn display_size(&self) -> Vec2<IntCoord> {
         self.inner.display_size()
     }
 
-    pub fn set_display_size(&self, size: Vec2<Coord>) {
+    pub fn set_display_size(&self, size: Vec2<IntCoord>) {
         self.inner.set_display_size(size)
     }
 
@@ -88,18 +92,27 @@ impl Canvas {
         self.inner.set_resize_strategy(resize_strategy);
     }
 
-    pub fn force_display_size(&self, size: Vec2<Coord>) {
+    pub fn force_display_size(&self, size: Vec2<IntCoord>) {
         self.inner.force_display_size(size);
     }
 
-    pub async fn on_window_resize(&self) -> Result<UiEvent, Cancelled> {
+    pub fn translate_coord(&self, axis: Axis, input: IntCoord) -> FracCoord {
+        self.inner.translate_coord(axis, input)
+    }
+
+    pub fn translate_vec2(&self, input: Vec2<IntCoord>) -> Vec2<FracCoord> {
+        self.inner.translate_vec2(input)
+    }
+
+    pub async fn on_resize(&self) -> Result<UiEvent, Cancelled> {
         self.events.on_window_resize.listen_next().await
     }
 }
 
 #[derive(Debug)]
 struct CanvasInner {
-    logical_size: Cell<Vec2<Coord>>,
+    logical_size: Cell<Vec2<IntCoord>>,
+    display_size: Cell<Vec2<IntCoord>>,
     resize_strategy: Cell<ResizeStrategy>,
     parent: HtmlElement,
     element: HtmlCanvasElement,
@@ -107,19 +120,20 @@ struct CanvasInner {
 }
 
 impl CanvasInner {
-    fn logical_size(&self) -> Vec2<Coord> {
+    fn logical_size(&self) -> Vec2<IntCoord> {
         self.logical_size.get()
     }
 
-    fn set_logical_size(&self, size: Vec2<Coord>) {
+    fn set_logical_size(&self, size: Vec2<IntCoord>) {
         self.logical_size.set(size)
     }
 
-    fn display_size(&self) -> Vec2<Coord> {
-        Vec2 { x: self.element.width(), y: self.element.height() }
+    fn display_size(&self) -> Vec2<IntCoord> {
+        self.display_size.get()
     }
 
-    fn set_display_size(&self, size: Vec2<Coord>) {
+    fn set_display_size(&self, size: Vec2<IntCoord>) {
+        self.display_size.set(size);
         self.element.set_width(size.x);
         self.element.set_height(size.y);
     }
@@ -132,12 +146,24 @@ impl CanvasInner {
         self.resize_strategy.set(resize_strategy);
     }
 
-    fn force_display_size(&self, size: Vec2<Coord>) {
+    fn force_display_size(&self, size: Vec2<IntCoord>) {
         self.set_resize_strategy(ResizeStrategy::NoResize);
         self.set_display_size(size);
     }
 
-    fn parent_display_size(&self) -> Vec2<Coord> {
+    fn translate_coord(&self, axis: Axis, input: IntCoord) -> FracCoord {
+        let display_size = self.display_size();
+        let logical_size = self.logical_size();
+        FracCoord::from(display_size[axis])
+            / FracCoord::from(logical_size[axis])
+            * FracCoord::from(input)
+    }
+
+    fn translate_vec2(&self, input: Vec2<IntCoord>) -> Vec2<FracCoord> {
+        input.map_with_axes(|axis, coord| self.translate_coord(axis, coord))
+    }
+
+    fn parent_display_size(&self) -> Vec2<IntCoord> {
         let mut size = Vec2 {
             x: u32::try_from(self.parent.client_width()).unwrap_throw(),
             y: u32::try_from(self.parent.client_height()).unwrap_throw(),
@@ -235,7 +261,7 @@ impl Error for ParseComputedPxError {
     }
 }
 
-fn parse_computed_px(input: &str) -> Result<Coord, ParseComputedPxError> {
+fn parse_computed_px(input: &str) -> Result<IntCoord, ParseComputedPxError> {
     match input.split_once("px") {
         Some((head, "")) => {
             head.parse().map_err(ParseComputedPxError::IntParseError)

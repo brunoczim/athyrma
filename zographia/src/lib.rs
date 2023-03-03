@@ -270,3 +270,45 @@ fn parse_computed_px(input: &str) -> Result<IntCoord, ParseComputedPxError> {
         None => Err(ParseComputedPxError::MissingPx),
     }
 }
+
+#[cfg(test)]
+pub mod test {
+    use crate::Canvas;
+    use wasm_bindgen::{JsCast, UnwrapThrowExt};
+    use web_sys::{Document, HtmlDivElement, HtmlElement};
+
+    #[derive(Debug)]
+    pub struct TestableCanvas {
+        pub canvas: Canvas,
+        parent: HtmlDivElement,
+    }
+
+    impl TestableCanvas {
+        pub fn new() -> Self {
+            let window = web_sys::window().unwrap_throw();
+            let document = window.document().unwrap_throw();
+            let body = document.body().unwrap_throw();
+            let parent = document
+                .create_element("div")
+                .unwrap_throw()
+                .dyn_into::<HtmlDivElement>()
+                .unwrap_throw();
+
+            body.style().set_property("width", "100%").unwrap_throw();
+            body.style().set_property("padding", "0").unwrap_throw();
+            body.style().set_property("margin", "0").unwrap_throw();
+            parent.style().set_property("width", "100%").unwrap_throw();
+            parent.style().set_property("padding", "0").unwrap_throw();
+            parent.style().set_property("margin", "0").unwrap_throw();
+
+            Self { canvas: Canvas::new(body), parent }
+        }
+    }
+
+    impl Drop for TestableCanvas {
+        fn drop(&mut self) {}
+    }
+
+    #[webio::test]
+    async fn resize_correctly() {}
+}

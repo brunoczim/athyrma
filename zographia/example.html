@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Example</title>
+    </head>
+    <body>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+            }
+            html, body, #root {
+                width: 100%;
+                height: 100%;
+            }
+            #root {
+                background-color: gray;
+            }
+            #parent {
+                margin: 100px;
+                width: fit-content;
+                height: min-content;
+                background-color: blue;
+                width: 100%;
+                height: 100%;
+            }
+            #canvas {
+                background-color: black;
+            }
+        </style>
+        <div id="root">
+            <div id="parent">
+                <canvas id="canvas" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </body>
+</html>

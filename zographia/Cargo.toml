@@ -17,6 +17,7 @@ features = [
     "Element",
     "HtmlElement",
     "HtmlCanvasElement",
+    "HtmlDivElement",
 ]
 
 [dependencies.webio]
@@ -26,3 +27,6 @@ features = [
     "macros",
     "event",
 ]
+
+[dev-dependencies]
+wasm-bindgen-test = "^0.3.34"

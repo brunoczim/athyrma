@@ -7,7 +7,7 @@ var sourcesIndex = JSON.parse('{\
 "idna":["",[],["lib.rs","punycode.rs","uts46.rs"]],\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs"]]],["arbitrary.rs","equivalent.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
 "katalogos":["",[],["coproduct.rs","lib.rs"]],\
-"metaphrastees":["",[],["compiler.rs","dfa.rs","lib.rs","nfa.rs"]],\
+"metaphrastees":["",[],["compiler.rs","dfa.rs","em_nfa.rs","lib.rs","nfa.rs"]],\
 "paideia":["",[["component",[["block",[],["list.rs","media.rs","table.rs","text.rs"]],["inline",[],["media.rs","text.rs"]]],["asset.rs","block.rs","inline.rs","page.rs","section.rs"]],["render",[],["common_text.rs","html.rs","markdown.rs","text.rs"]]],["component.rs","lib.rs","location.rs","render.rs","site.rs"]],\
 "percent_encoding":["",[],["lib.rs"]],\
 "phonetikos":["",[],["consonant.rs","diacritic.rs","lib.rs","vowel.rs"]],\

@@ -1,4 +1,4 @@
-use crate::finite_automaton::{Enumerable, FiniteAutomaton};
+use crate::{finite_automaton::FiniteAutomaton, symbol::ToIndex};
 use core::fmt;
 use std::{
     collections::{hash_map, hash_set, HashMap, HashSet},
@@ -70,7 +70,7 @@ struct StateTable {
 
 impl StateTable {
     fn new() -> Self {
-        Self { counter: 0, map: HashMap::new() }
+        Self { counter: 1, map: HashMap::from([(State::INITIAL, 0)]) }
     }
 }
 
@@ -154,7 +154,7 @@ where
         }
     }
 
-    pub fn try_final_state(
+    pub fn try_add_final_state(
         &mut self,
         state: State,
     ) -> Result<&mut Self, BuildError> {
@@ -163,8 +163,8 @@ where
         Ok(self)
     }
 
-    pub fn final_state(&mut self, state: State) -> &mut Self {
-        match self.try_final_state(state) {
+    pub fn add_final_state(&mut self, state: State) -> &mut Self {
+        match self.try_add_final_state(state) {
             Ok(this) => this,
             Err(error) => panic_build_error(error),
         }
@@ -207,7 +207,7 @@ where
         IterFinalStates { inner: self.final_states.iter() }
     }
 
-    fn drop_useless_transitions(&mut self) {
+    pub fn drop_useless_transitions(&mut self) -> ReachableStates {
         let mut reachable = HashSet::new();
         let mut branches = vec![State::INITIAL];
 
@@ -223,9 +223,13 @@ where
 
         self.transitions.drain_filter(|_, next_states| {
             next_states
-                .drain_filter(|_, next_state| reachable.contains(&next_state));
-            next_states.len() > 0
+                .drain_filter(|_, next_state| !reachable.contains(&next_state));
+            next_states.len() == 0
         });
+
+        self.final_states.drain_filter(|state| !reachable.contains(&state));
+
+        ReachableStates { count: reachable.len(), inner: reachable.into_iter() }
     }
 
     pub fn build_small(mut self) -> SmallAutomaton<T> {
@@ -235,7 +239,6 @@ where
         state_table.map(State::INITIAL);
 
         let mut automaton = SmallAutomaton {
-            state_count: 0,
             transitions: HashMap::new(),
             final_states: HashSet::new(),
         };
@@ -252,34 +255,37 @@ where
             }
         }
 
-        automaton.state_count = state_table.counter;
+        automaton.final_states.extend(
+            self.final_states.iter().map(|state| state_table.map(*state)),
+        );
+
         automaton
     }
 }
 
 impl<T> Builder<T>
 where
-    T: Hash + Eq + Enumerable,
+    T: Hash + Eq + ToIndex,
 {
     pub fn build_fast(mut self) -> FastAutomaton<T> {
-        self.drop_useless_transitions();
+        let reachable = self.drop_useless_transitions();
         let mut state_table = StateTable::new();
-        state_table.map(State::INITIAL);
 
-        let words = FastAutomaton::<T>::words(
-            usize::try_from(self.state_counter.0).expect("too much states"),
-        );
+        let words = FastAutomaton::<T>::words(reachable.total_count());
         let mut automaton = FastAutomaton {
             transitions: vec![usize::MAX; words],
             _marker: PhantomData,
         };
 
+        for state in reachable {
+            let new_state = state_table.map(state);
+            let index = FastAutomaton::<T>::entry_final_state(new_state);
+            let is_final = self.final_states.contains(&state);
+            automaton.transitions[index] = usize::from(is_final);
+        }
+
         for (current_state, next_states) in self.transitions {
             let new_current = state_table.map(current_state);
-            let index = FastAutomaton::<T>::entry_final_state(new_current);
-            let is_final = self.final_states.contains(&current_state);
-            automaton.transitions[index] = usize::from(is_final);
-
             for (symbol, next_state) in next_states {
                 let new_next = state_table.map(next_state);
                 let index =
@@ -345,7 +351,27 @@ impl<'builder> Iterator for IterFinalStates<'builder> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
+pub struct ReachableStates {
+    count: usize,
+    inner: hash_set::IntoIter<State>,
+}
+
+impl ReachableStates {
+    pub fn total_count(&self) -> usize {
+        self.count
+    }
+}
+
+impl Iterator for ReachableStates {
+    type Item = State;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner.next()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FastAutomaton<T> {
     transitions: Vec<usize>,
     _marker: PhantomData<T>,
@@ -353,14 +379,14 @@ pub struct FastAutomaton<T> {
 
 impl<T> FastAutomaton<T>
 where
-    T: Enumerable,
+    T: ToIndex,
 {
     fn entry_size() -> usize {
-        1 + T::count()
+        1 + T::COUNT
     }
 
     fn entry_start(index: usize) -> usize {
-        Self::entry_size() + index
+        Self::entry_size() * index
     }
 
     fn words(state_count: usize) -> usize {
@@ -378,7 +404,7 @@ where
 
 impl<T> FiniteAutomaton<T> for FastAutomaton<T>
 where
-    T: Enumerable,
+    T: ToIndex,
 {
     fn test<'item, I>(&self, input: I) -> bool
     where
@@ -408,6 +434,18 @@ pub struct SmallAutomaton<T> {
     final_states: HashSet<usize>,
 }
 
+impl<T> PartialEq for SmallAutomaton<T>
+where
+    T: Hash + Eq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.transitions == other.transitions
+            && self.final_states == other.final_states
+    }
+}
+
+impl<T> Eq for SmallAutomaton<T> where T: Hash + Eq {}
+
 impl<T> FiniteAutomaton<T> for SmallAutomaton<T>
 where
     T: Hash + Eq,
@@ -433,5 +471,111 @@ where
         }
 
         self.final_states.contains(&current_state)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{Builder, State};
+    use crate::{
+        finite_automaton::FiniteAutomaton,
+        symbol::{Countable, FromIndex, ToIndex},
+    };
+
+    #[derive(
+        Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash,
+    )]
+    pub struct Succ;
+
+    impl Countable for Succ {
+        const COUNT: usize = 1;
+    }
+
+    impl ToIndex for Succ {
+        fn to_index(&self) -> usize {
+            0
+        }
+    }
+
+    impl FromIndex for Succ {
+        fn from_index(_index: usize) -> Self {
+            Self
+        }
+    }
+
+    fn unary_odd_builder() -> Builder<Succ> {
+        let mut builder = Builder::new();
+        let states = [State::INITIAL, builder.gen_state()];
+
+        builder
+            .transition(states[0], Succ, states[1])
+            .transition(states[1], Succ, states[0])
+            .add_final_state(states[1]);
+
+        builder
+    }
+
+    fn binary_odd_builder() -> Builder<bool> {
+        let mut builder = Builder::new();
+        let states = [State::INITIAL, builder.gen_state(), builder.gen_state()];
+        builder
+            .transition(states[0], false, states[1])
+            .transition(states[0], true, states[2])
+            .transition(states[1], false, states[1])
+            .transition(states[1], true, states[2])
+            .transition(states[2], false, states[1])
+            .transition(states[2], true, states[2])
+            .add_final_state(states[2]);
+        builder
+    }
+
+    #[test]
+    fn unary_odd_fast() {
+        let automaton = unary_odd_builder().build_fast();
+        assert!(!automaton.test(&[]));
+        assert!(automaton.test(&[Succ]));
+        assert!(!automaton.test(&[Succ, Succ]));
+        assert!(automaton.test(&[Succ, Succ, Succ]));
+    }
+
+    #[test]
+    fn unary_odd_small() {
+        let automaton = dbg!(unary_odd_builder().build_small());
+        assert!(!automaton.test(&[]));
+        assert!(automaton.test(&[Succ]));
+        assert!(!automaton.test(&[Succ, Succ]));
+        assert!(automaton.test(&[Succ, Succ, Succ]));
+    }
+
+    #[test]
+    fn binary_odd_fast() {
+        let automaton = binary_odd_builder().build_fast();
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(automaton.test(&[true]));
+        assert!(!automaton.test(&[false, false]));
+        assert!(automaton.test(&[false, true]));
+        assert!(!automaton.test(&[true, false]));
+        assert!(automaton.test(&[true, true]));
+        assert!(!automaton.test(&[false, true, false]));
+        assert!(automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(automaton.test(&[false, true, false, true]));
+    }
+
+    #[test]
+    fn binary_odd_small() {
+        let automaton = dbg!(binary_odd_builder().build_small());
+        assert!(!automaton.test(&[]));
+        assert!(!automaton.test(&[false]));
+        assert!(automaton.test(&[true]));
+        assert!(!automaton.test(&[false, false]));
+        assert!(automaton.test(&[false, true]));
+        assert!(!automaton.test(&[true, false]));
+        assert!(automaton.test(&[true, true]));
+        assert!(!automaton.test(&[false, true, false]));
+        assert!(automaton.test(&[false, false, true]));
+        assert!(!automaton.test(&[true, true, true, false]));
+        assert!(automaton.test(&[false, true, false, true]));
     }
 }

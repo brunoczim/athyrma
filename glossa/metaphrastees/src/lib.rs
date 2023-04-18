@@ -1,7 +1,7 @@
 #![feature(hash_drain_filter)]
 
+pub mod symbol;
 pub mod finite_automaton;
-
 pub mod dfa;
 
 /*
